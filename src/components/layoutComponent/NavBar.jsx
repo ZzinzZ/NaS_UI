@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import InputBase from "@mui/material/InputBase";
@@ -23,15 +23,25 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
-import Cookies from 'js-cookie';
-import { useDispatch } from 'react-redux';
-import { logout } from '@/redux/slices/AuthSlice'; // Giả sử bạn có một action để xóa token
+import Cookies from "js-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/redux/slices/AuthSlice";
+import { getProfile } from "@/redux/thunks/profileThunk";
+import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
+import { usePathname } from "next/navigation";
 
 const NavBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [popoverId, setPopoverId] = useState(null);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
+  const path = usePathname();
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const { profileData, isLoading, error } = useSelector(
+    (state) => state.profile
+  );
+  
+
 
   const handlePopoverOpen = (event, id) => {
     setAnchorEl(event.currentTarget);
@@ -55,12 +65,18 @@ const NavBar = () => {
     dispatch(logout());
     handleUserMenuClose();
   };
-  const handleNavProfile = () => {
-
-  }
 
   const open = Boolean(anchorEl);
   const userMenuOpen = Boolean(userMenuAnchorEl);
+
+  useEffect(() => {
+    console.log("user", user);
+    if (!user) {
+      Cookies.remove("token");
+    } else if (user?._id) {
+      dispatch(getProfile(user._id));
+    }
+  }, [user]);
 
   return (
     <AppBar
@@ -69,7 +85,7 @@ const NavBar = () => {
       sx={{ height: "3.75rem", top: 0, zIndex: 3, background: "#ffff" }}
     >
       <Toolbar>
-        <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
+        <Link href="/user" style={{ color: "inherit", textDecoration: "none" }}>
           <Image
             src="/NA_logo.jpg"
             alt="NaSocial"
@@ -87,12 +103,19 @@ const NavBar = () => {
             <Stack className="nav-page" direction="row" spacing={2}>
               <Button
                 className="nav-page-button current-page"
-                aria-owns={open && popoverId === "home" ? "mouse-over-popover-home" : undefined}
+                aria-owns={
+                  open && popoverId === "home"
+                    ? "mouse-over-popover-home"
+                    : undefined
+                }
                 onMouseEnter={(e) => handlePopoverOpen(e, "home")}
                 onMouseLeave={handlePopoverClose}
               >
-                <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
-                  <HomeOutlinedIcon sx={{ color: "#686b68", fontSize: 30 }} />
+                <Link
+                  href="/user"
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
+                  <HomeOutlinedIcon sx={{ color: path === "/user" ? "#1978ca" : "#686b68" , fontSize: 30 }} />
                 </Link>
               </Button>
               <Popover
@@ -105,16 +128,25 @@ const NavBar = () => {
                 onClose={handlePopoverClose}
                 disableRestoreFocus
               >
-                <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>Home</Typography>
+                <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>
+                  Home
+                </Typography>
               </Popover>
 
               <Button
                 className="nav-page-button"
-                aria-owns={open && popoverId === "friends" ? "mouse-over-popover-friends" : undefined}
+                aria-owns={
+                  open && popoverId === "friends"
+                    ? "mouse-over-popover-friends"
+                    : undefined
+                }
                 onMouseEnter={(e) => handlePopoverOpen(e, "friends")}
                 onMouseLeave={handlePopoverClose}
               >
-                <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
+                <Link
+                  href="/"
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
                   <GroupOutlinedIcon sx={{ color: "#686b68", fontSize: 30 }} />
                 </Link>
               </Button>
@@ -128,16 +160,25 @@ const NavBar = () => {
                 onClose={handlePopoverClose}
                 disableRestoreFocus
               >
-                <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>Friends</Typography>
+                <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>
+                  Friends
+                </Typography>
               </Popover>
 
               <Button
                 className="nav-page-button"
-                aria-owns={open && popoverId === "groups" ? "mouse-over-popover-groups" : undefined}
+                aria-owns={
+                  open && popoverId === "groups"
+                    ? "mouse-over-popover-groups"
+                    : undefined
+                }
                 onMouseEnter={(e) => handlePopoverOpen(e, "groups")}
                 onMouseLeave={handlePopoverClose}
               >
-                <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
+                <Link
+                  href="/"
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
                   <GroupsIcon sx={{ color: "#686b68", fontSize: 30 }} />
                 </Link>
               </Button>
@@ -151,16 +192,25 @@ const NavBar = () => {
                 onClose={handlePopoverClose}
                 disableRestoreFocus
               >
-                <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>Groups</Typography>
+                <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>
+                  Groups
+                </Typography>
               </Popover>
 
               <Button
                 className="nav-page-button"
-                aria-owns={open && popoverId === "chat" ? "mouse-over-popover-chat" : undefined}
+                aria-owns={
+                  open && popoverId === "chat"
+                    ? "mouse-over-popover-chat"
+                    : undefined
+                }
                 onMouseEnter={(e) => handlePopoverOpen(e, "chat")}
                 onMouseLeave={handlePopoverClose}
               >
-                <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
+                <Link
+                  href="/"
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
                   <MessageIcon sx={{ color: "#686b68", fontSize: 30 }} />
                 </Link>
               </Button>
@@ -174,7 +224,9 @@ const NavBar = () => {
                 onClose={handlePopoverClose}
                 disableRestoreFocus
               >
-                <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>Chat</Typography>
+                <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>
+                  Chat
+                </Typography>
               </Popover>
             </Stack>
 
@@ -185,7 +237,7 @@ const NavBar = () => {
                 </Badge>
               </div>
               <IconButton onClick={handleUserMenuOpen} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="images.jpg"/>
+                <Avatar alt="AVATAR" src={profileData.avatar ? profileData.avatar?.content.media[0].media_url : USER_AVATAR_ORIGINAL} />
               </IconButton>
               <Menu
                 anchorEl={userMenuAnchorEl}
@@ -194,7 +246,15 @@ const NavBar = () => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                 transformOrigin={{ vertical: "top", horizontal: "center" }}
               >
-                <MenuItem><Link href="/user/profile" style={{ textDecoration: 'none', color:"#000" }}>Profile</Link></MenuItem>
+                <MenuItem>
+                  <Link
+                    href={`/user/profile?id=${user?._id}`}
+                    style={{ textDecoration: "none", color: "#000" }}
+                    onClick={() => handleUserMenuClose()}
+                  >
+                    Profile
+                  </Link>
+                </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </Stack>

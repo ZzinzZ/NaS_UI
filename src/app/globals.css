@@ -1,16 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
-*{
+@import url('https://fonts.googleapis.com/css2?family=Grey+Qo&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sankofa+Display&display=swap');
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   color: #000000;
-  font-family: "Nunito", sans-serif;
-  background: rgb(238, 238, 238);
+  font-family: "Poppins", sans-serif !important;
+  background: #f1f2f6;
 }
-/* ------------------------------------ Nav Bar ------------------------------------------- */
+
+
+/* ------------------------------------ General ------------------------------------------- */
 .loading {
   --speed-of-animation: 0.9s;
   --gap: 6px;
@@ -25,44 +28,62 @@ body {
   width: 100px;
   gap: 6px;
   height: 100px;
- }
- 
- .loading span {
+}
+
+.loading span {
   width: 4px;
   height: 50px;
   background: var(--first-color);
   animation: scale var(--speed-of-animation) ease-in-out infinite;
- }
- 
- .loading span:nth-child(2) {
+}
+
+.loading span:nth-child(2) {
   background: var(--second-color);
   animation-delay: -0.8s;
- }
- 
- .loading span:nth-child(3) {
+}
+
+.loading span:nth-child(3) {
   background: var(--third-color);
   animation-delay: -0.7s;
- }
- 
- .loading span:nth-child(4) {
+}
+
+.loading span:nth-child(4) {
   background: var(--fourth-color);
   animation-delay: -0.6s;
- }
- 
- .loading span:nth-child(5) {
+}
+
+.loading span:nth-child(5) {
   background: var(--fifth-color);
   animation-delay: -0.5s;
- }
- 
- @keyframes scale {
-  0%, 40%, 100% {
-   transform: scaleY(0.05);
+}
+
+@keyframes scale {
+
+  0%,
+  40%,
+  100% {
+    transform: scaleY(0.05);
   }
- 
+
   20% {
-   transform: scaleY(1);
+    transform: scaleY(1);
   }
- }
+}
+
+.link-button {
+  text-decoration: none !important;
+  color: #656567;
+}
+.left-text-button {
+  width: 100%;
+  display: flex !important;
+  text-align: start !important;
+  align-items: start !important;
+}
+.note-small-text {
+  color: #656567;
+  font-size: 0.8rem !important;
+}
 
 /* ------------------------------------ Nav Bar ------------------------------------------- */
 .App-logo {
@@ -73,12 +94,14 @@ body {
   border: 1px solid #cccccc79;
   box-shadow: 1px 1px 3px rgba(96, 96, 96, 0.5);
 }
-.nav-container{
-  display: flex ;
+
+.nav-container {
+  display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.nav-search{
+
+.nav-search {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,16 +113,20 @@ body {
   height: 2.5rem;
   transition: 0.2s ease-in-out;
 }
+
 .nav-search-input {
-  flex: 1; 
+  flex: 1;
 }
+
 .nav-search-input:focus {
-  outline: none; 
+  outline: none;
 }
 
 .nav-search:focus-within {
-  width: 20rem; /* Increase width on focus */
-  border: 1px solid #027df84e;;
+  width: 20rem;
+  /* Increase width on focus */
+  border: 1px solid #027df84e;
+  ;
 }
 
 .user-logged {
@@ -107,34 +134,45 @@ body {
   height: 2.5rem;
   border-radius: 50%;
   padding: 0;
-  overflow: hidden; 
+  overflow: hidden;
   display: flex;
-  align-items: center; 
-  justify-content: center; 
+  align-items: center;
+  justify-content: center;
   box-shadow: 1px 1px 3px rgba(96, 96, 96, 0.5);
 }
 
 .user-logged-avt {
   width: 2.5rem;
   height: 2.5rem;
-  object-fit: cover; 
-  border-radius: 50%; 
+  object-fit: cover;
+  border-radius: 50%;
   box-shadow: 1px 1px 3px rgba(96, 96, 96, 0.5);
 }
-.nav-user-feat{
+
+.nav-user-feat {
   display: flex;
   align-items: center;
 }
 
-.nav-page-button{
+.nav-page-button {
   width: 6rem;
   height: 2.5rem;
 }
 
 .current-page {
-  background: #f3fbff;
-  border-bottom: 2px solid #027ef8;
+  background: #f3fbff !important;
 }
+.current-page::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #027ef8;
+  border-radius: 2px;
+}
+
 .nav-notification-button {
   display: flex;
   align-items: center;
@@ -153,46 +191,85 @@ body {
 }
 
 /*-------------------------------Login-register--------------------------------------*/
-@keyframes gradientBackground {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
+
 
 .auth-background {
-  background: linear-gradient(270deg, #2f8e67, #5aeeff, #40dcff, #9d82ff);
+  background: linear-gradient(45deg, black 50%, #1976D3 50%) !important;
   background-size: 800% 800%;
-  animation: gradientBackground 13s ease infinite;
   height: 100vh;
 }
+
 .login-form {
-  background-color: #00000042;
+  position: relative;
+  background-color: #ffffff;
+  width: 35rem;
+  height: 30rem;
   padding: 2rem;
   border-radius: 1rem;
-  color: #ffffff;
   border: 1px solid #ebebeb5a;
-  box-shadow: rgba(255, 255, 255, 0.548) 1px 5px 15px 0px;
+  box-shadow: rgba(110, 110, 110, 0.548) 1px 5px 15px 0px;
 }
-.register-form{
-  background-color: #0000003c;
-  padding: 2rem;
-  width: 50vw;
+
+.login-form::after {
+  content: "MAKE IT SIMPLE";
+  position: absolute;
+  bottom: 1.5rem;
+  left: -3rem;
+  width: 6rem;
+  height: 90%;
+  background: white ;
   border-radius: 1rem;
-  color: #ffffff;
+  box-shadow: rgba(110, 110, 110, 0.548) 1px 2px 2px 0px;
+  z-index: 3;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  writing-mode: vertical-rl;
+  text-align: center;
+  font-size: 1.8rem;
+  color: #1976D3;
+  font-weight: 600;
+  letter-spacing: 0.7rem;
+}
+
+.register-form {
+  position: relative;
+  background-color: #ffffff;
+  width: 38rem;
+  height: 35rem;
+  padding: 2rem;
+  border-radius: 1rem;
   border: 1px solid #ebebeb5a;
-  box-shadow: rgba(255, 255, 255, 0.548) 1px 5px 15px 0px;
-  
+  box-shadow: rgba(110, 110, 110, 0.548) 1px 5px 15px 0px;
+}
+
+.register-form::after {
+  content: "MAKE IT SIMPLE";
+  position: absolute;
+  bottom: 1.5rem;
+  left: -3rem;
+  width: 6rem;
+  height: 90%;
+  background: white ;
+  border-radius: 1rem;
+  box-shadow: rgba(110, 110, 110, 0.548) 1px 2px 2px 0px;
+  z-index: 3;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  writing-mode: vertical-rl;
+  text-align: center;
+  font-size: 1.8rem;
+  color: #1976D3;
+  font-weight: 600;
+  letter-spacing: 0.7rem;
 }
 
 .otp-Form {
-  width: 230px;
-  height: 300px;
+  width: 17rem;
+  height: 20rem;
   background-color: rgb(255, 255, 255);
   display: flex;
   flex-direction: column;
@@ -225,6 +302,7 @@ body {
   gap: 10px;
   align-items: center;
   justify-content: center;
+  padding: 0 1rem !important;
 }
 
 .otp-input {
@@ -250,8 +328,8 @@ body {
   width: 100%;
   height: 30px;
   border: none;
-  background: #1976d3;
-  color: white;
+  background: #1976d3 !important;
+  color: white !important;
   font-weight: 600;
   cursor: pointer;
   border-radius: 10px;
@@ -338,3 +416,58 @@ body {
   right: 0.2rem;
   border: 2px solid white;
 }
+
+/*-----------------------------Profile page------------------------------*/
+.grey-profile-button {
+  outline: none !important;
+  background: #e5e4ea !important;
+  border: none !important;
+  color: #000000 !important;
+  box-shadow: 0 1px 2px rgba(75, 75, 75, 0.82);
+
+}
+
+.choose-avt {
+  color: #000000 !important;
+  background: #acaaad !important;
+  border-radius: 50% !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border: 2px solid #ffffff !important;
+  position: absolute;
+  top: 8rem;
+  left: -3rem;
+}
+
+.profile-background-gradient::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #00000000, #ffffffd7, #ffffff);
+  backdrop-filter: blur(35px);
+}
+
+.tab-navigation {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: #64686b;
+  text-transform: capitalize !important;
+}
+.profile-edit-background-button {
+  background: #ffffff !important;
+}
+.create-post-box-button {
+  flex: 1 !important;
+  text-transform: capitalize !important;
+  color: #656565 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+}
+
+.button-comment:hover{
+  background-color: #f1f2f6 !important;
+}
+
