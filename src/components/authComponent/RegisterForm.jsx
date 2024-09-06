@@ -133,7 +133,8 @@ const RegisterForm = () => {
     switch (step) {
       case 0:
         return (
-          <TextField
+          <Stack spacing={2}>
+            <TextField
             type="email"
             label="Email"
             name="email"
@@ -142,23 +143,7 @@ const RegisterForm = () => {
             value={formData.email}
             onChange={handleChange}
           />
-        );
-      case 1:
-        return (
           <TextField
-            type="text"
-            label="Name"
-            name="name"
-            variant="outlined"
-            fullWidth
-            value={formData.name}
-            onChange={handleChange}
-          />
-        );
-      case 2:
-        return (
-          <>
-            <TextField
               type={showPassword ? "text" : "password"}
               label="Password"
               name="password"
@@ -202,6 +187,24 @@ const RegisterForm = () => {
                 ),
               }}
             />
+          </Stack>
+        );
+      case 1:
+        return (
+          <TextField
+            type="text"
+            label="Name"
+            name="name"
+            variant="outlined"
+            fullWidth
+            value={formData.name}
+            onChange={handleChange}
+          />
+        );
+      case 2:
+        return (
+          <>
+            
           </>
         );
       default:

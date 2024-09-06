@@ -8,18 +8,17 @@ import ThemeProviderWarp from "@/components/provider/ThemeProvider";
 import Localization from "@/components/provider/LocalizationProvider";
 
 const inter = Inter({ subsets: ["latin"] });
-const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-};
+// const viewport = {
+//   width: "device-width",
+//   initialScale: 1,
+//   maximumScale: 1,
+// };
 export const metadata = {
   title: "NaS",
   description: "Make it simple",
   icons: {
     icon: "/NA_logo.jpg",
   },
-  viewport,
 };
 function RootLayout({ children }) {
   return (
