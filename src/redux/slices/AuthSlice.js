@@ -1,17 +1,16 @@
 "use client";
-
 import { createSlice } from "@reduxjs/toolkit";
-import { login } from "../thunks/authThunk";
-import { refreshToken } from "../thunks/authThunk";
 import Cookies from 'js-cookie';
+import { registerUser, login, refreshToken } from "../thunks/authThunk";
+import { resetProfile } from "./profileSlice";
 
-const authSlice = createSlice({
+const AuthSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
     error: null,
     loading: false,
-    token: null
+    token: Cookies.get('token') || null
   },
   reducers: {
     logout: (state) => {
@@ -19,7 +18,11 @@ const authSlice = createSlice({
       state.error = null;
       state.loading = false;
       state.token = null;
+      console.log("remove token and logout");
+      
       Cookies.remove('token'); 
+      Cookies.remove('refreshToken'); 
+      resetProfile();
     },
     setToken: (state, action) => {
       state.token = action.payload;
@@ -33,22 +36,30 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.user = action.payload.user || null;
+        state.token = action.payload.token || null;
+        resetProfile();
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.error = action.payload;
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
-        state.token = action.payload.token;
+        state.token = action.payload.data.token;
       })
       .addCase(refreshToken.rejected, (state, action) => {
         state.error = action.payload;
-      })
+        console.log("refresh error:",action.payload);
+      });
   }
-})
+});
 
-export const { logout, setToken } = authSlice.actions;
-export default authSlice.reducer;
-
+export const { logout, setToken } = AuthSlice.actions;
+export default AuthSlice.reducer;

@@ -12,11 +12,6 @@ const RegisterSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-        state.success = false;
-      })
       .addCase(registerUser.fulfilled, (state) => {
         state.isLoading = false;
         state.success = true;
