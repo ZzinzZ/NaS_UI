@@ -1,35 +1,21 @@
-import axios from "axios";
+"use client";
+import apiClient from "./apiClient";
 
-export const baseUrl = "http://localhost:5000/api/v1";
+export const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const postRequest = async (url, body) => {
-  const user = JSON.parse(localStorage.getItem("User"));
-  const token = user?.token;
-  const response = await axios({
-    method: "POST",
-    url,
-    data: body,
-    headers: {
-      ...(token && { "x-auth-token": token }),
-      "Content-Type": "application/json",
-    },
-  });
-  return response.data;
+  try {
+    const response = await apiClient.post(url, body);
+    return response.data;
+  } catch (error) {
+    console.error("Error making POST request:", error);
+    throw error;
+  }
 };
 
 export const getRequest = async (url) => {
-  const user = JSON.parse(localStorage.getItem("User"));
-  const token = user?.token;
-
   try {
-    const response = await axios({
-      method: "GET",
-      url,
-      headers: {
-        ...(token && { "x-auth-token": token }),
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await apiClient.get(url);
     return response.data;
   } catch (error) {
     console.error("Error making GET request:", error);
@@ -38,30 +24,31 @@ export const getRequest = async (url) => {
 };
 
 export const putRequest = async (url, body) => {
-  const user = JSON.parse(localStorage.getItem("User"));
-  const token = user?.token;
-  const response = await axios({
-    method: "PUT",
-    url,
-    data: body,
-    headers: {
-      ...(token && { "x-auth-token": token }),
-      "Content-Type": "application/json",
-    },
-  });
-  return response.data;
+  try {
+    const response = await apiClient.put(url, body);
+    return response.data;
+  } catch (error) {
+    console.error("Error making PUT request:", error);
+    throw error;
+  }
 };
 
+export const patchRequest = async (url, body) => {
+  try {
+    const response = await apiClient.patch(url, body);
+    return response.data;
+  } catch (error) {
+    console.error("Error making PATCH request:", error);
+    throw error;
+  }
+}
+
 export const deleteRequest = async (url) => {
-  const user = JSON.parse(localStorage.getItem("User"));
-  const token = user?.token;
-  const response = await axios({
-    method: "DELETE",
-    url,
-    headers: {
-      ...(token && { "x-auth-token": token }),
-      "Content-Type": "application/json",
-    },
-  });
-  return response.data;
+  try {
+    const response = await apiClient.delete(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error making DELETE request:", error);
+    throw error;
+  }
 };
