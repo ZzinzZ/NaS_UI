@@ -10,6 +10,7 @@ body {
   color: #000000;
   font-family: "Poppins", sans-serif !important;
   background: #f1f2f6;
+  padding: 0 !important;
 }
 
 
@@ -85,48 +86,14 @@ body {
   font-size: 0.8rem !important;
 }
 
+
+
 /* ------------------------------------ Nav Bar ------------------------------------------- */
 .App-logo {
   padding: 0.2rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
-  border: 1px solid #cccccc79;
-  box-shadow: 1px 1px 3px rgba(96, 96, 96, 0.5);
-}
-
-.nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-search {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: -0.2rem 0 0 0;
-  border-radius: 2rem;
-  padding: 0.15rem 0.5rem;
-  border: 1px solid #a5a5a579;
-  width: 10rem;
-  height: 2.5rem;
-  transition: 0.2s ease-in-out;
-}
-
-.nav-search-input {
-  flex: 1;
-}
-
-.nav-search-input:focus {
-  outline: none;
-}
-
-.nav-search:focus-within {
-  width: 20rem;
-  /* Increase width on focus */
-  border: 1px solid #027df84e;
-  ;
 }
 
 .user-logged {
@@ -155,22 +122,17 @@ body {
 }
 
 .nav-page-button {
-  width: 6rem;
+  width: 4.5rem;
   height: 2.5rem;
 }
 
 .current-page {
-  background: #f3fbff !important;
+  background: #ffffffca !important;
+  
 }
-.current-page::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #027ef8;
-  border-radius: 2px;
+
+.current-page-icon {
+  color: #1976D3 !important;
 }
 
 .nav-notification-button {
@@ -217,7 +179,7 @@ body {
   left: -3rem;
   width: 6rem;
   height: 90%;
-  background: white ;
+  background: #1976D3 ;
   border-radius: 1rem;
   box-shadow: rgba(110, 110, 110, 0.548) 1px 2px 2px 0px;
   z-index: 3;
@@ -228,7 +190,7 @@ body {
   writing-mode: vertical-rl;
   text-align: center;
   font-size: 1.8rem;
-  color: #1976D3;
+  color: #fff;
   font-weight: 600;
   letter-spacing: 0.7rem;
 }
@@ -236,8 +198,8 @@ body {
 .register-form {
   position: relative;
   background-color: #ffffff;
-  width: 38rem;
-  height: 35rem;
+  width: 35rem;
+  height: 33rem;
   padding: 2rem;
   border-radius: 1rem;
   border: 1px solid #ebebeb5a;
@@ -251,7 +213,7 @@ body {
   left: -3rem;
   width: 6rem;
   height: 90%;
-  background: white ;
+  background: #1976D3 ;
   border-radius: 1rem;
   box-shadow: rgba(110, 110, 110, 0.548) 1px 2px 2px 0px;
   z-index: 3;
@@ -259,10 +221,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  writing-mode: vertical-rl;
+  writing-mode: vertical-lr;
   text-align: center;
   font-size: 1.8rem;
-  color: #1976D3;
+  color: #fff;
   font-weight: 600;
   letter-spacing: 0.7rem;
 }
@@ -376,6 +338,8 @@ body {
   font-size: 1.1em;
   font-weight: 700;
 }
+
+
 
 /*-------------------------------Chats--------------------------------------*/
 

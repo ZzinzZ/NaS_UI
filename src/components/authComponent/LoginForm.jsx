@@ -69,7 +69,7 @@ const LoginForm = () => {
                 <Typography sx={{ fontWeight: 600, fontSize: "1.2rem"}}>Welcome to </Typography>
                 <Stack direction="row" alignItems="center">
                   <Typography sx={{ color: "#1976D3", fontWeight: 700, fontSize: "1.2rem"}}>N</Typography>
-                  <Typography sx={{ color: "#1976D3", fontWeight: 700, fontSize: "1.2rem"}}>A</Typography>
+                  <Typography sx={{ fontWeight: 700, fontSize: "1.2rem"}}>A</Typography>
                 </Stack>
                 <Typography sx={{ fontWeight: 600, fontSize: "1.2rem"}}>Social</Typography>
               </Stack>

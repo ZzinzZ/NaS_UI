@@ -43,9 +43,12 @@ export const patchRequest = async (url, body) => {
   }
 }
 
-export const deleteRequest = async (url) => {
+export const deleteRequest = async (url, body) => {
+  console.log("body", body);
   try {
-    const response = await apiClient.delete(url);
+    const response = await apiClient.delete(url, {
+      data: body, 
+    });
     return response.data;
   } catch (error) {
     console.error("Error making DELETE request:", error);

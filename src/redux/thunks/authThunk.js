@@ -13,7 +13,7 @@ export const registerUser = createAsyncThunk(
       const response = await postRequest(`${baseUrl}/users/register`, userData);
       return response.data;
     } catch (error) {
-      toast.error(`Failed to register: ${error.message}`);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.message);
     }
   }
@@ -34,8 +34,7 @@ export const login = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(`Failed to login: ${error.message}`);
-      console.error("Login error:", error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.message);
     }
   }

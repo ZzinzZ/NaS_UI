@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -13,111 +13,123 @@ import {
 } from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
 import LockIcon from "@mui/icons-material/Lock";
-import { addProfileExperience, editProfileExperience } from "@/utils/services/profileService/profileDetails";
+import { addProfileEducation, editProfileEducation } from "@/utils/services/profileService/profileDetails";
 import { useSearchParams } from "next/navigation";
 
-const WorkplaceForm = ({ initialData, onSave, onCancel }) => {
+const EducationForm = ({ initialData, onSave, onCancel }) => {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
 
-  const [workplaceData, setWorkplaceData] = useState(
-    initialData || {
-      company: "",
-      position: "",
-      from: null,
-      to: null,
-      status: true,
+  const [educationData, setEducationData] = useState({
+    school: "",
+    from: "",
+    to: "",
+    status: true,
+  });
+  const [isCurrent, setIsCurrent] = useState(true);
+
+  // Đồng bộ dữ liệu ban đầu
+  useEffect(() => {
+    if (initialData) {
+      setEducationData({
+        school: initialData.school || "",
+        from: initialData.from || "",
+        to: initialData.to || "",
+        status: initialData.status ?? true,
+      });
+      setIsCurrent(!initialData.to); // Kiểm tra xem có 'to' hay không để cập nhật trạng thái isCurrent
     }
-  );
-  const [isCurrent, setIsCurrent] = useState(initialData?.to ? false : true);
+  }, [initialData]);
 
   const handleChange = (e) => {
-    setWorkplaceData({
-      ...workplaceData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setEducationData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const handleCheckboxChange = (e) => {
-    setIsCurrent(e.target.checked);
+    const checked = e.target.checked;
+    setIsCurrent(checked);
+
+    if (checked) {
+      setEducationData((prevState) => ({
+        ...prevState,
+        to: "", // Xóa giá trị 'to' khi checkbox được chọn
+      }));
+    }
   };
 
   const handleSubmit = async () => {
     let responseData;
+
+    // Nếu có initialData, gọi API để chỉnh sửa thông tin
     if (initialData) {
-      responseData = await editProfileExperience({
+      responseData = await editProfileEducation({
         userId,
-        experienceId: initialData._id,
-        company: workplaceData.company,
-        position: workplaceData.position,
-        status: workplaceData.status,
-        start: workplaceData.from,
-        end: isCurrent ? null : workplaceData.to,
+        educationId: initialData._id,
+        school: educationData.school,
+        from: educationData.from,
+        to: isCurrent ? null : educationData.to,
+        status: educationData.status,
       });
     } else {
+      // Thêm thông tin mới
       if (!isCurrent) {
-        responseData = await addProfileExperience({
+        responseData = await addProfileEducation({
           userId,
-          company: workplaceData.company,
-          position: workplaceData.position,
-          status: workplaceData.status,
-          start: workplaceData.from,
-          end: workplaceData.to,
+          school: educationData.school,
+          from: educationData.from,
+          to: educationData.to,
+          status: educationData.status,
         });
       } else {
-        responseData = await addProfileExperience({
+        responseData = await addProfileEducation({
           userId,
-          company: workplaceData.company,
-          position: workplaceData.position,
-          status: workplaceData.status,
-          start: workplaceData.from,
+          school: educationData.school,
+          from: educationData.from,
+          status: educationData.status,
         });
       }
     }
+
     if (responseData) {
-      onSave(responseData); 
+      onSave(responseData); // Trả về dữ liệu sau khi hoàn tất
     }
   };
 
   return (
     <Box>
       <TextField
-        label="Company"
-        name="company"
-        value={workplaceData?.company}
+        label="School"
+        name="school"
+        value={educationData.school}
         onChange={handleChange}
         fullWidth
         margin="normal"
-      />
-      <TextField
-        label="Position"
-        name="position"
-        value={workplaceData?.position}
-        onChange={handleChange}
-        fullWidth
-        margin="normal"
+        required
       />
       <FormControlLabel
-        control={
-          <Checkbox checked={isCurrent} onChange={handleCheckboxChange} />
-        }
-        label="I currently work here"
+        control={<Checkbox checked={isCurrent} onChange={handleCheckboxChange} />}
+        label="Currently Studying"
       />
       <Stack direction="row" spacing={2}>
         <TextField
           label="From (year)"
           name="from"
-          value={workplaceData.from}
+          value={educationData.from}
           onChange={handleChange}
           fullWidth
           margin="normal"
           type="number"
+          required
         />
         {!isCurrent && (
           <TextField
             label="To (year)"
             name="to"
-            value={workplaceData.to}
+            value={educationData.to}
             onChange={handleChange}
             fullWidth
             margin="normal"
@@ -133,10 +145,12 @@ const WorkplaceForm = ({ initialData, onSave, onCancel }) => {
         >
           <FormControl sx={{ minWidth: 120 }}>
             <Select
-              labelId="status-label"
-              value={workplaceData.status}
+              value={educationData.status}
               onChange={(e) =>
-                setWorkplaceData({ ...workplaceData, status: e.target.value })
+                setEducationData((prevState) => ({
+                  ...prevState,
+                  status: e.target.value,
+                }))
               }
             >
               <MenuItem value={true}>
@@ -168,4 +182,4 @@ const WorkplaceForm = ({ initialData, onSave, onCancel }) => {
   );
 };
 
-export default WorkplaceForm;
+export default EducationForm;
