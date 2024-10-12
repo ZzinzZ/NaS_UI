@@ -12,11 +12,10 @@ import {
   Tab,
   Menu,
   MenuItem,
+  useMediaQuery,
 } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import AvatarGroup from "@mui/material/AvatarGroup";
-import EditIcon from "@mui/icons-material/Edit";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import ChatIcon from "@mui/icons-material/Chat";
@@ -24,6 +23,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import VisuallyHiddenInput from "../generals/VisuallyHiddenInput";
+import { useTheme } from "@mui/material/styles";
 import {
   acceptFriendRequest,
   getProfile,
@@ -33,10 +33,12 @@ import {
   updateAvatar,
   updateBackground,
 } from "@/redux/thunks/profileThunk";
-import { showLoading, hideLoading } from "@/redux/slices/LoadingSlice";
 import FriendOverView from "./FriendOverView";
 import { toast } from "react-toastify";
-import { USER_AVATAR_ORIGINAL, USER_BACKGROUND_ORIGINAL } from "@/config/profileConfig";
+import {
+  USER_AVATAR_ORIGINAL,
+  USER_BACKGROUND_ORIGINAL,
+} from "@/config/profileConfig";
 
 const ProfileHeader = ({ user, profile, listFriend }) => {
   const router = useRouter();
@@ -47,14 +49,24 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
   const { profileData } = useSelector((state) => state.profile);
   const [isOtherProfile, setIsOtherProfile] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
   const [avatar, setAvatar] = useState(null);
   const [isRequesting, setIsRequesting] = useState(false);
   const [isRequested, setIsRequested] = useState(false);
   const [responseAnchorEl, setResponseAnchorEl] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [friendMenuAnchorEl, setFriendMenuAnchorEl] = useState(null);
   const [hoveredFriend, setHoveredFriend] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const handleViewMoreClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
 
   useEffect(() => {
     if (user && profile) {
@@ -84,7 +96,6 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
   };
 
   const handleSendRequest = async () => {
-    dispatch(showLoading());
     try {
       await dispatch(
         sendFriendRequest({ receptionId: userId, senderId: user?._id })
@@ -92,13 +103,10 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
       setIsRequesting(true);
     } catch (error) {
       console.error(error);
-    } finally {
-      dispatch(hideLoading());
     }
   };
 
   const handleRemoveRequest = async () => {
-    dispatch(showLoading());
     try {
       dispatch(
         removeFriendRequest({ receiverId: userId, senderId: user?._id })
@@ -106,17 +114,7 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
       setIsRequesting(false);
     } catch (error) {
       console.error(error);
-    } finally {
-      dispatch(hideLoading());
     }
-  };
-
-  const openMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const closeMenu = () => {
-    setAnchorEl(null);
   };
 
   const openResponseMenu = (event) => {
@@ -128,7 +126,6 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
   };
 
   const handleAcceptRequest = async () => {
-    dispatch(showLoading());
     try {
       await dispatch(
         acceptFriendRequest({ receiverId: user?._id, senderId: userId })
@@ -137,21 +134,16 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
       closeResponseMenu();
     } catch (error) {
       console.error(error);
-    } finally {
-      dispatch(hideLoading());
     }
   };
 
   const handleRejectRequest = () => {
-    dispatch(showLoading());
     try {
       dispatch(
         rejectFriendRequest({ receiverId: user?._id, senderId: userId })
       );
     } catch (error) {
       toast.error(error);
-    } finally {
-      dispatch(hideLoading());
     }
     setIsRequested(false);
     closeResponseMenu();
@@ -169,16 +161,11 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
   const handleAvatarChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      dispatch(showLoading());
       try {
-        await dispatch(
-          updateAvatar({ userId: user?._id, avatarFile: file })
-        );
+        await dispatch(updateAvatar({ userId: user?._id, avatarFile: file }));
         await dispatch(getProfile(user?._id));
       } catch (error) {
         console.log(error);
-      } finally {
-        dispatch(hideLoading());
       }
     }
   };
@@ -186,7 +173,6 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
   const handleBackgroundChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      dispatch(showLoading());
       try {
         await dispatch(
           updateBackground({ userId: user?._id, backgroundFile: file })
@@ -194,19 +180,19 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
         await dispatch(getProfile(user?._id));
       } catch (error) {
         console.log(error);
-      } finally {
-        dispatch(hideLoading());
       }
     }
   };
 
   const avatarUrl = isOtherProfile
-  ? profile?.avatar?.content?.media[0]?.media_url || USER_AVATAR_ORIGINAL
-  : profileData?.avatar?.content?.media[0]?.media_url || USER_AVATAR_ORIGINAL;
+    ? profile?.avatar?.content?.media[0]?.media_url || USER_AVATAR_ORIGINAL
+    : profileData?.avatar?.content?.media[0]?.media_url || USER_AVATAR_ORIGINAL;
 
   const backgroundUrl = isOtherProfile
-  ? profile?.background?.content?.media[0]?.media_url || USER_BACKGROUND_ORIGINAL
-  : profileData?.background?.content?.media[0]?.media_url || USER_BACKGROUND_ORIGINAL;
+    ? profile?.background?.content?.media[0]?.media_url ||
+      USER_BACKGROUND_ORIGINAL
+    : profileData?.background?.content?.media[0]?.media_url ||
+      USER_BACKGROUND_ORIGINAL;
 
   return (
     <>
@@ -215,9 +201,7 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
           sx={{
             position: "relative",
             height: "300px",
-            background: `url(${
-              backgroundUrl
-            }) no-repeat center center/cover`,
+            background: `url(${backgroundUrl}) no-repeat center center/cover`,
           }}
           className="profile-background-gradient"
         >
@@ -228,9 +212,7 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                 borderEndEndRadius: "0.4rem",
                 borderBottomLeftRadius: "0.4rem",
                 height: "300px",
-                background: `url(${
-                  backgroundUrl
-                }) no-repeat center center/cover`,
+                background: `url(${backgroundUrl}) no-repeat center center/cover`,
               }}
             >
               {!isOtherProfile && (
@@ -241,13 +223,13 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                   startIcon={<CameraAltIcon />}
                   sx={{
                     position: "absolute",
-                    bottom: "20px",
+                    bottom: { xs: "40px", sm: "30px", md: "20px" },
                     right: "20px",
                     color: "black",
                   }}
                   className="profile-edit-background-button"
                 >
-                  Edit background
+                  <Typography sx={{display: { xs: "none", sm: "block", md: "block" }}}>Edit background</Typography>
                   <VisuallyHiddenInput
                     type="file"
                     onChange={handleBackgroundChange}
@@ -257,14 +239,18 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
             </Box>
           </Container>
         </Box>
-        <Container maxWidth="content" sx={{ mt: -3}}>
+        <Container maxWidth="content" sx={{ mt: -3 }}>
           <Stack
-            direction="row"
+            direction={{ xs: "column", sm: "column", md: "row" }}
             alignItems="center"
             justifyContent="space-between"
             spacing={2}
           >
-            <Stack direction="row" alignItems="center" spacing={2}>
+            <Stack
+              direction={{ xs: "column", sm: "column", md: "row" }}
+              alignItems="center"
+              spacing={2}
+            >
               <Stack direction="row">
                 <Avatar
                   alt={user.name}
@@ -291,7 +277,8 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
               <Stack
                 direction="column"
                 alignItems="start"
-                justifyContent="start"
+                justifyContent={{ xs: "center", sm: "center", md: "start" }}
+                sx={{ textAlign: { xs: "center", sm: "center", md: "start" } }}
               >
                 <Typography
                   variant="h4"
@@ -299,60 +286,73 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                 >
                   {profile?.userName}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: "600",
-                    fontSize: "1rem",
-                    color: "#797372",
-                    padding: "0.5rem 0",
-                  }}
+                <Stack
+                  justifyContent={{ xs: "center", sm: "center", md: "start" }}
+                  alignItems={{ xs: "center", sm: "center", md: "start" }}
+                  sx={{ width: "100%" }}
                 >
-                  {profile?.friends?.length} friends
-                </Typography>
-                <AvatarGroup
-                  total={profile?.friends?.length}
-                  max={7}
-                  sx={{
-                    "& .MuiAvatarGroup-avatar": {
-                      fontSize: 14,
-                      width: 30,
-                      height: 30,
-                    },
-                  }}
-                >
-                  {listFriend?.map((friend, index) => (
-                    <Box
-                      key={index}
-                      onMouseEnter={(event) => handleFriendHover(event, friend)}
-                      onMouseLeave={closeFriendMenu}
-                    >
-                      <Menu
-                        anchorEl={friendMenuAnchorEl}
-                        open={Boolean(
-                          friendMenuAnchorEl && hoveredFriend === friend
-                        )}
-                        onClose={closeFriendMenu}
-                        anchorOrigin={{
-                          vertical: "top",
-                          horizontal: "center",
-                        }}
-                        transformOrigin={{
-                          vertical: "bottom",
-                          horizontal: "center",
-                        }}
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: "600",
+                      fontSize: "1rem",
+                      color: "#797372",
+                      padding: "0.5rem 0",
+                      textAlign: { xs: "center", sm: "center", md: "start" },
+                    }}
+                  >
+                    {profile?.friends?.length} friends
+                  </Typography>
+                  <AvatarGroup
+                    total={profile?.friends?.length}
+                    max={7}
+                    sx={{
+                      "& .MuiAvatarGroup-avatar": {
+                        fontSize: 14,
+                        width: 30,
+                        height: 30,
+                      },
+                    }}
+                  >
+                    {listFriend?.map((friend, index) => (
+                      <Box
+                        key={index}
+                        onMouseEnter={(event) =>
+                          handleFriendHover(event, friend)
+                        }
+                        onMouseLeave={closeFriendMenu}
                       >
-                        <FriendOverView profile={friend} />
-                      </Menu>
-                      <Avatar
-                        alt={friend.name}
-                        src={friend?.avatar ? friend.avatar?.content?.media[0].media_url : USER_AVATAR_ORIGINAL}
-                        sx={{ width: 30, height: 30 }}
-                      />
-                      
-                    </Box>
-                  ))}
-                </AvatarGroup>
+                        <Menu
+                          anchorEl={friendMenuAnchorEl}
+                          open={Boolean(
+                            friendMenuAnchorEl && hoveredFriend === friend
+                          )}
+                          onClose={closeFriendMenu}
+                          anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "center",
+                          }}
+                          transformOrigin={{
+                            vertical: "bottom",
+                            horizontal: "center",
+                          }}
+                          disableScrollLock={true}
+                        >
+                          <FriendOverView profile={friend} />
+                        </Menu>
+                        <Avatar
+                          alt={friend.name}
+                          src={
+                            friend?.avatar
+                              ? friend.avatar?.content?.media[0].media_url
+                              : USER_AVATAR_ORIGINAL
+                          }
+                          sx={{ width: 30, height: 30 }}
+                        />
+                      </Box>
+                    ))}
+                  </AvatarGroup>
+                </Stack>
               </Stack>
             </Stack>
             {isOtherProfile ? (
@@ -417,18 +417,7 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                 </Button>
               </Stack>
             ) : (
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Button variant="contained" sx={{ ml: "auto" }}>
-                  + Add story
-                </Button>
-                <Button
-                  startIcon={<EditIcon />}
-                  className="grey-profile-button"
-                  variant="outlined"
-                >
-                  Edit profile
-                </Button>
-              </Stack>
+              <Stack direction="row" alignItems="center" spacing={1}></Stack>
             )}
           </Stack>
           <Box sx={{ color: "#ccc", padding: "1rem 0" }}>
@@ -447,28 +436,55 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                   label="Introduce"
                   value="introduce"
                 />
-                <Tab className="tab-navigation" label="Friend" value="friend" />
-                <Tab className="tab-navigation" label="Image" value="image" />
-                <Tab className="tab-navigation" label="Video" value="video" />
+
+                {!isMobile && (
+                  <Tab
+                    className="tab-navigation"
+                    label="Friend"
+                    value="friend"
+                  />
+                )}
+                {!isMobile && (
+                  <Tab
+                    className="tab-navigation"
+                    label="Library"
+                    value="library"
+                  />
+                )}
+
+                {isMobile && (
+                  <Button
+                    onClick={handleViewMoreClick}
+                    style={{ minWidth: "auto" }}
+                  >
+                    <Typography sx={{ color: "#666666", fontWeight: 600 }}>
+                      View more
+                    </Typography>
+                  </Button>
+                )}
               </Tabs>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleCloseMenu}
+              >
+                <Tabs value={tab} onChange={handleTabChange}>
+                  <Tab
+                    className="tab-navigation"
+                    label="Friend"
+                    value="friend"
+                    onClick={handleCloseMenu}
+                  />
+                  <Tab
+                    className="tab-navigation"
+                    label="Library"
+                    value="library"
+                    onClick={handleCloseMenu}
+                  />
+                </Tabs>
+              </Menu>
             </Stack>
-            <Button
-              onClick={openMenu}
-              sx={{ background: "#dedfe4", width: "2rem", height: "2rem" }}
-            >
-              <MoreHorizIcon sx={{ color: "#000" }} />
-            </Button>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={closeMenu}
-              className="menu-container"
-            >
-              <MenuItem onClick={closeMenu}>View mode</MenuItem>
-              <MenuItem onClick={closeMenu}>Search</MenuItem>
-              <MenuItem onClick={closeMenu}>Archive</MenuItem>
-              <MenuItem onClick={closeMenu}>Activity Log</MenuItem>
-            </Menu>
           </Stack>
         </Container>
       </Box>

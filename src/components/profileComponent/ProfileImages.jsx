@@ -9,13 +9,18 @@ import {
   Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import FriendListOverViewLoading from "../generals/FriendListOverViewLoading";
 
 const ProfileImages = () => {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
+  const router = useRouter();
+
+  const handleSeeAllClick = () => {
+    router.push(`/user/profile?id=${userId}&tab=library`);
+  };
   const [listImage, setListImage] = useState();
 
   useEffect(() => {
@@ -48,9 +53,9 @@ const ProfileImages = () => {
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
               Image
             </Typography>
-            <Link href="/" style={{ textDecoration: "none", color: "#2877c9" }}>
+            <Typography onClick={handleSeeAllClick} sx={{ textDecoration: "none", color: "#2877c9", cursor: "pointer" }}>
               See all
-            </Link>
+            </Typography>
           </Stack>
           <Box sx={{ marginTop: "1rem" }}>
             <ImageList cols={3} gap={8}>

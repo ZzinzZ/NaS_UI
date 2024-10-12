@@ -18,7 +18,7 @@ export const getProfile = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -33,7 +33,7 @@ export const getListFriends = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -51,7 +51,7 @@ export const sendFriendRequest = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -68,7 +68,7 @@ export const acceptFriendRequest = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -85,7 +85,7 @@ export const rejectFriendRequest = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -102,7 +102,7 @@ export const removeFriendRequest = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -119,7 +119,7 @@ export const unfriend = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -144,7 +144,6 @@ export const updateAvatar = createAsyncThunk(
         toast.error(response.message);
       }
     } catch (error) {
-      toast.error("Failed to update");
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -170,7 +169,6 @@ export const updateBackground = createAsyncThunk(
       }
       
     } catch (error) {
-      toast.error("Failed to update");
       return rejectWithValue(error.response?.data || error.message);
     }
   }

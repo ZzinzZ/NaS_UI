@@ -7,11 +7,21 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import Link from "next/link";
+
 import React from "react";
 import FriendListOverViewLoading from "../generals/FriendListOverViewLoading";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const ProfileFriendOverview = ({ friendList }) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
+  const handleSeeAllClick = () => {
+    // Điều hướng đến URL với tab=friend
+    router.push(`/user/profile?id=${id}&tab=friend`);
+  };
+
   return (
     <Box
       sx={{
@@ -37,9 +47,13 @@ const ProfileFriendOverview = ({ friendList }) => {
                 {friendList?.length} friends in total
               </Typography>
             </Stack>
-            <Link href="/" style={{ textDecoration: "none", color: "#2877c9" }}>
+            {/* Thay đổi Link thành một nút và điều hướng khi nhấn */}
+            <Typography
+              onClick={handleSeeAllClick}
+              sx={{ textDecoration: "none", color: "#2877c9", cursor: "pointer" }}
+            >
               See all
-            </Link>
+            </Typography>
           </Stack>
           <Box sx={{ marginTop: "1rem" }}>
             <ImageList cols={3} gap={8}>
@@ -88,7 +102,7 @@ const ProfileFriendOverview = ({ friendList }) => {
                     position="below"
                     sx={{
                       width: "100%",
-                      mt: 1, 
+                      mt: 1,
                     }}
                   />
                 </ImageListItem>

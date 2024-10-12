@@ -1,5 +1,5 @@
 "use client";
-import { Box, Dialog, IconButton, Stack, Typography, Skeleton } from "@mui/material";
+import { Box, Dialog, IconButton, Stack, Typography } from "@mui/material";
 import ShortTextIcon from "@mui/icons-material/ShortText";
 import React, { useEffect, useState } from "react";
 import CommentBar from "./CommentBar";
@@ -31,6 +31,7 @@ const PostCommentListDetail = ({ open, handleClose, post, getPost }) => {
     <Dialog
       open={open}
       onClose={handleClose}
+      disableScrollLock={true}
       PaperProps={{
         sx: {
           width: "60vw",

@@ -1,34 +1,24 @@
 "use client";
-import { Box, Button, Stack, Typography } from "@mui/material";
-import Link from "next/link";
-import React, { useState } from "react";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { Avatar, Box, Stack, Typography } from "@mui/material";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
-import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
-import CreateIcon from "@mui/icons-material/Create";
 import EditProfileForm from "./EditProfileForm";
-import { usePathname, useRouter } from "next/navigation";
 import IntroductionDetailsInfor from "./IntroductionDetailsInfor";
+import { usePathname, useRouter } from "next/navigation";
+import React, { useState } from "react";
+import moment from "moment"; // Import moment
 
-const ProfileIntroduce = ({ profile, user, isOtherProfile }) => {
+const ProfileIntroduce = ({ profile, isOtherProfile }) => {
   const [openForm, setOpenForm] = useState(false);
-  const router = useRouter();
-  const path = usePathname();
-  const currentDate = new Date();
+
+  const formattedBirthday = profile.birthday
+    ? moment(profile.birthday).format("DD/MM/YYYY")
+    : "No birthday available";
 
   const handleOpenForm = () => {
     setOpenForm(true);
   };
   const handleCloseForm = () => {
     setOpenForm(false);
-  };
-
-  const handleNavigation = (about) => {
-    const url = new URL(window.location.href);
-    const searchParams = new URLSearchParams(url.search);
-    searchParams.set("about", about);
-    const newUrl = `${path}?${searchParams.toString()}`;
-    router.push(newUrl);
   };
 
   return (
@@ -48,28 +38,15 @@ const ProfileIntroduce = ({ profile, user, isOtherProfile }) => {
         profile={profile}
       />
       <Stack direction="row">
-        <Stack spacing={1}>
-          <Typography>Introduce</Typography>
-          <Button sx={{padding: "0.5rem"}} onClick={() => handleNavigation("overview")}>
-            <Typography className="link-button left-text-button">Overview</Typography>
-          </Button>
-          <Button sx={{padding: "0.5rem"}} onClick={() => handleNavigation("work-and-education")}>
-            <Typography className="link-button left-text-button">Work and education</Typography>
-          </Button>
-          <Button sx={{padding: "0.5rem"}} onClick={() => handleNavigation("place-of-residence")}>
-            <Typography className="link-button left-text-button">Place of residence</Typography>
-          </Button>
-          <Button sx={{padding: "0.5rem"}}
-            onClick={() => handleNavigation("contact-and-basic-information")}
-          >
-            <Typography className="link-button left-text-button">Contact and basic information</Typography>
-          </Button>
-          <Button sx={{padding: "0.5rem"}} onClick={() => handleNavigation("family-and-relationship")}>
-            <Typography className="link-button left-text-button">Family and relationship</Typography>
-          </Button>
-          <Button sx={{padding: "0.5rem"}} onClick={() => handleNavigation("life-event")}>
-            <Typography  className="link-button left-text-button">Life event</Typography>
-          </Button>
+        <Stack spacing={1} textAlign="center" sx={{ marginRight: "1rem" }}>
+          <Typography variant="h6">Introduce</Typography>
+          <Avatar
+            alt={profile.name}
+            src={profile?.avatar?.content.media[0].media_url}
+            sx={{ width: 150, height: 150, border: "3px solid white" }}
+          />
+          <Typography sx={{ fontWeight: "600" }}>{profile.userName}</Typography>
+          <Typography>Birthday: {formattedBirthday}</Typography>
         </Stack>
         <hr />
         <Stack spacing={2} sx={{ paddingLeft: "1rem" }}>
@@ -96,7 +73,10 @@ const ProfileIntroduce = ({ profile, user, isOtherProfile }) => {
             </Stack>
           ) : (
             <>
-              <IntroductionDetailsInfor/>
+              <IntroductionDetailsInfor
+                profile={profile}
+                isOtherProfile={isOtherProfile}
+              />
             </>
           )}
         </Stack>
