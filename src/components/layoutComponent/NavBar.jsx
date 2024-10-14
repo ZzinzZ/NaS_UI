@@ -17,6 +17,7 @@ import {
   IconButton,
   Avatar,
   Toolbar,
+  rgbToHex,
 } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
@@ -76,7 +77,7 @@ const NavBar = () => {
       className=""
       position="fixed"
       sx={{
-        width: { xs: "100%", sm: "100%", md: "4rem" },
+        width: { xs: "100%", sm: "100%", md: "4.5rem" },
         height: { xs: "3rem", sm: "3rem", md: "100vh" },
         bottom: { xs: 0, sm: "0", md: "auto" },
         top: { xs: "auto", sm: "auto" },
@@ -122,16 +123,24 @@ const NavBar = () => {
           direction={{ xs: "row", sm: "row", md: "column" }}
         >
           <Stack spacing={2} alignItems="center"  direction={{ xs: "row", sm: "row", md: "column" }}>
-            <Button
-              className="nav-page-button "
-              aria-owns={
-                open && popoverId === "home"
-                  ? "mouse-over-popover-home"
-                  : undefined
-              }
-              onMouseEnter={(e) => handlePopoverOpen(e, "home")}
-              onMouseLeave={handlePopoverClose}
-            >
+          <Button
+  className="nav-page-button"
+  aria-owns={
+    open && popoverId === "home" ? "mouse-over-popover-home" : undefined
+  }
+  onMouseEnter={(e) => handlePopoverOpen(e, "home")}
+  onMouseLeave={handlePopoverClose}
+  sx={{
+    background: {
+      xs: path === "/user" ? "rgba(255,255,255,0.6)" : "#1976d3",
+      sm: path === "/user" ? "rgba(255,255,255,0.6)" : "#1976d3",
+      md: path === "/user" ? "rgba(255,255,255,0.6)" : "#1976d3",
+    },
+    "&:hover": {
+      backgroundColor: "rgba(255,255,255,0.8) !important",
+    },
+  }}
+>
               <Link
                 href="/user"
                 style={{ color: "inherit", textDecoration: "none" }}
