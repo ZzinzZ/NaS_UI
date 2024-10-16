@@ -47,7 +47,6 @@ export const sendFriendRequest = createAsyncThunk(
         `${baseUrl}/profiles/friends/friend_request/${receptionId}`,
         { senderId: senderId }
       );
-      console.log("friend request", response);
       toast.info(response.message);
       return response.data;
     } catch (error) {
@@ -191,7 +190,6 @@ export const updateBio= createAsyncThunk(
       else {
         toast.error(response.message);
       }
-      
     } catch (error) {
       toast.error("Failed to update");
       return rejectWithValue(error.response?.data || error.message);

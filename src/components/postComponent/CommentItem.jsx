@@ -183,7 +183,7 @@ const CommentItem = ({ post, comment, isReply = false }) => {
             </Typography>
           </Box>
 
-          <Typography
+          {/* <Typography
             onClick={toggleReplyInput}
             sx={{
               color: "#6f7277",
@@ -193,7 +193,7 @@ const CommentItem = ({ post, comment, isReply = false }) => {
             }}
           >
             Reply
-          </Typography>
+          </Typography> */}
         </Stack>
 
         {/* Reply Input Section */}
@@ -204,7 +204,7 @@ const CommentItem = ({ post, comment, isReply = false }) => {
         )}
 
         {/* Nested Replies */}
-        {comment?.replies && comment?.replies.length > 0 && (
+        {/* {comment?.replies && comment?.replies.length > 0 && (
           <Box sx={{ marginLeft: "1rem", marginTop: "0.5rem" }}>
             {comment?.replies.map((reply, index) => (
               <CommentItem
@@ -215,7 +215,7 @@ const CommentItem = ({ post, comment, isReply = false }) => {
               />
             ))}
           </Box>
-        )}
+        )} */}
       </Stack>
     </Stack>
   );

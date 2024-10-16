@@ -10,7 +10,7 @@ function UserLayout({ children }) {
       <TokenChecker>
         <ProtectedRoute>
           <NavBar />
-          <Stack sx={{ marginLeft: {xs: 0 , sm: 0, md : "5rem" }}}>{children}</Stack>
+          <Stack sx={{ marginLeft: {xs: 0 , sm: 0, md : "4.6rem" }}}>{children}</Stack>
         </ProtectedRoute>
       </TokenChecker>
     </Localization>

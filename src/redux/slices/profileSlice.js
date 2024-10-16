@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { acceptFriendRequest, getListFriends, getProfile, sendFriendRequest } from "../thunks/profileThunk";
+import { acceptFriendRequest, getListFriends, getProfile, rejectFriendRequest, sendFriendRequest, unfriend } from "../thunks/profileThunk";
 
 const initialState= {
   profileData: {},
@@ -75,7 +75,19 @@ const profileSlice = createSlice({
         .addCase(acceptFriendRequest.rejected, (state, action) => {
           state.isLoading = false;
           state.error = action.payload || action.error.message;
-        });
+        })
+        .addCase(unfriend.pending, (state, action) => {
+          state.isLoading = true;
+        })
+        .addCase(unfriend.fulfilled, (state, action) => {
+          state.isLoading = false;
+        })
+        .addCase(rejectFriendRequest.pending, (state, action) => {
+          state.isLoading = false;
+        })
+        .addCase(rejectFriendRequest.fulfilled, (state, action) => {
+          state.isLoading = false;
+        })
     },
   });
   
