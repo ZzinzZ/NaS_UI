@@ -19,11 +19,11 @@ const ProfileFriend = ({ listFriend }) => {
       </Typography>
 
       <Grid container spacing={2}>
-        {listFriend?.map((list) => (
+        {listFriend?.length > 0 ? listFriend?.map((list) => (
           <Grid item xs={6} key={list._id}>
             <UserItem profile={list} />
           </Grid>
-        ))}
+        )): <Typography>User has no friend</Typography>}
       </Grid>
     </Box>
   );

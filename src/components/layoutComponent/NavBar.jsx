@@ -92,7 +92,8 @@ const NavBar = () => {
       <Stack
         direction={{ xs: "row", sm: "row", md: "column" }}
         alignItems="center"
-        sx={{ height: "100%", }}
+        sx={{ height: "100%"}}
+        justifyContent={{xs: "center", sm: "center"}}
       >
         <Stack
           sx={{
@@ -122,25 +123,31 @@ const NavBar = () => {
           sx={{ height: "100%" }}
           direction={{ xs: "row", sm: "row", md: "column" }}
         >
-          <Stack spacing={2} alignItems="center"  direction={{ xs: "row", sm: "row", md: "column" }}>
-          <Button
-  className="nav-page-button"
-  aria-owns={
-    open && popoverId === "home" ? "mouse-over-popover-home" : undefined
-  }
-  onMouseEnter={(e) => handlePopoverOpen(e, "home")}
-  onMouseLeave={handlePopoverClose}
-  sx={{
-    background: {
-      xs: path === "/user" ? "rgba(255,255,255,0.6)" : "#1976d3",
-      sm: path === "/user" ? "rgba(255,255,255,0.6)" : "#1976d3",
-      md: path === "/user" ? "rgba(255,255,255,0.6)" : "#1976d3",
-    },
-    "&:hover": {
-      backgroundColor: "rgba(255,255,255,0.8) !important",
-    },
-  }}
->
+          <Stack
+            spacing={2}
+            alignItems="center"
+            direction={{ xs: "row", sm: "row", md: "column" }}
+          >
+            <Button
+              className="nav-page-button"
+              aria-owns={
+                open && popoverId === "home"
+                  ? "mouse-over-popover-home"
+                  : undefined
+              }
+              onMouseEnter={(e) => handlePopoverOpen(e, "home")}
+              onMouseLeave={handlePopoverClose}
+              sx={{
+                background: {
+                  xs: path === "/user" ? "rgba(255,255,255,0.8)" : "transparent",
+                  sm: path === "/user" ? "rgba(255,255,255,0.8)" : "transparent",
+                  md: path === "/user" ? "rgba(255,255,255,0.8)" : "transparent",
+                },
+                "&:hover": {
+                  backgroundColor: "rgba(255,255,255,0.7) !important",
+                },
+              }}
+            >
               <Link
                 href="/user"
                 style={{ color: "inherit", textDecoration: "none" }}
@@ -182,9 +189,19 @@ const NavBar = () => {
               }
               onMouseEnter={(e) => handlePopoverOpen(e, "friends")}
               onMouseLeave={handlePopoverClose}
+              sx={{
+                background: {
+                  xs:  path.includes("/friends") ? "rgba(255,255,255,0.8)" : "transparent",
+                  sm:  path.includes("/friends") ? "rgba(255,255,255,0.8)" : "transparent",
+                  md:  path.includes("/friends") ? "rgba(255,255,255,0.8)" : "transparent",
+                },
+                "&:hover": {
+                  backgroundColor: "rgba(255,255,255,0.7) !important",
+                },
+              }}
             >
               <Link
-                href="/"
+                href="/user/friends"
                 style={{ color: "inherit", textDecoration: "none" }}
               >
                 <GroupOutlinedIcon
@@ -224,6 +241,16 @@ const NavBar = () => {
               }
               onMouseEnter={(e) => handlePopoverOpen(e, "groups")}
               onMouseLeave={handlePopoverClose}
+              sx={{
+                background: {
+                  xs:  path.includes("/groups") ? "rgba(255,255,255,0.8)" : "transparent",
+                  sm:  path.includes("/groups") ? "rgba(255,255,255,0.8)" : "transparent",
+                  md:  path.includes("/groups") ? "rgba(255,255,255,0.8)" : "transparent",
+                },
+                "&:hover": {
+                  backgroundColor: "rgba(255,255,255,0.7) !important",
+                },
+              }}
             >
               <Link
                 href="/"
@@ -266,6 +293,16 @@ const NavBar = () => {
               }
               onMouseEnter={(e) => handlePopoverOpen(e, "chat")}
               onMouseLeave={handlePopoverClose}
+              sx={{
+                background: {
+                  xs:  path.includes("/posts") ? "rgba(255,255,255,0.8)" : "transparent",
+                  sm:  path.includes("/posts") ? "rgba(255,255,255,0.8)" : "transparent",
+                  md:  path.includes("/posts") ? "rgba(255,255,255,0.8)" : "transparent",
+                },
+                "&:hover": {
+                  backgroundColor: "rgba(255,255,255,0.7) !important",
+                },
+              }}
             >
               <Link
                 href="/"

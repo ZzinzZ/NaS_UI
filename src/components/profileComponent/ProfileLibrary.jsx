@@ -40,10 +40,10 @@ const ProfileLibrary = ({ userId }) => {
                 src={image.image}
                 alt={`image-${index}`}
                 sx={{
-                  width: "100%", // Đảm bảo rộng 100% của container
-                  height: "200px", // Đặt chiều cao cố định
+                  width: "100%", 
+                  height: "200px", 
                   borderRadius: "8px",
-                  objectFit: "cover", // Cắt hình ảnh để vừa khít với khung
+                  objectFit: "cover",
                 }}
               />
             </Grid>

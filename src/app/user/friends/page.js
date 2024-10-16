@@ -1,9 +1,14 @@
-import React from 'react'
+import FriendNavBar from "@/components/friendComponent/FriendNav";
+import { Container } from "@mui/material";
+import React from "react";
 
 const FriendPage = () => {
   return (
-    <div>Friends</div>
-  )
-}
+    <>
+      <FriendNavBar />
+      <Container></Container>
+    </>
+  );
+};
 
-export default FriendPage
+export default FriendPage;

@@ -71,6 +71,25 @@ body {
   }
 }
 
+
+@keyframes search {
+  0% {
+    transform: translateX(0%) rotate(70deg);
+  }
+
+  100% {
+    transform: translateX(100px) rotate(10deg);
+  }
+}
+.svgIcon circle,
+line {
+  stroke: #1976d3;
+}
+.svgIcon circle {
+  fill: rgba(238, 239, 255, 0.3);
+}
+
+
 .link-button {
   text-decoration: none !important;
   color: #656567;
