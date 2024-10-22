@@ -24,7 +24,7 @@ const CreatePostBoard = ({ open, handleClose, onNew, profile }) => {
   const { user } = useSelector((state) => state.auth);
   const [content, setContent] = useState("");
   const [pictures, setPictures] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null); // Quản lý vị trí hiển thị của EmojiPicker
+  const [anchorEl, setAnchorEl] = useState(null); 
 
   const handlePostSubmit = async () => {
     if (!content && pictures.length === 0) {

@@ -370,6 +370,7 @@ const PostItem = ({ profile, postItem, onDelete  }) => {
             )}
           </Box>
           <Button
+          onClick={handleOpenCommentList}
             fullWidth
             startIcon={
               <Box

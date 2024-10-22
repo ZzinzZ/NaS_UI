@@ -5,7 +5,6 @@ import FeedIcon from "@mui/icons-material/Feed";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import GroupsIcon from "@mui/icons-material/Groups";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
   Stack,
   Badge,
@@ -16,8 +15,7 @@ import {
   MenuItem,
   IconButton,
   Avatar,
-  Toolbar,
-  rgbToHex,
+
 } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
