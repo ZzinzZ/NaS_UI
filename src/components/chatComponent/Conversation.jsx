@@ -1,189 +1,68 @@
 "use client";
-import { Avatar, Box, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
 import ActiveAvatar from "./ActiveAvatar";
 import CallIcon from "@mui/icons-material/Call";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import AutoAwesomeMosaicIcon from "@mui/icons-material/AutoAwesomeMosaic";
 import InputChat from "./InputChat";
-import Message from "./Message";
+import { getChatDetails } from "@/utils/services/chatService/chatService";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import ChatDrawer from "./ChatDrawer";
 
-const fakeMessages = [
-  {
-    _id: "64c8f3e8f5d3a3421c4d0011",
-    senderId: "64c8f3e8f5d3a3421c4d1234", // Người dùng hiện tại gửi
-    content: {
-      text: "Hey, how are you?",
-      file: null,
-      image: null,
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: ["64c8f3e8f5d3a3421c4d5678"],
-      sent: true,
-    },
-  },
-  {
-    _id: "64c8f3e8f5d3a3421c4d0022",
-    senderId: "64c8f3e8f5d3a3421c4d5678", // Người khác gửi
-    content: {
-      text: "I'm good! How about you?",
-      file: null,
-      image: null,
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: ["64c8f3e8f5d3a3421c4d1234"],
-      sent: true,
-    },
-  },
-  {
-    _id: "64c8f3e8f5d3a3421c4d0033",
-    senderId: "64c8f3e8f5d3a3421c4d1234", // Người dùng hiện tại gửi
-    content: {
-      text: null,
-      file: null,
-      image: ["https://via.placeholder.com/150"], // Gửi hình ảnh
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: [],
-      sent: true,
-    },
-  },
-  {
-    _id: "64c8f3e8f5d3a3421c4d0044",
-    senderId: "64c8f3e8f5d3a3421c4d5678", // Người khác gửi
-    content: {
-      text: "Check out this file.",
-      file: "https://example.com/file.zip", // Gửi file
-      image: null,
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: ["64c8f3e8f5d3a3421c4d1234"],
-      sent: true,
-    },
-  },
-  {
-    _id: "64c8f3e8f5d3a3421c4d0055",
-    senderId: "64c8f3e8f5d3a3421c4d1234", // Người dùng hiện tại gửi
-    content: {
-      text: "Do you have any updates on the project?",
-      file: null,
-      image: null,
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: ["64c8f3e8f5d3a3421c4d5678"],
-      sent: true,
-    },
-  },
-  {
-    _id: "64c8f3e8f5d3a3421c4d0066",
-    senderId: "64c8f3e8f5d3a3421c4d5678", // Người khác gửi
-    content: {
-      text: "Yes, the project is almost done. Here's the latest file.",
-      file: "https://example.com/new-project-file.zip", // Gửi file
-      image: null,
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: ["64c8f3e8f5d3a3421c4d1234"],
-      sent: true,
-    },
-  },
-  {
-    _id: "64c8f3e8f5d3a3421c4d0077",
-    senderId: "64c8f3e8f5d3a3421c4d5678", // Người khác gửi
-    content: {
-      text: "Here are some images from the recent event.",
-      file: null,
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: ["64c8f3e8f5d3a3421c4d1234"],
-      sent: true,
-    },
-  },
-  {
-    _id: "64c8f3e8f5d3a3421c4d0088",
-    senderId: "64c8f3e8f5d3a3421c4d1234", // Người dùng hiện tại gửi
-    content: {
-      text: "Wow! These look great!",
-      file: null,
-      image: null,
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: ["64c8f3e8f5d3a3421c4d5678"],
-      sent: true,
-    },
-  },
-  {
-    _id: "64c8f3e8f5d3a3421c4d0099",
-    senderId: "64c8f3e8f5d3a3421c4d5678", // Người khác gửi
-    content: {
-      text: "Glad you liked them! Let's plan the next event soon.",
-      file: null,
-      image: null,
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: ["64c8f3e8f5d3a3421c4d1234"],
-      sent: true,
-    },
-  },
-  {
-    _id: "64c8f3e8f5d3a3421c4d0100",
-    senderId: "64c8f3e8f5d3a3421c4d1234", // Người dùng hiện tại gửi
-    content: {
-      text: "Definitely! I'll check my calendar.",
-      file: null,
-      image: null,
-    },
-    chatId: "64c8f3e8f5d3a3421c4d4567",
-    react: [],
-    status: {
-      delivery: true,
-      seen_by: ["64c8f3e8f5d3a3421c4d5678"],
-      sent: true,
-    },
-  },
-];
+const drawerWidth = 240;
 
-const Conversation = () => {
+const Conversation = ({ chatId }) => {
   const [isActive, setIsActive] = useState(true);
+  const [chat, setChat] = useState();
+  const [open, setOpen] = useState(false);
+  const [listMember, setLisMember] = useState([]);
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
+  const { user } = useSelector((state) => state.auth);
+
   const lastMessageRef = useRef(null);
+
+  const chatDetails = async (chatId) => {
+    try {
+      const response = await getChatDetails({ chatId: chatId });
+      setChat(response?.chat);
+      setLisMember(response?.participantProfiles);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     if (lastMessageRef.current) {
       lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [fakeMessages]);
+    chatDetails(chatId);
+  }, [chatId]);
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Stack sx={{ width: "100%", height: "100vh" }}>
-        {/*Conversation header*/}
+    <Box
+      sx={{
+        width: "100%",
+      }}
+    >
+      <Stack
+        sx={{
+          width: open ? `calc(100% - ${drawerWidth}px)` : "100%",
+          height: "100vh",
+          transition: "width 0.3s ease-out",
+        }}
+      >
+        {/* Conversation header */}
         <Box sx={{ position: "sticky", top: 0, zIndex: 1, background: "#fff" }}>
           <Stack
             direction="row"
@@ -192,9 +71,15 @@ const Conversation = () => {
             sx={{ padding: "0.8rem" }}
           >
             <Stack spacing={1} direction="row">
-              {isActive ? <ActiveAvatar /> : <Avatar />}
+              {isActive ? (
+                <ActiveAvatar image_url={chat?.avatar} />
+              ) : (
+                <Avatar src={chat?.avatar} />
+              )}
               <Stack>
-                <Typography sx={{ fontWeight: 600 }}>UserName</Typography>
+                <Typography sx={{ fontWeight: 600 }}>
+                  {chat?.chat_name}
+                </Typography>
                 <Typography
                   sx={{
                     fontWeight: 400,
@@ -213,13 +98,13 @@ const Conversation = () => {
               <IconButton>
                 <VideocamIcon sx={{ color: "#1976d3" }} />
               </IconButton>
-              <IconButton>
+              <IconButton onClick={handleDrawerOpen}>
                 <AutoAwesomeMosaicIcon sx={{ color: "#1976d3" }} />
               </IconButton>
             </Stack>
           </Stack>
         </Box>
-        {/*Conversation center*/}
+        {/* Conversation center */}
         <Box
           sx={{
             flexGrow: 1,
@@ -227,36 +112,25 @@ const Conversation = () => {
             padding: "1rem",
             backgroundColor: "#f1f2f6",
             "&::-webkit-scrollbar": {
-                width: "6px",
-                height: "6px",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#bfbfbf",
-                borderRadius: "10px",
-              },
-              "&::-webkit-scrollbar-thumb:hover": {
-                backgroundColor: "#a1a1a1",
-              },
-              "&::-webkit-scrollbar-track": {
-                backgroundColor: "#f1f1f1",
-                borderRadius: "10px",
-              },
+              width: "6px",
+              height: "6px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#bfbfbf",
+              borderRadius: "10px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              backgroundColor: "#a1a1a1",
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "#f1f1f1",
+              borderRadius: "10px",
+            },
           }}
         >
-          {fakeMessages?.map((message, index) => {
-            const isLastMessage = index === fakeMessages.length - 1;
-            return (
-              <Message
-                key={message._id}
-                message={message}
-                ref={isLastMessage ? lastMessageRef : null}
-              />
-            );
-          })}
-          {/* Tạo một div trống để đảm bảo việc scroll đến phần tử cuối */}
           <Box ref={lastMessageRef} />
         </Box>
-        {/*Conversation input*/}
+        {/* Conversation input */}
         <Box
           sx={{
             position: "sticky",
@@ -267,6 +141,14 @@ const Conversation = () => {
         >
           <InputChat />
         </Box>
+        <ChatDrawer
+          open={open}
+          handleDrawerClose={handleDrawerClose}
+          chat={chat}
+          onUpdate={setChat}
+          listMember={listMember}
+          setLisMember={setLisMember}
+        />
       </Stack>
     </Box>
   );

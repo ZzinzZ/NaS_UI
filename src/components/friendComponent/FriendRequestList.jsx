@@ -30,8 +30,8 @@ const FriendRequestList = () => {
         sx={{ flexWrap: "wrap", rowGap: "0.8rem" }}
       >
         {listRequest?.length > 0 ? (
-          listRequest?.map((request) => (
-            <FriendRequestItem profile={request} onRemove={getListRequest} />
+          listRequest?.map((request, index) => (
+            <FriendRequestItem key={index} profile={request} onRemove={getListRequest} />
           ))
         ) : (
           <Typography>No request</Typography>

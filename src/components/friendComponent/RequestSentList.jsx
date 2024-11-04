@@ -30,8 +30,8 @@ const RequestSentList = () => {
         sx={{ flexWrap: "wrap", rowGap: "0.8rem" }}
       >
         {listRequest?.length > 0 ? (
-          listRequest?.map((request) => (
-            <RequestSentItem profile={request} onRemove={getListRequestSent} />
+          listRequest?.map((request, index) => (
+            <RequestSentItem key={index} profile={request} onRemove={getListRequestSent} />
           ))
         ) : (
           <Typography>No request</Typography>

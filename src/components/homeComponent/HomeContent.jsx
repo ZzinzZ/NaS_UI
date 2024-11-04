@@ -1,15 +1,20 @@
+"use client"
 import { Container, Stack } from "@mui/material";
 import React from "react";
-import PostCreateComponent from "../profileComponent/PostCreateComponent";
-import PostItem from "../postComponent/PostItem";
+import { useRouter, useSearchParams } from "next/navigation";
 import ChatBar from "../chatComponent/ChatBar";
 import Conversation from "../chatComponent/Conversation";
+import WaitingSlider from "./WaitingSlider";
 
 const HomeContent = () => {
+  const searchParams = useSearchParams();
+  const chatId = searchParams.get("chat-id");
   return (
     <Stack direction="row">
       <ChatBar />
-      <Conversation />
+      {
+        chatId ? <Conversation chatId={chatId}/> : <WaitingSlider/>
+      }
     </Stack>
   );
 };

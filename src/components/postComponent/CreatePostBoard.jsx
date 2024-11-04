@@ -39,6 +39,7 @@ const CreatePostBoard = ({ open, handleClose, onNew, profile }) => {
         files: pictures,
       });
       onNew();
+      setContent("");
       handleClose();
     } catch (error) {
       console.error("Error creating post:", error);
@@ -66,10 +67,16 @@ const CreatePostBoard = ({ open, handleClose, onNew, profile }) => {
   };
 
   const handleEmojiPickerClose = () => {
-    setAnchorEl(null); // Đóng EmojiPicker
+    setAnchorEl(null); 
   };
 
-  const openEmojiPicker = Boolean(anchorEl); // Kiểm tra trạng thái mở của EmojiPicker
+  const clearAndClose = () => {
+    setContent("");
+    setPictures([]);
+    handleClose();
+  }
+
+  const openEmojiPicker = Boolean(anchorEl); 
 
   return (
     <Dialog
@@ -102,7 +109,7 @@ const CreatePostBoard = ({ open, handleClose, onNew, profile }) => {
           >
             <Stack></Stack>
             <Typography variant="h8">Create Post</Typography>
-            <IconButton onClick={handleClose}>
+            <IconButton onClick={clearAndClose}>
               <CloseIcon />
             </IconButton>
           </Stack>

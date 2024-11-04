@@ -36,9 +36,10 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let user = null;
     dispatch(showLoading());
     try {
-      await dispatch(login(formData)).unwrap();
+      user = await dispatch(login(formData)).unwrap();
       router.push("/user");
     } catch (err) {
       toast.error(`Login failed: ${err.message}`);

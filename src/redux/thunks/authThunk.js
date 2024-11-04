@@ -29,7 +29,6 @@ export const login = createAsyncThunk(
       Cookies.set("token", token, { expires });
       Cookies.set("refreshToken", refreshToken, { expires: 365 });
       Cookies.set("tokenExpiry", expires.getTime(), { expires });
-
       dispatch(resetProfile());
       toast.info(response.message);
       return response.data;

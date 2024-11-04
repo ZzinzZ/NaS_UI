@@ -25,6 +25,7 @@ import { logout } from "@/redux/slices/AuthSlice";
 import { getProfile } from "@/redux/thunks/profileThunk";
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
 import { usePathname } from "next/navigation";
+import { initiateSocketConnection } from "@/utils/services/socket/socketService";
 
 const NavBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -34,6 +35,11 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { profileData } = useSelector((state) => state.profile);
+  
+
+  useEffect(() => {
+    initiateSocketConnection(user?._id);
+  },[])
 
   const handlePopoverOpen = (event, id) => {
     setAnchorEl(event.currentTarget);
