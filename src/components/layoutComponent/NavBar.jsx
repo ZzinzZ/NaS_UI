@@ -5,7 +5,6 @@ import FeedIcon from "@mui/icons-material/Feed";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import GroupsIcon from "@mui/icons-material/Groups";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
   Stack,
   Badge,
@@ -16,8 +15,7 @@ import {
   MenuItem,
   IconButton,
   Avatar,
-  Toolbar,
-  rgbToHex,
+
 } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
@@ -27,6 +25,7 @@ import { logout } from "@/redux/slices/AuthSlice";
 import { getProfile } from "@/redux/thunks/profileThunk";
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
 import { usePathname } from "next/navigation";
+import { initiateSocketConnection } from "@/utils/services/socket/socketService";
 
 const NavBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -36,6 +35,11 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { profileData } = useSelector((state) => state.profile);
+  
+
+  useEffect(() => {
+    initiateSocketConnection(user?._id);
+  },[])
 
   const handlePopoverOpen = (event, id) => {
     setAnchorEl(event.currentTarget);

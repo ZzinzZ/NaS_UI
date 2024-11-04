@@ -5,7 +5,7 @@ import { createTheme, ThemeProvider } from "@mui/material";
 const theme = createTheme({
   typography: {
     allVariants: {
-      fontFamily: '"Poppins", "Sankofa Display", sans-serif',
+      fontFamily: '"Open Sans", "Sankofa Display", sans-serif',
       textTransform: "none",
     },
   },

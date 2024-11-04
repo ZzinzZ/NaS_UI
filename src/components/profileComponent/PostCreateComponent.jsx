@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react';
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
 import { Event, PhotoLibrary } from "@mui/icons-material";

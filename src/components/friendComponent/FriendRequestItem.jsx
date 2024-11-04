@@ -1,4 +1,5 @@
 import { acceptFriendRequest, rejectFriendRequest } from "@/redux/thunks/profileThunk";
+import { createPrivateChat } from "@/utils/services/chatService/chatService";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import Image from "next/image";
 import React from "react";
@@ -13,6 +14,7 @@ const FriendRequestItem = ({ profile, onRemove }) => {
           await dispatch(
             acceptFriendRequest({ receiverId: user._id, senderId: profile.userId })
           );
+          await createPrivateChat({userId: user._id, participants: [profile.userId]});
           onRemove();
         } catch (error) {
             console.log(error);

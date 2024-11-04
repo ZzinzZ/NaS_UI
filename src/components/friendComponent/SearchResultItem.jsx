@@ -22,6 +22,7 @@ import {
   unfriend,
 } from "@/redux/thunks/profileThunk";
 import { useRouter } from "next/navigation";
+import { createPrivateChat } from "@/utils/services/chatService/chatService";
 
 const SearchResultItem = ({ profile }) => {
   const { user } = useSelector((state) => state.auth);
@@ -72,6 +73,7 @@ const SearchResultItem = ({ profile }) => {
       await dispatch(
         acceptFriendRequest({ receiverId: user._id, senderId: profile.userId })
       );
+      await createPrivateChat({userId: user._id, participants:[profile.userId]});
       setIsReceivedRequest(false);
       setIsFriend(true);
       setAnchorEl(null);

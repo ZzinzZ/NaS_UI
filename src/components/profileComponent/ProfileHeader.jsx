@@ -229,7 +229,7 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                   }}
                   className="profile-edit-background-button"
                 >
-                  <Typography sx={{display: { xs: "none", sm: "block", md: "block" }}}>Edit background</Typography>
+                  <Typography  sx={{display: { xs: "none", sm: "block", md: "block" }}}>Edit background</Typography>
                   <VisuallyHiddenInput
                     type="file"
                     onChange={handleBackgroundChange}

@@ -1,5 +1,5 @@
 "use client";
-import { Box, Dialog, CircularProgress } from "@mui/material";
+import { Dialog } from "@mui/material";
 
 import { useSelector } from "react-redux";
 
