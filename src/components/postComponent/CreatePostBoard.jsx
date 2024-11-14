@@ -31,7 +31,6 @@ const CreatePostBoard = ({ open, handleClose, onNew, profile }) => {
       toast.error("Please write something or add a picture.");
       return;
     }
-
     try {
       await createPost({
         userId: user._id,

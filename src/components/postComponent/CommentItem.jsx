@@ -55,7 +55,6 @@ const CommentItem = ({ post, comment, isReply = false }) => {
 
     getUserProfile();
   }, [comment, user]);
-  console.log(userComment);
 
   useEffect(() => {
     switch (typeEmotion) {

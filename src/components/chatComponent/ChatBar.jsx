@@ -20,6 +20,7 @@ import {
 import CreateGroupBoard from "./CreateGroupBoard";
 import ListChatLoading from "./ListChatLoading";
 import useDebounce from "@/customHooks/useDebounce";
+import { useSocket } from "@/contexts/SocketContext";
 
 const ChatBar = () => {
   const router = useRouter();
@@ -27,8 +28,10 @@ const ChatBar = () => {
   const [chats, setChats] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [openCreateBoard, setOpenCreateBoard] = useState(false);
+  const [isReadMessage, setIsReadMessage] = useState(false);
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText, 300);
+  const { messages, newMessage, receiveMessage } = useSocket();
 
   const getUserChat = async () => {
     setIsFetching(true);
@@ -56,18 +59,18 @@ const ChatBar = () => {
       }
     } catch (error) {
       console.log(error);
-    }
-    finally {
+    } finally {
       setIsFetching(false);
     }
   };
 
   useEffect(() => {
     getUserChat();
-  }, [user]);
+  }, [user, messages, newMessage, receiveMessage]);
 
   const handleChatItemClick = (chatId) => {
     router.push(`/user?chat-id=${chatId}`);
+    setIsReadMessage(true);
   };
 
   const handleCreateBoardClick = () => {
@@ -199,15 +202,21 @@ const ChatBar = () => {
         <Stack>
           {isFetching ? (
             <ListChatLoading />
-          ) : (
+          ) : chats?.length > 0 ? (
             chats?.map((chat) => (
               <Box
                 key={chat?._id}
                 onClick={() => handleChatItemClick(chat?._id)}
               >
-                <ChatItem chat={chat} />
+                <ChatItem
+                  chat={chat}
+                  isReadMessage={isReadMessage}
+                  setIsReadMessage={setIsReadMessage}
+                />
               </Box>
             ))
+          ) : (
+            <Typography>No conversation available</Typography>
           )}
         </Stack>
       </Box>

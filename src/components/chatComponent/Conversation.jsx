@@ -1,53 +1,96 @@
 "use client";
-import {
-  Avatar,
-  Box,
-  Button,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Avatar, Box, IconButton, Stack, Typography } from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
 import ActiveAvatar from "./ActiveAvatar";
 import CallIcon from "@mui/icons-material/Call";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import AutoAwesomeMosaicIcon from "@mui/icons-material/AutoAwesomeMosaic";
 import InputChat from "./InputChat";
-import { getChatDetails } from "@/utils/services/chatService/chatService";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
 import ChatDrawer from "./ChatDrawer";
+import { useSocket } from "@/contexts/SocketContext";
+import Message from "./Message";
+import { useSearchParams } from "next/navigation";
+import { getChatDetails } from "@/redux/thunks/chatThunk";
+import { toast } from "react-toastify";
 
 const drawerWidth = 240;
 
-const Conversation = ({ chatId }) => {
-  const [isActive, setIsActive] = useState(true);
+const Conversation = ({ currentChat }) => {
+  const searchParams = useSearchParams();
+  const chatId = searchParams.get("chat-id");
+  const [isActive, setIsActive] = useState(false);
   const [chat, setChat] = useState();
   const [open, setOpen] = useState(false);
   const [listMember, setLisMember] = useState([]);
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
+  const [otherParticipant, setOtherParticipant] = useState();
   const { user } = useSelector((state) => state.auth);
-
+  const { onlineUsers, newMessage, messages, reactedMessage } = useSocket();
+  const dispatch = useDispatch();
   const lastMessageRef = useRef(null);
+  const handleDrawerOpen = () => setOpen(!open);
+  const handleDrawerClose = () => setOpen(false);
 
-  const chatDetails = async (chatId) => {
+  const chatDetails = async () => {
     try {
-      const response = await getChatDetails({ chatId: chatId });
+      const response = await dispatch(getChatDetails({ chatId })).unwrap();
+
       setChat(response?.chat);
-      setLisMember(response?.participantProfiles);
-      console.log(response);
+      setLisMember(response?.participantProfiles || []);
     } catch (error) {
-      console.log(error);
+      toast.error("Không thể lấy chi tiết cuộc trò chuyện:", error);
     }
   };
+
+  useEffect(() => {
+    if (chat?.type === "group") {
+      const otherParticipants = chat?.participants.filter(
+        (participant) => participant.userId !== user?._id
+      );
+      const isChatActive = otherParticipants.some((participant) =>
+        onlineUsers.some(
+          (onlineUser) => onlineUser.userId === participant.userId
+        )
+      );
+      setIsActive(isChatActive);
+    }
+    if (chat?.type === "private") {
+      const otherParticipant = chat.participants.find(
+        (participant) => participant.userId !== user._id
+      );
+      setOtherParticipant(
+        listMember?.find(
+          (participant) => participant.userId === otherParticipant.userId
+        )
+      );
+      const isChatActive = onlineUsers.some(
+        (onlineUser) => onlineUser.userId === otherParticipant.userId
+      );
+      setIsActive(isChatActive);
+    }
+  }, [onlineUsers, chat]);
+
+  useEffect(() => {
+    if (chatId !== undefined) {
+      const timeoutId = setTimeout(() => {
+        chatDetails(chatId);
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [chatId]);
+
+  useEffect(() => {
+    if (messages?.length > 0 && lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (lastMessageRef.current) {
       lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
-    chatDetails(chatId);
-  }, [chatId]);
+  }, [newMessage, reactedMessage]);
 
   return (
     <Box
@@ -62,7 +105,6 @@ const Conversation = ({ chatId }) => {
           transition: "width 0.3s ease-out",
         }}
       >
-        {/* Conversation header */}
         <Box sx={{ position: "sticky", top: 0, zIndex: 1, background: "#fff" }}>
           <Stack
             direction="row"
@@ -72,13 +114,28 @@ const Conversation = ({ chatId }) => {
           >
             <Stack spacing={1} direction="row">
               {isActive ? (
-                <ActiveAvatar image_url={chat?.avatar} />
+                <ActiveAvatar
+                  image_url={
+                    chat?.type === "private"
+                      ? otherParticipant?.avatar?.content?.media[0].media_url
+                      : chat?.avatar
+                  }
+                />
               ) : (
-                <Avatar src={chat?.avatar} />
+                <Avatar
+                  sx={{ width: 50, height: 50 }}
+                  src={
+                    chat?.type === "private"
+                      ? otherParticipant?.avatar?.content?.media[0].media_url
+                      : chat?.avatar
+                  }
+                />
               )}
               <Stack>
                 <Typography sx={{ fontWeight: 600 }}>
-                  {chat?.chat_name}
+                  {chat?.chat_name !== null
+                    ? chat?.chat_name
+                    : otherParticipant?.userName}
                 </Typography>
                 <Typography
                   sx={{
@@ -128,6 +185,9 @@ const Conversation = ({ chatId }) => {
             },
           }}
         >
+          {messages?.map((message) => (
+            <Message message={message} key={message?._id} />
+          ))}
           <Box ref={lastMessageRef} />
         </Box>
         {/* Conversation input */}
@@ -139,7 +199,7 @@ const Conversation = ({ chatId }) => {
             background: "#fff",
           }}
         >
-          <InputChat />
+          <InputChat chat={chat} />
         </Box>
         <ChatDrawer
           open={open}

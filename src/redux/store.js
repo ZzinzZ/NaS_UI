@@ -4,8 +4,8 @@ import storage from 'redux-persist/lib/storage';
 import loadingReducer from './slices/LoadingSlice';
 import AuthReducer from './slices/AuthSlice';
 import ProfileReducer from './slices/profileSlice';
-import RegisterReducer from './slices/RegisterSlice';
 import PostReducer from './slices/PostSlice';
+import chatReducer from './slices/ChatSlice';
 
 // Cấu hình Redux Persist
 const persistConfig = {
@@ -18,8 +18,8 @@ const rootReducer = {
   loading: loadingReducer,
   auth: AuthReducer,
   profile: ProfileReducer,
-  register: RegisterReducer,
-  posts: PostReducer
+  posts: PostReducer,
+  chat: chatReducer,
 };
 
 const persistedReducer = persistReducer(persistConfig, combineReducers(rootReducer));

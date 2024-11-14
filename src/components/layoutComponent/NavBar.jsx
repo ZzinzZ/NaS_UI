@@ -25,7 +25,6 @@ import { logout } from "@/redux/slices/AuthSlice";
 import { getProfile } from "@/redux/thunks/profileThunk";
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
 import { usePathname } from "next/navigation";
-import { initiateSocketConnection } from "@/utils/services/socket/socketService";
 
 const NavBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -36,10 +35,6 @@ const NavBar = () => {
   const { user } = useSelector((state) => state.auth);
   const { profileData } = useSelector((state) => state.profile);
   
-
-  useEffect(() => {
-    initiateSocketConnection(user?._id);
-  },[])
 
   const handlePopoverOpen = (event, id) => {
     setAnchorEl(event.currentTarget);
@@ -233,58 +228,6 @@ const NavBar = () => {
             >
               <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>
                 Friends
-              </Typography>
-            </Popover>
-
-            <Button
-              className="nav-page-button"
-              aria-owns={
-                open && popoverId === "groups"
-                  ? "mouse-over-popover-groups"
-                  : undefined
-              }
-              onMouseEnter={(e) => handlePopoverOpen(e, "groups")}
-              onMouseLeave={handlePopoverClose}
-              sx={{
-                background: {
-                  xs:  path.includes("/groups") ? "rgba(255,255,255,0.8)" : "transparent",
-                  sm:  path.includes("/groups") ? "rgba(255,255,255,0.8)" : "transparent",
-                  md:  path.includes("/groups") ? "rgba(255,255,255,0.8)" : "transparent",
-                },
-                "&:hover": {
-                  backgroundColor: "rgba(255,255,255,0.7) !important",
-                },
-              }}
-            >
-              <Link
-                href="/"
-                style={{ color: "inherit", textDecoration: "none" }}
-              >
-                <GroupsIcon
-                  sx={{
-                    color: {
-                      xs: path.includes("/groups") ? "#1976d3" : "black",
-                      sm: path.includes("/groups") ? "#1976d3" : "black",
-                      md: path.includes("/groups") ? "#0074ec" : "#fff",
-                    },
-                    fontSize: 30,
-                  }}
-                />
-              </Link>
-            </Button>
-            <Popover
-              id="mouse-over-popover-groups"
-              sx={{ pointerEvents: "none", marginTop: "0.3rem" }}
-              open={open && popoverId === "groups"}
-              anchorEl={anchorEl}
-              anchorOrigin={{ vertical: "right", horizontal: "right" }}
-              transformOrigin={{ vertical: "left", horizontal: "left" }}
-              onClose={handlePopoverClose}
-              disableRestoreFocus
-              disableScrollLock={true}
-            >
-              <Typography sx={{ p: 1, background: "#474645", color: "#fff" }}>
-                Groups
               </Typography>
             </Popover>
 

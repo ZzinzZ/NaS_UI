@@ -27,16 +27,17 @@ import {
   Typography,
 } from "@mui/material";
 import {
-    deleteChat,
-    getChatDetails,
-    leaveChat,
-    removeGroupMember,
-    updateChatAvatar,
-    updateChatName,
-  } from "@/utils/services/chatService/chatService";
+  deleteChat,
+  getChatDetails,
+  leaveChat,
+  removeGroupMember,
+  updateChatAvatar,
+  updateChatName,
+} from "@/utils/services/chatService/chatService";
 import VisuallyHiddenInput from "../generals/VisuallyHiddenInput";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const drawerWidth = 240;
 
@@ -48,12 +49,21 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
-const ChatDrawer = ({chat, open, handleDrawerClose, onUpdate, listMember, setLisMember}) => {
+const ChatDrawer = ({
+  chat,
+  open,
+  handleDrawerClose,
+  onUpdate,
+  listMember,
+  setLisMember,
+}) => {
   const [isAddMember, setIsAddMember] = useState(false);
   const [updatingName, setUpdatingName] = useState(false);
   const [showMember, setShowMember] = useState(false);
   const [newChatName, setNewChatName] = useState("");
+  const [otherParticipants, setOtherParticipants] = useState();
   const { user } = useSelector((state) => state.auth);
+  const router = useRouter();
   const theme = useTheme();
 
   const handleShowMember = () => {
@@ -64,11 +74,15 @@ const ChatDrawer = ({chat, open, handleDrawerClose, onUpdate, listMember, setLis
     router.push(`/user/profile?id=${userId}`);
   };
 
-  const chatDetails = async (chatId) => {
+  const chatDetails = async () => {
     try {
-      const response = await getChatDetails({ chatId: chatId });
+      const response = await getChatDetails({ chatId: chat?._id });
       setLisMember(response?.participantProfiles);
-      console.log(response);
+      setOtherParticipants(
+        response?.participantProfiles.find(
+          (participant) => participant.userId !== user?._id
+        )
+      );
     } catch (error) {
       console.log(error);
     }
@@ -162,7 +176,9 @@ const ChatDrawer = ({chat, open, handleDrawerClose, onUpdate, listMember, setLis
     }
   };
   useEffect(() => {
-    chatDetails(chat?._id);
+    if(chat) {
+      chatDetails();
+    }
   }, [chat]);
   return (
     <Drawer
@@ -173,8 +189,6 @@ const ChatDrawer = ({chat, open, handleDrawerClose, onUpdate, listMember, setLis
           width: drawerWidth,
           boxSizing: "border-box",
         },
-        
-        
       }}
       variant="persistent"
       anchor="right"
@@ -196,7 +210,14 @@ const ChatDrawer = ({chat, open, handleDrawerClose, onUpdate, listMember, setLis
         sx={{ padding: "0 1rem" }}
       >
         <Stack direction="row" sx={{ position: "relative" }}>
-          <Avatar src={chat?.avatar} sx={{ width: 65, height: 65 }} />
+          <Avatar
+            sx={{ width: 65, height: 65 }}
+            src={
+              chat?.type === "private"
+                ? otherParticipants?.avatar?.content?.media[0].media_url
+                : chat?.avatar
+            }
+          />
           {chat?.type === "group" && (
             <IconButton
               sx={{
@@ -228,7 +249,11 @@ const ChatDrawer = ({chat, open, handleDrawerClose, onUpdate, listMember, setLis
         </Typography>
         {!updatingName ? (
           <Stack direction="row" alignItems="center">
-            <Typography variant="h6">{chat?.chat_name}</Typography>
+            <Typography variant="h6">
+              {chat?.chat_name !== null
+                ? chat?.chat_name
+                : otherParticipants?.userName}
+            </Typography>
             <IconButton onClick={() => setUpdatingName(true)}>
               <BorderColorIcon sx={{ fontSize: "1rem" }} />
             </IconButton>
@@ -352,7 +377,7 @@ const ChatDrawer = ({chat, open, handleDrawerClose, onUpdate, listMember, setLis
             >
               Leave chat
             </Button>
-            {user._id === chat.created_by && (
+            {user?._id === chat.created_by && (
               <Button
                 variant="outlined"
                 color="error"

@@ -84,7 +84,7 @@ const CommentBar = ({ post, comment, getPost }) => {
 
   const handleSelectGif = (gif) => {
     if (gif) {
-      console.log("gif", gif);
+
       setGif(gif.url);
       setDisplayImage(gif.url);
     } else {
@@ -109,7 +109,6 @@ const CommentBar = ({ post, comment, getPost }) => {
     if (!content && !image && !gif) return;
     let result;
     if (comment) {
-      console.log(comment);
       
       result = await dispatch(
         replyCommentPost({
