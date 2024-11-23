@@ -35,9 +35,10 @@ import {
   updateChatName,
 } from "@/utils/services/chatService/chatService";
 import VisuallyHiddenInput from "../generals/VisuallyHiddenInput";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { hideLoading, showLoading } from "@/redux/slices/LoadingSlice";
 
 const drawerWidth = 240;
 
@@ -63,6 +64,7 @@ const ChatDrawer = ({
   const [newChatName, setNewChatName] = useState("");
   const [otherParticipants, setOtherParticipants] = useState();
   const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const router = useRouter();
   const theme = useTheme();
 
@@ -279,7 +281,12 @@ const ChatDrawer = ({
             <Button
               fullWidth
               variant="contained"
-              onClick={() => handleViewProfile(chat?.participants[0].userId)}
+              onClick={() => {
+                const otherUser = chat?.participants.find(
+                  (participant) => participant.userId !== user?._id
+                );
+                handleViewProfile(otherUser?.userId);
+              }}
             >
               View profile
             </Button>
@@ -326,6 +333,8 @@ const ChatDrawer = ({
                 open={isAddMember}
                 handleClose={closeAddMember}
                 chat={chat}
+                onUpdate={onUpdate}
+                listMember={listMember}
               />
               <List component="div" disablePadding>
                 <Button

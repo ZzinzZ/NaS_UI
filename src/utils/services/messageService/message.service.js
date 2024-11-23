@@ -1,12 +1,17 @@
 import { toast } from "react-toastify";
 import {
   baseUrl,
+  deleteRequest,
   getRequest,
   patchRequest,
   postRequest,
+  putRequest,
 } from "../requestService";
 
-export const sendMessage = async ({ senderId, chatId, text, images }) => {
+export const sendMessage = async (
+  { senderId, chatId, text, images },
+  onUploadProgress
+) => {
   try {
     const formData = new FormData();
     formData.append("senderId", senderId);
@@ -47,6 +52,17 @@ export const deleteSoftMessage = async ({ messageId, userId }) => {
   }
 };
 
+export const removeMessage = async ({ messageId, userId }) => {
+  try {
+    const message = await putRequest(`${baseUrl}/messages/remove/${messageId}`, {
+      userId,
+    });
+    return message.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+  }
+};
+
 export const markAsRead = async ({ messageId, userId }) => {
   try {
     const message = await patchRequest(
@@ -55,7 +71,7 @@ export const markAsRead = async ({ messageId, userId }) => {
     );
     return message.data;
   } catch (error) {
-    toast.error(error.response.data.message || error);
+    // toast.error(error.response.data.message || error);
   }
 };
 
@@ -89,12 +105,51 @@ export const reactMessage = async ({ messageId, userId, emotion }) => {
   }
 };
 
-export const countUnreadMessages = async ({userId, chatId}) => {
+export const countUnreadMessages = async ({ userId, chatId }) => {
   try {
-    const count = await getRequest(`${baseUrl}/messages/unread/count/${chatId}/${userId}`);
-    console.log(count.data);
+    const count = await getRequest(
+      `${baseUrl}/messages/unread/count/${chatId}/${userId}`
+    );
     return count.data;
   } catch (error) {
     toast.error(error.response.data.message);
   }
-}
+};
+
+export const deleteChatMessages = async ({ chatId, userId }) => {
+  try {
+    const response = await putRequest(`${baseUrl}/messages/chat-soft-delete`, {
+      chatId,
+      userId,
+    });
+    toast.info(response.message);
+    return response.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+    console.log(error);
+  }
+};
+
+export const getUserSeenMessage = async ({ messageId }) => {
+  try {
+    const response = await getRequest(
+      `${baseUrl}/messages/seen-list/${messageId}`
+    );
+    return response.data;
+  } catch (error) {
+    // toast.error(error.response.data.message);
+    console.log(error);
+  }
+};
+
+export const getUserReactMessage = async ({ messageId }) => {
+  try {
+    const response = await getRequest(
+      `${baseUrl}/messages/react-list/${messageId}`
+    );
+    return response.data;
+  } catch (error) {
+    // toast.error(error.response.data.message);
+    console.log(error);
+  }
+};

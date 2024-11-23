@@ -3,6 +3,8 @@ import {
   getMessageByChatId,
   markAsRead,
   reactMessage,
+  removeMessage,
+  replyMessage,
   sendMessage,
 } from "@/utils/services/messageService/message.service";
 import React, {
@@ -25,7 +27,9 @@ export const SocketProvider = ({ children, userId }) => {
   const [newMessage, setNewMessage] = useState(null);
   const [receiveMessage, setReceiveMessage] = useState(0);
   const [reactedMessage, setReactedMessage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const chat = useSelector((state) => state.chat.chatData);
+  const {user} = useSelector(state => state.auth)
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
@@ -67,7 +71,9 @@ export const SocketProvider = ({ children, userId }) => {
   };
 
   useEffect(() => {
-    getChatMessage();
+    if(user && chat) {
+      getChatMessage();
+    }
   }, [chat, userId]);
 
   const sendMessageSocket = () => {
@@ -133,6 +139,20 @@ export const SocketProvider = ({ children, userId }) => {
       images,
       setImages
     ) => {
+      const tempMessage = {
+        sender_id: senderId,
+        chatId,
+        content: {
+          text: textMessage,
+          images: images.map((file) => URL.createObjectURL(file)),
+        },
+        isLoading: images.length > 0,
+      };
+      setMessages((prev) => [...prev, tempMessage]);
+      setTextMessage("");
+      setImages([]);
+
+      // 2. Gửi request lên server
       const response = await sendMessage({
         senderId: senderId,
         chatId: chatId,
@@ -140,11 +160,64 @@ export const SocketProvider = ({ children, userId }) => {
         images: images,
       });
 
+      setMessages((prev) =>
+        prev.map((msg) => (msg === tempMessage ? response : msg))
+      );
       setNewMessage(response);
-      setMessages((prev) => [...prev, response]);
+    }
+  );
+
+  const handleReplyMessage = useCallback(
+    async (
+      textMessage,
+      senderId,
+      messageId,
+      setTextMessage,
+      images,
+      setImages
+    ) => {
+      const tempMessage = {
+        sender_id: senderId,
+        content: {
+          text: textMessage,
+          images: images.map((file) => URL.createObjectURL(file)),
+        },
+        isLoading: images.length > 0,
+      };
+      setMessages((prev) => [...prev, tempMessage]);
       setTextMessage("");
       setImages([]);
+
+      const response = await replyMessage({
+        userId: senderId,
+        messageId: messageId,
+        text: textMessage,
+        images: images,
+      });
+
+      setMessages((prev) =>
+        prev.map((msg) => (msg === tempMessage ? response : msg))
+      );
+      setNewMessage(response);
     }
+  );
+
+  const handleRemoveMessage = useCallback(
+    async (userId, messageId) => {
+      try {
+        const response = await removeMessage({ messageId, userId });
+        setMessages((prev) =>
+          prev.map((msg) => (msg._id === messageId ? response : msg))
+        );
+        const recipients = chat?.participants?.filter(
+          (participant) => participant.userId !== userId
+        );
+        socket.emit("removeMessage", { message: response, recipients });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [chat]
   );
 
   useEffect(() => {
@@ -153,7 +226,7 @@ export const SocketProvider = ({ children, userId }) => {
       if (chat?._id !== message?.chat_id) {
         setReceiveMessage((prev) => prev + 1);
         return;
-      };
+      }
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
@@ -167,11 +240,15 @@ export const SocketProvider = ({ children, userId }) => {
 
     socket?.on("receiveRead", (message) => {
       if (chat?._id !== message?.chat_id) return;
-      
+
       setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg._id === message._id ? message : msg
-        )
+        prevMessages?.map((msg) => (msg._id === message._id ? message : msg))
+      );
+    });
+
+    socket?.on("receiveRemove", (message) => {
+      setMessages((prevMessages) =>
+        prevMessages?.map((msg) => (msg._id === message?._id ? message : msg))
       );
     });
 
@@ -203,8 +280,11 @@ export const SocketProvider = ({ children, userId }) => {
         setMessages,
         setNewMessage,
         handleSendMessage,
+        handleReplyMessage,
         handleReadMessage,
         handleReactMessage,
+        uploadProgress,
+        handleRemoveMessage,
       }}
     >
       {children}

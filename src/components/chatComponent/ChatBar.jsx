@@ -22,7 +22,7 @@ import ListChatLoading from "./ListChatLoading";
 import useDebounce from "@/customHooks/useDebounce";
 import { useSocket } from "@/contexts/SocketContext";
 
-const ChatBar = () => {
+const ChatBar = ({ setIsDeleteMessages }) => {
   const router = useRouter();
   const { user } = useSelector((state) => state.auth);
   const [chats, setChats] = useState([]);
@@ -31,18 +31,19 @@ const ChatBar = () => {
   const [isReadMessage, setIsReadMessage] = useState(false);
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText, 300);
-  const { messages, newMessage, receiveMessage } = useSocket();
+  const { newMessage, receiveMessage } = useSocket();
 
   const getUserChat = async () => {
-    setIsFetching(true);
+    // setIsFetching(true);
     try {
       const response = await getChatsList({ userId: user._id });
       setChats(response);
     } catch (error) {
       console.log(error);
-    } finally {
-      setIsFetching(false);
-    }
+    } 
+    // finally {
+    //   setIsFetching(false);
+    // }
   };
 
   const findChat = async (keyword) => {
@@ -66,7 +67,7 @@ const ChatBar = () => {
 
   useEffect(() => {
     getUserChat();
-  }, [user, messages, newMessage, receiveMessage]);
+  }, [user, newMessage, receiveMessage]);
 
   const handleChatItemClick = (chatId) => {
     router.push(`/user?chat-id=${chatId}`);
@@ -212,6 +213,7 @@ const ChatBar = () => {
                   chat={chat}
                   isReadMessage={isReadMessage}
                   setIsReadMessage={setIsReadMessage}
+                  setIsDeleteMessages={setIsDeleteMessages}
                 />
               </Box>
             ))

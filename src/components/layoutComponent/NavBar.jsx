@@ -63,7 +63,6 @@ const NavBar = () => {
   const userMenuOpen = Boolean(userMenuAnchorEl);
 
   useEffect(() => {
-    console.log("user", user);
     if (!user) {
       Cookies.remove("token");
     } else if (user?._id) {

@@ -39,6 +39,7 @@ const RequestSentItem = ({ profile, onRemove }) => {
           }
           width={150}
           height={150}
+          sx={{borderRadius:"0.5rem"}}
           alt="profile avatar"
         />
         <Typography>{profile.userName}</Typography>

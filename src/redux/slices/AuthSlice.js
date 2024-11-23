@@ -18,8 +18,6 @@ const AuthSlice = createSlice({
       state.error = null;
       state.loading = false;
       state.token = null;
-      
-      
       Cookies.remove('token'); 
       Cookies.remove('refreshToken'); 
       resetProfile();

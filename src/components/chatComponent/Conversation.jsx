@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 
 const drawerWidth = 240;
 
-const Conversation = ({ currentChat }) => {
+const Conversation = ({ isDeleteMessages }) => {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("chat-id");
   const [isActive, setIsActive] = useState(false);
@@ -24,10 +24,12 @@ const Conversation = ({ currentChat }) => {
   const [open, setOpen] = useState(false);
   const [listMember, setLisMember] = useState([]);
   const [otherParticipant, setOtherParticipant] = useState();
+  const [refMessage, setRefMessage] = useState(null);
   const { user } = useSelector((state) => state.auth);
   const { onlineUsers, newMessage, messages, reactedMessage } = useSocket();
   const dispatch = useDispatch();
   const lastMessageRef = useRef(null);
+  const messageRefs = useRef({});
   const handleDrawerOpen = () => setOpen(!open);
   const handleDrawerClose = () => setOpen(false);
 
@@ -39,6 +41,12 @@ const Conversation = ({ currentChat }) => {
       setLisMember(response?.participantProfiles || []);
     } catch (error) {
       toast.error("Không thể lấy chi tiết cuộc trò chuyện:", error);
+    }
+  };
+
+  const scrollToMessage = (messageId) => {
+    if (messageRefs.current[messageId]) {
+      messageRefs.current[messageId].scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 
@@ -78,7 +86,7 @@ const Conversation = ({ currentChat }) => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [chatId]);
+  }, [chatId, isDeleteMessages]);
 
   useEffect(() => {
     if (messages?.length > 0 && lastMessageRef.current) {
@@ -186,7 +194,13 @@ const Conversation = ({ currentChat }) => {
           }}
         >
           {messages?.map((message) => (
-            <Message message={message} key={message?._id} />
+            <Message
+              scrollToMessage={scrollToMessage}
+              ref={(el) => (messageRefs.current[message?._id] = el)}
+              message={message}
+              key={message?._id}
+              setRefMessage={setRefMessage}
+            />
           ))}
           <Box ref={lastMessageRef} />
         </Box>
@@ -199,7 +213,11 @@ const Conversation = ({ currentChat }) => {
             background: "#fff",
           }}
         >
-          <InputChat chat={chat} />
+          <InputChat
+            chat={chat}
+            refMessage={refMessage}
+            setRefMessage={setRefMessage}
+          />
         </Box>
         <ChatDrawer
           open={open}

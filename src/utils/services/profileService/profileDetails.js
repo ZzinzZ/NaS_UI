@@ -140,8 +140,6 @@ export const deleteProfileExperience = async ({ userId, experienceId }) => {
 
 export const deleteProfileEducation = async ({ userId, educationId }) => {
   try {
-    console.log(educationId);
-    
     const response = await deleteRequest(
       `${baseUrl}/profiles/education/${userId}`,
       { educationId }

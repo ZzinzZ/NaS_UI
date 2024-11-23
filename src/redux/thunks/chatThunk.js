@@ -8,7 +8,6 @@ export const getChatDetails = createAsyncThunk(
   async ({chatId}, { rejectWithValue }) => {
     try {
       const response = await getRequest(`${baseUrl}/chats/details/${chatId}`);
-      console.log(response.data);
       return response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || "Đã xảy ra lỗi");

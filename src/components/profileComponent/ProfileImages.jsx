@@ -26,8 +26,6 @@ const ProfileImages = () => {
   useEffect(() => {
     const getListImage = async () => {
       const response = await getListPhotos({ userId });
-      console.log(response);
-      
       setListImage(response);
     };
     getListImage();

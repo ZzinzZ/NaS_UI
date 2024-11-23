@@ -14,7 +14,7 @@ const FriendRequestItem = ({ profile, onRemove }) => {
           await dispatch(
             acceptFriendRequest({ receiverId: user._id, senderId: profile.userId })
           );
-          await createPrivateChat({userId: user._id, participants: [profile.userId]});
+          await createPrivateChat({userId: user._id, participantId: profile.userId});
           onRemove();
         } catch (error) {
             console.log(error);
@@ -52,6 +52,7 @@ const FriendRequestItem = ({ profile, onRemove }) => {
           width={150}
           height={150}
           alt="profile avatar"
+          sx={{borderRadius:"0.5rem"}}
         />
         <Typography>{profile.userName}</Typography>
         <Stack sx={{width:"90%"}} spacing={1}>

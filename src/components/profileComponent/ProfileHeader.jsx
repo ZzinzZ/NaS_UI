@@ -18,7 +18,7 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import AvatarGroup from "@mui/material/AvatarGroup";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import ChatIcon from "@mui/icons-material/Chat";
+
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,6 +39,7 @@ import {
   USER_AVATAR_ORIGINAL,
   USER_BACKGROUND_ORIGINAL,
 } from "@/config/profileConfig";
+import GoChatButton from "../generals/GoChatButton";
 
 const ProfileHeader = ({ user, profile, listFriend }) => {
   const router = useRouter();
@@ -407,14 +408,7 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                     Add Friend
                   </Button>
                 )}
-                <Button
-                  className="grey-profile-button"
-                  variant="outlined"
-                  startIcon={<ChatIcon />}
-                  sx={{ ml: "auto" }}
-                >
-                  Text Message
-                </Button>
+                <GoChatButton userId={userId}/>
               </Stack>
             ) : (
               <Stack direction="row" alignItems="center" spacing={1}></Stack>
