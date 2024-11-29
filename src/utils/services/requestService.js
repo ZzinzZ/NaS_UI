@@ -3,9 +3,9 @@ import apiClient from "./apiClient";
 
 export const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-export const postRequest = async (url, body) => {
+export const postRequest = async (url, body, config = {}) => {
   try {
-    const response = await apiClient.post(url, body);
+    const response = await apiClient.post(url, body, config);
     return response.data;
   } catch (error) {
     console.error("Error making POST request:", error);
@@ -41,13 +41,12 @@ export const patchRequest = async (url, body) => {
     console.error("Error making PATCH request:", error);
     throw error;
   }
-}
+};
 
 export const deleteRequest = async (url, body) => {
-  console.log("body", body);
   try {
     const response = await apiClient.delete(url, {
-      data: body, 
+      data: body,
     });
     return response.data;
   } catch (error) {

@@ -55,11 +55,9 @@ const RegisterForm = () => {
     gender: "",
   });
 
-  const { isLoading } = useSelector((state) => state.register);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    console.log(activeStep);
   };
 
   const handleBack = () => {
@@ -75,7 +73,6 @@ const RegisterForm = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    console.log("formData changed", formData);
   };
 
   const handleVerification = async () => {
@@ -126,7 +123,6 @@ const RegisterForm = () => {
 
     const { confirmPassword, ...registerData } = formData;
     registerData.birthday = formattedBirthday;
-    console.log("formData", formData);
     dispatch(showLoading());
 
     dispatch(registerUser({ ...registerData, otp: otpVerified }))
@@ -434,7 +430,6 @@ const RegisterForm = () => {
                     color="primary"
                     fullWidth
                     sx={{ mt: 2 }}
-                    disabled={isLoading}
                   >
                     <Link href="/login" style={{color: "#fff" , textDecoration:"none", width:"100%"}}>Login now</Link>
                   </Button>

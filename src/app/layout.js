@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ThemeProviderWarp from "@/components/provider/ThemeProvider";
 import Localization from "@/components/provider/LocalizationProvider";
+import ContextProvider from "@/components/provider/ContextProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 // const viewport = {
@@ -39,19 +40,21 @@ function RootLayout({ children }) {
         <ThemeProviderWarp>
           <Localization>
             <ReduxProvider>
-              <ToastContainer
-                position="top-center"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss={false}
-                draggable={false}
-                pauseOnHover={false}
-              />
-              <FetchLoading />
-              {children}
+              <ContextProvider>
+                <ToastContainer
+                  position="top-center"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss={false}
+                  draggable={false}
+                  pauseOnHover={false}
+                />
+                <FetchLoading />
+                {children}
+              </ContextProvider>
             </ReduxProvider>
           </Localization>
         </ThemeProviderWarp>

@@ -14,7 +14,7 @@ const Reaction = [
   ];
 
 
-  const ReactSelector = ({handleReact}) => {
+  const ReactSelector = ({handleReact, left}) => {
     return (
         <ReactionBarSelector
         reactions={Reaction}
@@ -23,6 +23,7 @@ const Reaction = [
           padding: "0 1rem 0 0",
           position: "absolute",
           top: "-2.7rem",
+          left:left
         }}
         onSelect={(key) => handleReact(key)}
       />

@@ -21,7 +21,6 @@ const IntroduceOverView = ({ user, profile }) => {
   const [editBio, setEditBio] = useState(false);
 
   const currentDate = Date.now();
-  console.log("profile", profile);
 
   useEffect(() => {
     if (user && profile) {

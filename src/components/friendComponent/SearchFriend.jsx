@@ -129,7 +129,7 @@ const SearchFriend = () => {
               </Stack>
             </Stack>
             <Stack spacing={1} sx={{ padding: "1rem" }}>
-              <Typography>Search Histories</Typography>
+              <Typography sx={{color:"#ccc"}}>Search Histories</Typography>
               <Stack
                 direction="row"
                 spacing={1}

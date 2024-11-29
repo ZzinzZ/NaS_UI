@@ -42,7 +42,8 @@ const LoginForm = () => {
       user = await dispatch(login(formData)).unwrap();
       router.push("/user");
     } catch (err) {
-      toast.error(`Login failed: ${err.message}`);
+      console.log(err);
+      
     } finally {
       dispatch(hideLoading());
     }

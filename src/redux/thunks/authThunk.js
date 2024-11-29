@@ -33,6 +33,8 @@ export const login = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
+      console.log("error",error);
+      
       toast.error(error.response.data.message);
       return rejectWithValue(error.message);
     }

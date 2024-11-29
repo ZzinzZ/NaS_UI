@@ -20,26 +20,26 @@ import {
 import CreateGroupBoard from "./CreateGroupBoard";
 import ListChatLoading from "./ListChatLoading";
 import useDebounce from "@/customHooks/useDebounce";
+import { useSocket } from "@/contexts/SocketContext";
 
-const ChatBar = () => {
+const ChatBar = ({ setIsDeleteMessages }) => {
   const router = useRouter();
   const { user } = useSelector((state) => state.auth);
   const [chats, setChats] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [openCreateBoard, setOpenCreateBoard] = useState(false);
+  const [isReadMessage, setIsReadMessage] = useState(false);
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText, 300);
+  const { newMessage, receiveMessage } = useSocket();
 
   const getUserChat = async () => {
-    setIsFetching(true);
     try {
       const response = await getChatsList({ userId: user._id });
       setChats(response);
     } catch (error) {
       console.log(error);
-    } finally {
-      setIsFetching(false);
-    }
+    } 
   };
 
   const findChat = async (keyword) => {
@@ -56,18 +56,20 @@ const ChatBar = () => {
       }
     } catch (error) {
       console.log(error);
-    }
-    finally {
+    } finally {
       setIsFetching(false);
     }
   };
 
   useEffect(() => {
     getUserChat();
-  }, [user]);
+    
+  
+  }, [user, newMessage, receiveMessage]);
 
   const handleChatItemClick = (chatId) => {
     router.push(`/user?chat-id=${chatId}`);
+    setIsReadMessage(true);
   };
 
   const handleCreateBoardClick = () => {
@@ -199,15 +201,22 @@ const ChatBar = () => {
         <Stack>
           {isFetching ? (
             <ListChatLoading />
-          ) : (
+          ) : chats?.length > 0 ? (
             chats?.map((chat) => (
               <Box
                 key={chat?._id}
                 onClick={() => handleChatItemClick(chat?._id)}
               >
-                <ChatItem chat={chat} />
+                <ChatItem
+                  chat={chat}
+                  isReadMessage={isReadMessage}
+                  setIsReadMessage={setIsReadMessage}
+                  setIsDeleteMessages={setIsDeleteMessages}
+                />
               </Box>
             ))
+          ) : (
+            <Typography>No conversation available</Typography>
           )}
         </Stack>
       </Box>

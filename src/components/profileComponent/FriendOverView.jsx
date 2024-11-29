@@ -10,7 +10,6 @@ const FriendOverView = ({ profile }) => {
   const handleViewProfile = () => {
     router.push(`/user/profile?id=${profile?.userId}`);
   };
-  console.log(profile);
   
   return (
     <Box sx={{ background: "#fff", padding: "1rem" }}>

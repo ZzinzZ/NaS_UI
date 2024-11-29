@@ -61,7 +61,6 @@ const PostItem = ({ profile, postItem, onDelete  }) => {
     setIsLoadingData(true);
     try {
       const post = await dispatch(getPostDetails(postItem?._id));
-      console.log(post.payload);
 
       setPost(post.payload.post);
       setPostUser(post.payload.profile);

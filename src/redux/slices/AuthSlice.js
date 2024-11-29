@@ -3,7 +3,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import Cookies from 'js-cookie';
 import { registerUser, login, refreshToken } from "../thunks/authThunk";
 import { resetProfile } from "./profileSlice";
-import { disconnectSocket } from "@/utils/services/socket/socketService";
 
 const AuthSlice = createSlice({
   name: 'auth',
@@ -15,13 +14,10 @@ const AuthSlice = createSlice({
   },
   reducers: {
     logout: (state) => {
-      disconnectSocket()
       state.user = null;
       state.error = null;
       state.loading = false;
       state.token = null;
-      
-      
       Cookies.remove('token'); 
       Cookies.remove('refreshToken'); 
       resetProfile();
