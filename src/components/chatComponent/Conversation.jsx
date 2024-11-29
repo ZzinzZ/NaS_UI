@@ -25,6 +25,9 @@ const Conversation = ({ isDeleteMessages }) => {
   const [listMember, setLisMember] = useState([]);
   const [otherParticipant, setOtherParticipant] = useState();
   const [refMessage, setRefMessage] = useState(null);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [isBlockedBy, setIsBlockedBy] = useState(false);
+  const [stranger, setStranger] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const { onlineUsers, newMessage, messages, reactedMessage } = useSocket();
   const dispatch = useDispatch();
@@ -46,7 +49,10 @@ const Conversation = ({ isDeleteMessages }) => {
 
   const scrollToMessage = (messageId) => {
     if (messageRefs.current[messageId]) {
-      messageRefs.current[messageId].scrollIntoView({ behavior: "smooth", block: "center" });
+      messageRefs.current[messageId].scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }
   };
 
@@ -100,6 +106,20 @@ const Conversation = ({ isDeleteMessages }) => {
     }
   }, [newMessage, reactedMessage]);
 
+  useEffect(() => {
+    if(chat?.type === "private") {
+      setIsBlocked(
+        otherParticipant?.blockedBy?.some((block) => block.userId === user?._id)
+      );
+      setIsBlockedBy(
+        otherParticipant?.blockedUsers?.some(
+          (block) => block.userId === user?._id
+        )
+      );
+      setStranger(!otherParticipant?.friends?.some((friend) => friend.userId === user?._id))
+    }
+  }, [otherParticipant, chat]);
+
   return (
     <Box
       sx={{
@@ -113,7 +133,7 @@ const Conversation = ({ isDeleteMessages }) => {
           transition: "width 0.3s ease-out",
         }}
       >
-        <Box sx={{ position: "sticky", top: 0, zIndex: 1, background: "#fff" }}>
+        <Box sx={{ position: "sticky", top: 0, zIndex: 1, background: "#fff" , boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",}}>
           <Stack
             direction="row"
             justifyContent="space-between"
@@ -140,11 +160,16 @@ const Conversation = ({ isDeleteMessages }) => {
                 />
               )}
               <Stack>
+                <Stack direction="row" spacing={1}>
                 <Typography sx={{ fontWeight: 600 }}>
                   {chat?.chat_name !== null
                     ? chat?.chat_name
                     : otherParticipant?.userName}
                 </Typography>
+                {
+                  stranger && <Typography sx={{backgroundColor:"#ccc", padding:"0 0.2rem", borderRadius:"0.4rem"}}>Stranger</Typography>
+                }
+                </Stack>
                 <Typography
                   sx={{
                     fontWeight: 400,
@@ -200,9 +225,17 @@ const Conversation = ({ isDeleteMessages }) => {
               message={message}
               key={message?._id}
               setRefMessage={setRefMessage}
+              isBlockedBy={isBlockedBy}
             />
           ))}
           <Box ref={lastMessageRef} />
+          {isBlockedBy && (
+            <Stack justifyContent="center" sx={{width:"100%"}}>
+              <Typography sx={{ color: "red", textAlign:"center" }}>
+              Messages cannot currently be sent to this user
+            </Typography>
+            </Stack>
+          )}
         </Box>
         {/* Conversation input */}
         <Box
@@ -217,6 +250,7 @@ const Conversation = ({ isDeleteMessages }) => {
             chat={chat}
             refMessage={refMessage}
             setRefMessage={setRefMessage}
+            isBlockedBy={isBlockedBy}
           />
         </Box>
         <ChatDrawer
@@ -226,6 +260,8 @@ const Conversation = ({ isDeleteMessages }) => {
           onUpdate={setChat}
           listMember={listMember}
           setLisMember={setLisMember}
+          isBlocked={isBlocked}
+          setIsBlocked={setIsBlocked}
         />
       </Stack>
     </Box>

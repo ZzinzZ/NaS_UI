@@ -5,6 +5,7 @@ import {
   reactMessage,
   removeMessage,
   replyMessage,
+  sendFile,
   sendMessage,
 } from "@/utils/services/messageService/message.service";
 import React, {
@@ -29,7 +30,7 @@ export const SocketProvider = ({ children, userId }) => {
   const [reactedMessage, setReactedMessage] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const chat = useSelector((state) => state.chat.chatData);
-  const {user} = useSelector(state => state.auth)
+  const { user } = useSelector((state) => state.auth);
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
@@ -71,7 +72,7 @@ export const SocketProvider = ({ children, userId }) => {
   };
 
   useEffect(() => {
-    if(user && chat) {
+    if (user && chat) {
       getChatMessage();
     }
   }, [chat, userId]);
@@ -123,7 +124,7 @@ export const SocketProvider = ({ children, userId }) => {
       setReactedMessage(response);
 
       setMessages((prevMessages) =>
-        prevMessages.map((msg) => (msg._id === response._id ? response : msg))
+        prevMessages.map((msg) => (msg._id === response?._id ? response : msg))
       );
     } catch (error) {
       console.log(error);
@@ -152,7 +153,6 @@ export const SocketProvider = ({ children, userId }) => {
       setTextMessage("");
       setImages([]);
 
-      // 2. Gửi request lên server
       const response = await sendMessage({
         senderId: senderId,
         chatId: chatId,
@@ -166,6 +166,25 @@ export const SocketProvider = ({ children, userId }) => {
       setNewMessage(response);
     }
   );
+
+  const handleSendFile = useCallback(async (senderId, chatId, files) => {
+    const tempMessage = {
+      sender_id: senderId,
+      chatId,
+      content: {
+        files: files.map((file) => URL.createObjectURL(file)),
+      },
+      isLoading: true,
+    };
+    setMessages((prev) => [...prev, tempMessage]);
+    const response = await sendFile({ senderId, chatId, files }, (progress) => {
+      setUploadProgress(progress);
+    });
+    setMessages((prev) =>
+      prev.map((msg) => (msg === tempMessage ? response : msg))
+    );
+    setNewMessage(response);
+  });
 
   const handleReplyMessage = useCallback(
     async (
@@ -285,6 +304,7 @@ export const SocketProvider = ({ children, userId }) => {
         handleReactMessage,
         uploadProgress,
         handleRemoveMessage,
+        handleSendFile,
       }}
     >
       {children}

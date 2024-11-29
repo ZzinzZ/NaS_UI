@@ -20,13 +20,14 @@ import { useSocket } from "@/contexts/SocketContext";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ImageIcon from "@mui/icons-material/Image";
 
-const InputChat = ({ chat, refMessage, setRefMessage }) => {
+const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [emojiAnchorEl, setEmojiAnchorEl] = useState(null);
   const [chatContent, setChatContent] = useState("");
   const [images, setImages] = useState([]);
+  const [files, setFiles] = useState([]);
   const { user } = useSelector((state) => state.auth);
-  const { handleSendMessage, handleReplyMessage } = useSocket();
+  const { handleSendMessage, handleReplyMessage, handleSendFile } = useSocket();
 
   const onEmojiClick = (emojiObject, event) => {
     setChatContent((prev) => prev + emojiObject.emoji);
@@ -54,9 +55,17 @@ const InputChat = ({ chat, refMessage, setRefMessage }) => {
 
   const handleImageChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
+    
+    
     setImages((prevImages) => [...prevImages, ...selectedFiles]);
     handleMenuClose();
   };
+
+  const handleFileChange = async (event) => {
+    const selectedFiles = Array.from(event.target.files);
+    handleSendFile(user?._id, chat?._id, selectedFiles);
+    handleMenuClose();
+  }
 
   const removeImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
@@ -163,13 +172,15 @@ const InputChat = ({ chat, refMessage, setRefMessage }) => {
         sx={{ padding: "0.5rem 0.5rem" }}
       >
         <IconButton
+        disabled={isBlockedBy}
           onClick={handleMenuOpen}
           sx={{
             transition: "transform 0.3s",
             transform: openMenu ? "rotate(45deg)" : "rotate(0deg)",
+            
           }}
         >
-          <AddCircleIcon sx={{ color: "#1976d3" }} />
+          <AddCircleIcon sx={{ color: isBlockedBy ? "gray" : "#1976d3" }} />
         </IconButton>
 
         <Popover
@@ -206,7 +217,7 @@ const InputChat = ({ chat, refMessage, setRefMessage }) => {
                 multiple
                 style={{ display: "none" }}
                 id="attach-files"
-                onChange={handleImageChange}
+                onChange={handleFileChange}
               />
               <label htmlFor="attach-files">
                 <Stack direction="row" alignItems="center" spacing={1}>
@@ -255,6 +266,7 @@ const InputChat = ({ chat, refMessage, setRefMessage }) => {
           }}
         >
           <TextField
+          disabled={isBlockedBy}
             autoComplete="off"
             placeholder="Type a message..."
             value={chatContent}
@@ -286,8 +298,8 @@ const InputChat = ({ chat, refMessage, setRefMessage }) => {
               },
             }}
           />
-          <IconButton onClick={handleEmojiPickerOpen}>
-            <EmojiEmotionsIcon sx={{ color: "#1976d3" }} />
+          <IconButton onClick={handleEmojiPickerOpen} disabled={isBlockedBy}>
+            <EmojiEmotionsIcon sx={{ color: isBlockedBy ? "gray" : "#1976d3" }} />
           </IconButton>
           <Popover
             open={openEmojiPicker}
@@ -313,8 +325,8 @@ const InputChat = ({ chat, refMessage, setRefMessage }) => {
             />
           </Popover>
         </Stack>
-        <IconButton onClick={handleSend}>
-          <SendIcon sx={{ color: "#1976d3" }} />
+        <IconButton onClick={handleSend} disabled={isBlockedBy}>
+          <SendIcon sx={{ color: isBlockedBy ? "gray" : "#1976d3" }} />
         </IconButton>
       </Stack>
     </Stack>

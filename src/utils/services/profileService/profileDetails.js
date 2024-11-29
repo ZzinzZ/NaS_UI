@@ -4,6 +4,7 @@ import {
   deleteRequest,
   patchRequest,
   postRequest,
+  putRequest,
 } from "../requestService";
 
 export const addProfileExperience = async ({
@@ -156,6 +157,32 @@ export const deleteProfileLocation = async ({ userId, locationId }) => {
     const response = await deleteRequest(
       `${baseUrl}/profiles/location/${userId}`,
       { locationId }
+    );
+    return response.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+    console.error(error);
+  }
+};
+
+export const blockUser = async ({ blockerId, blockedId }) => {
+  try {
+    const response = await putRequest(
+      `${baseUrl}/profiles/friends/block/${blockerId}`,
+      { blockedId }
+    );
+    return response.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+    console.error(error);
+  }
+};
+
+export const unblockUser = async ({ unblockerId, blockedId }) => {
+  try {
+    const response = await putRequest(
+      `${baseUrl}/profiles/friends/unblock/${unblockerId}`,
+      { blockedId }
     );
     return response.data;
   } catch (error) {

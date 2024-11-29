@@ -15,14 +15,13 @@ import { useSocket } from "@/contexts/SocketContext";
 import { useSelector } from "react-redux";
 import { getChatDetails } from "@/utils/services/chatService/chatService";
 import ChatItemLoading from "./ChatItemLoading";
-import { countUnreadMessages, deleteChatMessages } from "@/utils/services/messageService/message.service";
+import {
+  countUnreadMessages,
+  deleteChatMessages,
+} from "@/utils/services/messageService/message.service";
 import moment from "moment";
 
-const ChatItem = ({
-  chat,
-  setIsReadMessage,
-  setIsDeleteMessages
-}) => {
+const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
   const [isCurrent, setIsCurrent] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -89,21 +88,27 @@ const ChatItem = ({
       }
     };
 
-    if (chat && user) {
+    if(isCurrent) {
+      setCountUnread(0);
+    }
+    else if (chat && user) {
+      console.log("receive");
       fetchUnreadCount();
     }
-  }, [chat._id, user._id]);
+  }, [messages, newMessage,setIsReadMessage, chat]);
 
   useEffect(() => {
-    setIsCurrent(chat._id.toString() === chatId);
-
     if (chat._id.toString() === chatId) {
       setIsReadMessage(true);
     }
     if (chat.type === "private") {
       getParticipants();
     }
-  }, [ chat, getParticipants, setIsReadMessage]);
+  }, [chat, getParticipants, setIsReadMessage]);
+
+  useEffect(() => {
+    setIsCurrent(chat._id.toString() === chatId);
+  }, [chatId, chat]);
 
   useEffect(() => {
     if (!chat?.last_message?.messId) {
@@ -115,7 +120,6 @@ const ChatItem = ({
     } else if (chat?.last_message?.messId?.content?.file) {
       setLastMessage("File");
     }
-    
   }, [chat]);
 
   useEffect(() => {
@@ -142,25 +146,25 @@ const ChatItem = ({
 
   const handleDeleteMessage = async () => {
     try {
-      await deleteChatMessages({chatId: chat._id, userId: user._id});
+      await deleteChatMessages({ chatId: chat._id, userId: user._id });
       setIsDeleteMessages(true);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
     <Box
-    onContextMenu={(event) => {
-      event.preventDefault(); 
-      handleMenuOpen(event); 
-    }}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        handleMenuOpen(event);
+      }}
       sx={{
         background: isCurrent ? "#EDEDED" : "transparent",
         padding: "0.5rem 1rem",
         width: "18rem",
         cursor: "pointer",
-        borderRadius:"0.7rem",
+        borderRadius: "0.7rem",
         "&:hover": {
           backgroundColor: "#EDEDED !important",
         },
@@ -207,28 +211,30 @@ const ChatItem = ({
                 {chat?.type === "group" ? chat?.chat_name : chatName}
               </Typography>
               <Stack direction="row" gap={0.5} alignItems="center">
-                <Typography sx={{
-                  color: countUnread === 0 ? "#5e5e5e" : "#000",
-                  fontSize: "0.8rem",
-                  fontWeight:  600,
-                }}>
-                {chat?.last_message?.messId?.sender_id?.name }
+                <Typography
+                  sx={{
+                    color: countUnread === 0 ? "#5e5e5e" : "#000",
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  {chat?.last_message?.messId?.sender_id?.name}
                 </Typography>
-              
-              <Typography
-                sx={{
-                  color: countUnread === 0 ? "#5e5e5e" : "#000",
-                  fontSize: "0.8rem",
-                  fontWeight: countUnread === 0 ? 400 : 600,
-                }}
-              >
-                {lastMessage}
-              </Typography>
+
+                <Typography
+                  sx={{
+                    color: countUnread === 0 ? "#5e5e5e" : "#000",
+                    fontSize: "0.8rem",
+                    fontWeight: countUnread === 0 ? 400 : 600,
+                  }}
+                >
+                  {lastMessage}
+                </Typography>
               </Stack>
             </Stack>
           </Stack>
-          <Typography sx={{fontSize:"0.8rem"}}>
-            {moment(chat?.updatedAt).format('LT')}
+          <Typography sx={{ fontSize: "0.8rem" }}>
+            {moment(chat?.updatedAt).format("LT")}
           </Typography>
           <Menu
             anchorEl={anchorEl}
@@ -244,7 +250,6 @@ const ChatItem = ({
               horizontal: "left",
             }}
           >
-
             <MenuItem onClick={handleDeleteMessage}>Delete messages</MenuItem>
           </Menu>
         </Stack>

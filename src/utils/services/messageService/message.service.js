@@ -29,6 +29,36 @@ export const sendMessage = async (
   }
 };
 
+export const sendFile = async (
+  { senderId, chatId, files },
+  onUploadProgress
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("senderId", senderId);
+    if (files && files?.length > 0) {
+      files?.forEach((file) => formData.append("files", file));
+    }
+    const message = await postRequest(
+      `${baseUrl}/messages/file/send/${chatId}`,
+      formData,
+      {
+        onUploadProgress: (progressEvent) => {
+          const percentage = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          if (onUploadProgress) {
+            onUploadProgress(percentage); // Gửi tiến độ upload về callback
+          }
+        },
+      }
+    );
+    return message.data;
+  } catch (error) {
+    toast.error(error.response?.data?.message || error);
+  }
+};
+
 export const getMessageByChatId = async ({ chatId, userId }) => {
   try {
     const message = await getRequest(
@@ -54,9 +84,12 @@ export const deleteSoftMessage = async ({ messageId, userId }) => {
 
 export const removeMessage = async ({ messageId, userId }) => {
   try {
-    const message = await putRequest(`${baseUrl}/messages/remove/${messageId}`, {
-      userId,
-    });
+    const message = await putRequest(
+      `${baseUrl}/messages/remove/${messageId}`,
+      {
+        userId,
+      }
+    );
     return message.data;
   } catch (error) {
     toast.error(error.response.data.message);

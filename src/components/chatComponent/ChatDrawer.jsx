@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
-import MuiAppBar from "@mui/material/AppBar";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
@@ -39,6 +38,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { hideLoading, showLoading } from "@/redux/slices/LoadingSlice";
+import {
+  blockUser,
+  unblockUser,
+} from "@/utils/services/profileService/profileDetails";
 
 const drawerWidth = 240;
 
@@ -57,11 +60,14 @@ const ChatDrawer = ({
   onUpdate,
   listMember,
   setLisMember,
+  isBlocked,
+  setIsBlocked,
 }) => {
   const [isAddMember, setIsAddMember] = useState(false);
   const [updatingName, setUpdatingName] = useState(false);
   const [showMember, setShowMember] = useState(false);
   const [newChatName, setNewChatName] = useState("");
+
   const [otherParticipants, setOtherParticipants] = useState();
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -177,8 +183,33 @@ const ChatDrawer = ({
       dispatch(hideLoading());
     }
   };
+
+  const handleBlockClick = async () => {
+    try {
+      await blockUser({
+        blockerId: user?._id,
+        blockedId: otherParticipants?.userId,
+      });
+      setIsBlocked(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUnblockClick = async () => {
+    try {
+      await unblockUser({
+        unblockerId: user?._id,
+        blockedId: otherParticipants?.userId,
+      });
+      setIsBlocked(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    if(chat) {
+    if (chat) {
       chatDetails();
     }
   }, [chat]);
@@ -290,14 +321,27 @@ const ChatDrawer = ({
             >
               View profile
             </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              fullWidth
-              endIcon={<BlockIcon sx={{ color: "#d32f2f" }} />}
-            >
-              Block
-            </Button>
+            {isBlocked ? (
+              <Button
+                fullWidth
+                variant="outlined"
+                color="error"
+                endIcon={<BlockIcon/>}
+                onClick={handleUnblockClick}
+              >
+                Unblock
+              </Button>
+            ) : (
+              <Button
+                fullWidth
+                variant="outlined"
+                color="error"
+                endIcon={<BlockIcon/>}
+                onClick={handleBlockClick}
+              >
+                Block
+              </Button>
+            )}
           </Stack>
         )}
         {chat?.type === "group" && (

@@ -34,16 +34,12 @@ const ChatBar = ({ setIsDeleteMessages }) => {
   const { newMessage, receiveMessage } = useSocket();
 
   const getUserChat = async () => {
-    // setIsFetching(true);
     try {
       const response = await getChatsList({ userId: user._id });
       setChats(response);
     } catch (error) {
       console.log(error);
     } 
-    // finally {
-    //   setIsFetching(false);
-    // }
   };
 
   const findChat = async (keyword) => {
@@ -67,6 +63,8 @@ const ChatBar = ({ setIsDeleteMessages }) => {
 
   useEffect(() => {
     getUserChat();
+    
+  
   }, [user, newMessage, receiveMessage]);
 
   const handleChatItemClick = (chatId) => {
