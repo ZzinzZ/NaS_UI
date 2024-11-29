@@ -271,7 +271,7 @@ const NavBar = () => {
               }}
             >
               <Link
-                href="/"
+                href="/user/posts"
                 style={{ color: "inherit", textDecoration: "none" }}
               >
                 <Badge badgeContent={4} color="error">
