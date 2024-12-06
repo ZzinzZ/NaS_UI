@@ -8,11 +8,12 @@ import WaitingSlider from "./WaitingSlider";
 
 const HomeContent = () => {
   const [isDeleteMessages, setIsDeleteMessages] = useState(false);
+  
   const searchParams = useSearchParams();
   const chatId = searchParams.get("chat-id");
 
   return (
-    <Stack direction="row">
+    <Stack direction="row"  >
       <ChatBar setIsDeleteMessages={setIsDeleteMessages}/>
       {
         chatId ? <Conversation isDeleteMessages={isDeleteMessages}/> : <WaitingSlider/>

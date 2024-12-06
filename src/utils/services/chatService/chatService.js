@@ -158,3 +158,12 @@ export const findChatByParticipants = async ({ userId, participantId }) => {
     }
   }
 };
+
+export const getGroupChats = async ({userId}) => {
+  try {
+    const response = await getRequest(`${baseUrl}/chats/group/list/${userId}`);
+    return response.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+  }
+}

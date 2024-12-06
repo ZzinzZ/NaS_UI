@@ -100,6 +100,7 @@ const ChatBar = ({ setIsDeleteMessages }) => {
         display: "flex",
         flexDirection: "column",
         borderRight: "0.3px solid #bdbdbd",
+        marginTop:{md: 0, xs: "3rem", sm:"3rem"}
       }}
     >
       <CreateGroupBoard

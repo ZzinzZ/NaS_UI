@@ -14,6 +14,8 @@ import { useSearchParams } from "next/navigation";
 import { getChatDetails } from "@/redux/thunks/chatThunk";
 import { toast } from "react-toastify";
 
+
+
 const drawerWidth = 240;
 
 const Conversation = ({ isDeleteMessages }) => {
@@ -33,8 +35,11 @@ const Conversation = ({ isDeleteMessages }) => {
   const dispatch = useDispatch();
   const lastMessageRef = useRef(null);
   const messageRefs = useRef({});
+
+
   const handleDrawerOpen = () => setOpen(!open);
   const handleDrawerClose = () => setOpen(false);
+
 
   const chatDetails = async () => {
     try {
@@ -55,6 +60,8 @@ const Conversation = ({ isDeleteMessages }) => {
       });
     }
   };
+
+  
 
   useEffect(() => {
     if (chat?.type === "group") {
@@ -107,7 +114,7 @@ const Conversation = ({ isDeleteMessages }) => {
   }, [newMessage, reactedMessage]);
 
   useEffect(() => {
-    if(chat?.type === "private") {
+    if (chat?.type === "private") {
       setIsBlocked(
         otherParticipant?.blockedBy?.some((block) => block.userId === user?._id)
       );
@@ -116,7 +123,11 @@ const Conversation = ({ isDeleteMessages }) => {
           (block) => block.userId === user?._id
         )
       );
-      setStranger(!otherParticipant?.friends?.some((friend) => friend.userId === user?._id))
+      setStranger(
+        !otherParticipant?.friends?.some(
+          (friend) => friend.userId === user?._id
+        )
+      );
     }
   }, [otherParticipant, chat]);
 
@@ -124,6 +135,7 @@ const Conversation = ({ isDeleteMessages }) => {
     <Box
       sx={{
         width: "100%",
+        marginTop: { md: 0, xs: "3rem", sm: "3rem" },
       }}
     >
       <Stack
@@ -133,7 +145,15 @@ const Conversation = ({ isDeleteMessages }) => {
           transition: "width 0.3s ease-out",
         }}
       >
-        <Box sx={{ position: "sticky", top: 0, zIndex: 1, background: "#fff" , boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",}}>
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
+            background: "#fff",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          }}
+        >
           <Stack
             direction="row"
             justifyContent="space-between"
@@ -161,14 +181,22 @@ const Conversation = ({ isDeleteMessages }) => {
               )}
               <Stack>
                 <Stack direction="row" spacing={1}>
-                <Typography sx={{ fontWeight: 600 }}>
-                  {chat?.chat_name !== null
-                    ? chat?.chat_name
-                    : otherParticipant?.userName}
-                </Typography>
-                {
-                  stranger && <Typography sx={{backgroundColor:"#ccc", padding:"0 0.2rem", borderRadius:"0.4rem"}}>Stranger</Typography>
-                }
+                  <Typography sx={{ fontWeight: 600 }}>
+                    {chat?.chat_name !== null
+                      ? chat?.chat_name
+                      : otherParticipant?.userName}
+                  </Typography>
+                  {stranger && (
+                    <Typography
+                      sx={{
+                        backgroundColor: "#ccc",
+                        padding: "0 0.2rem",
+                        borderRadius: "0.4rem",
+                      }}
+                    >
+                      Stranger
+                    </Typography>
+                  )}
                 </Stack>
                 <Typography
                   sx={{
@@ -230,10 +258,10 @@ const Conversation = ({ isDeleteMessages }) => {
           ))}
           <Box ref={lastMessageRef} />
           {isBlockedBy && (
-            <Stack justifyContent="center" sx={{width:"100%"}}>
-              <Typography sx={{ color: "red", textAlign:"center" }}>
-              Messages cannot currently be sent to this user
-            </Typography>
+            <Stack justifyContent="center" sx={{ width: "100%" }}>
+              <Typography sx={{ color: "red", textAlign: "center" }}>
+                Messages cannot currently be sent to this user
+              </Typography>
             </Stack>
           )}
         </Box>
@@ -241,7 +269,6 @@ const Conversation = ({ isDeleteMessages }) => {
         <Box
           sx={{
             position: "sticky",
-            bottom: { xs: "3rem", sm: "3rem", md: 0 },
             zIndex: 1,
             background: "#fff",
           }}

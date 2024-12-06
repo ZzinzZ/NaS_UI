@@ -11,6 +11,7 @@ const WaitingSlider = () => {
         height: "100vh",
         overflow: "hidden",
         position: "relative",
+        marginTop:{md: 0, xs: "3rem", sm:"3rem"}
       }}
     >
       {/* Phần tử hình nền */}

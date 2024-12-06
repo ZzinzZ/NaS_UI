@@ -9,8 +9,7 @@ import {
 } from "../requestService";
 
 export const sendMessage = async (
-  { senderId, chatId, text, images },
-  onUploadProgress
+  { senderId, chatId, text, images }
 ) => {
   try {
     const formData = new FormData();

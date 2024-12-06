@@ -92,7 +92,7 @@ export const rejectFriendRequest = createAsyncThunk(
 
 export const removeFriendRequest = createAsyncThunk(
   "profile/removeRequest",
-  async ({ receiverId, senderId }, { rejectWithValue }) => {
+  async ({ senderId, receiverId }, { rejectWithValue }) => {
     try {
       const response = await putRequest(
         `${baseUrl}/profiles/friends/remove_friend_request/${receiverId}`,

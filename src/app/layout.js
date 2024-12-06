@@ -35,6 +35,7 @@ function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
           rel="stylesheet"
         ></link>
+        <script type="text/javascript" src="https://cdn.stringee.com/sdk/web/latest/stringee-web-sdk.min.js"></script>
       </head>
       <body className={inter.className}>
         <ThemeProviderWarp>

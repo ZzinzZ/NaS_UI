@@ -42,6 +42,7 @@ const Message = forwardRef(
       handleReadMessage,
       handleRemoveMessage,
       newMessage,
+      onDeleteMessage
     } = useSocket();
     const isSentByCurrentUser =
       message?.sender_id?._id === user?._id || message?.sender_id === user?._id;
@@ -82,6 +83,8 @@ const Message = forwardRef(
         messageId: message?._id,
         userId: user?._id,
       });
+      onDeleteMessage(message?._id);
+      handleMenuClose();
     };
 
     const onRefMessage = () => {
@@ -98,6 +101,7 @@ const Message = forwardRef(
 
     const handleRemoveMessageClick = async () => {
       await handleRemoveMessage(user?._id, message?._id);
+      handleMenuClose();
     };
 
     useEffect(() => {
@@ -315,40 +319,42 @@ const Message = forwardRef(
                   {message?.content.file && (
                     <Stack spacing={0.3}>
                       {message?.content?.file?.map((file) => (
-                        <Link href={`${process.env.NEXT_PUBLIC_BACKEND_FILE_URL}/${file?.filePath}`} key={file?._id}>
-                        <Stack
+                        <Link
+                          href={`${process.env.NEXT_PUBLIC_BACKEND_FILE_URL}/${file?.filePath}`}
                           key={file?._id}
-                          direction="row"
-                          
-                          alignItems="center"
-                          sx={{
-                            background: "rgba(255,255,255,0.2)",
-                            padding: "0.5rem",
-                            borderRadius: "0.5rem",
-                          }}
                         >
-                          <Image
-                            src={handleSetFileIcon(file?.fileType)}
-                            width={50}
-                            height={50}
-                            alt={file?.fileName}
-                          />
-                          <Stack>
-                            <Typography
-                              sx={{
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                maxWidth: "15rem", // Chiều rộng tối đa để tên bị cắt
-                              }}
-                            >
-                              {file?.fileName}
-                            </Typography>
-                            <Typography sx={{ fontSize: "0.7rem" }}>
-                              {formatBytes(file?.fileSize)}
-                            </Typography>
+                          <Stack
+                            key={file?._id}
+                            direction="row"
+                            alignItems="center"
+                            sx={{
+                              background: "rgba(255,255,255,0.2)",
+                              padding: "0.5rem",
+                              borderRadius: "0.5rem",
+                            }}
+                          >
+                            <Image
+                              src={handleSetFileIcon(file?.fileType)}
+                              width={50}
+                              height={50}
+                              alt={file?.fileName}
+                            />
+                            <Stack>
+                              <Typography
+                                sx={{
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  maxWidth: "15rem", // Chiều rộng tối đa để tên bị cắt
+                                }}
+                              >
+                                {file?.fileName}
+                              </Typography>
+                              <Typography sx={{ fontSize: "0.7rem" }}>
+                                {formatBytes(file?.fileSize)}
+                              </Typography>
+                            </Stack>
                           </Stack>
-                        </Stack>
                         </Link>
                       ))}
                     </Stack>

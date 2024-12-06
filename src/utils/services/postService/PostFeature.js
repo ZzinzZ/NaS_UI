@@ -1,6 +1,6 @@
 
 import { toast } from "react-toastify";
-import { baseUrl, postRequest, deleteRequest } from "../requestService"; // sử dụng postRequest của bạn
+import { baseUrl, postRequest, deleteRequest, getRequest } from "../requestService"; // sử dụng postRequest của bạn
 
 export const createPost = async ({ userId, content, files }) => {
   const formData = new FormData();
@@ -27,4 +27,15 @@ export const deletePost = async ({postId}) => {
         toast.error(error.response.data.message);
         console.error(error);
     }
+}
+
+export const getListPost = async ({userId}) => {
+  try {
+    const response = await getRequest(`${baseUrl}/posts/list/${userId}`);
+    return response.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+    console.error(error);
+    
+  }
 }

@@ -77,8 +77,8 @@ const NavBar = () => {
       sx={{
         width: { xs: "100%", sm: "100%", md: "4.5rem" },
         height: { xs: "3rem", sm: "3rem", md: "100vh" },
-        bottom: { xs: 0, sm: "0", md: "auto" },
-        top: { xs: "auto", sm: "auto" },
+        top: { xs: 0, sm: "0", md: "auto" },
+        bottom: { xs: "auto", sm: "auto" },
         left: 0,
         right: 0,
         zIndex: 3,
@@ -96,7 +96,7 @@ const NavBar = () => {
         direction={{ xs: "row", sm: "row", md: "column" }}
         alignItems="center"
         sx={{ height: "100%" }}
-        justifyContent={{ xs: "center", sm: "center" }}
+        justifyContent={{ xs: "center", sm: "center", md: "center" }}
       >
         <Stack
           sx={{
@@ -123,7 +123,7 @@ const NavBar = () => {
         <Stack
           justifyContent="space-between"
           alignItems="center"
-          sx={{ height: "100%" }}
+          sx={{ height: "100%", width: {sm: "100%", xs: "100%"}, padding: {sm: "1rem"} }}
           direction={{ xs: "row", sm: "row", md: "column" }}
         >
           <Stack
