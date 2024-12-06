@@ -25,9 +25,10 @@ export const login = createAsyncThunk(
     try {
       const response = await postRequest(`${baseUrl}/users/login`, userData);
       const expires = new Date(new Date().getTime() + 30 * 1000);
-      const { token, refreshToken } = response.data;
+      const { token, refreshToken,stringeeToken } = response.data;
       Cookies.set("token", token, { expires });
       Cookies.set("refreshToken", refreshToken, { expires: 365 });
+      Cookies.set("stringeeToken", stringeeToken, { expires: 30 });
       Cookies.set("tokenExpiry", expires.getTime(), { expires });
       dispatch(resetProfile());
       toast.info(response.message);

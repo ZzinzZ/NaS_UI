@@ -12,7 +12,7 @@ const RequestSentItem = ({ profile, onRemove }) => {
 
   const handleRemoveRequest = async () => {
     try {
-        await dispatch(removeFriendRequest({receiverId:user._id, senderId: profile.userId }));
+        await dispatch(removeFriendRequest({receiverId:profile?.userId, senderId: user?._id }));
         onRemove();
     } catch (error) {
         console.log(error);

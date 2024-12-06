@@ -131,6 +131,10 @@ export const SocketProvider = ({ children, userId }) => {
     }
   });
 
+  const onDeleteMessage = (messageId) => {
+    setMessages((prevMessages) => prevMessages?.filter((msg) => msg._id !== messageId))
+  }
+
   const handleSendMessage = useCallback(
     async (
       textMessage,
@@ -166,6 +170,8 @@ export const SocketProvider = ({ children, userId }) => {
       setNewMessage(response);
     }
   );
+
+
 
   const handleSendFile = useCallback(async (senderId, chatId, files) => {
     const tempMessage = {
@@ -261,13 +267,13 @@ export const SocketProvider = ({ children, userId }) => {
       if (chat?._id !== message?.chat_id) return;
 
       setMessages((prevMessages) =>
-        prevMessages?.map((msg) => (msg._id === message._id ? message : msg))
+        prevMessages?.map((msg) => (msg?._id === message?._id ? message : msg))
       );
     });
 
     socket?.on("receiveRemove", (message) => {
       setMessages((prevMessages) =>
-        prevMessages?.map((msg) => (msg._id === message?._id ? message : msg))
+        prevMessages?.map((msg) => (msg?._id === message?._id ? message : msg))
       );
     });
 
@@ -305,6 +311,7 @@ export const SocketProvider = ({ children, userId }) => {
         uploadProgress,
         handleRemoveMessage,
         handleSendFile,
+        onDeleteMessage
       }}
     >
       {children}
