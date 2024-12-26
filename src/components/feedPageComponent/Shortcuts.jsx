@@ -78,7 +78,14 @@ const Shortcuts = () => {
         borderRadius: "0.5rem",
         width: "100%",
         boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-        display:{sm: "block", md:"block", xs:"none"}
+        display:{sm: "none", md:"block", xs:"none"},
+        height: "100vh",
+          overflowY: "scroll",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
       }}
     >
       <Stack sx={{ backgroundColor: "#fff", width: "100%", height: "100%" }}>

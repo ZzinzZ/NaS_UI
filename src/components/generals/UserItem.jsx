@@ -9,20 +9,17 @@ const UserItem = ({ profile }) => {
   const router = useRouter();
   const theme = useTheme();
 
-  // Hàm điều hướng đến trang profile với query id
   const handleClickProfile = (id) => {
     router.push(`/user/profile?id=${id}`);
   };
 
-  // Kiểm tra nếu màn hình nhỏ hơn "sm" (kích thước điện thoại)
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Điều chỉnh kích thước ảnh đại diện theo kích thước màn hình
-  const imageSize = isSmallScreen ? 60 : 120; // 60px cho màn hình nhỏ, 120px cho màn hình lớn
+  const imageSize = isSmallScreen ? 60 : 120; 
 
   return (
     <Box
-      onClick={() => handleClickProfile(profile.userId)} // Thêm sự kiện click
+      onClick={() => handleClickProfile(profile.userId)} 
       sx={{
         background: "#fff",
         borderRadius: "5px",
@@ -35,17 +32,15 @@ const UserItem = ({ profile }) => {
     >
       <Stack direction="row" alignItems="center">
         <Stack direction="row" alignItems="center" spacing={1}>
-          {/* Ảnh đại diện */}
           <Image
             alt={profile.userName}
             src={
               profile.avatar?.content?.media[0].media_url || NEXT_IMAGE_ORIGINAL_AVATAR
             }
-            width={imageSize} // Sử dụng imageSize đã tính toán
-            height={imageSize} // Sử dụng imageSize đã tính toán
-            style={{ borderRadius: "50%" }} // Để ảnh thành hình tròn
+            width={imageSize} 
+            height={imageSize}
+            style={{ borderRadius: "50%", width:imageSize, height:imageSize }} 
           />
-          {/* Tên người dùng */}
           <Typography
             variant="body1"
             sx={{ fontWeight: 500, fontSize: "1.3rem", marginBottom: "0.5rem" }}

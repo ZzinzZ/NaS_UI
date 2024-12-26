@@ -12,7 +12,7 @@ const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     if (!token || !user) {
       const tokenFromCookie = Cookies.get('token');
-      if (!tokenFromCookie) {
+      if (!tokenFromCookie || !user) {
         router.push('/login');
       }
     }

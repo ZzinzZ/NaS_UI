@@ -1,21 +1,25 @@
 "use client"
 
+import { showImage } from "@/redux/slices/imageSlice";
 import { Box, ImageList, ImageListItem, Typography } from "@mui/material";
 import Image from "next/image";
+import { useDispatch } from "react-redux";
 
 const RenderImages = ({ post }) => {
   const mediaCount = post?.content?.media?.length;
+  const dispatch = useDispatch();
 
   if (mediaCount === 1) {
     return (
       <ImageList cols={1}>
         <ImageListItem>
           <Image
-            src={post.content.media[0].media_url}
+            src={post?.content?.media[0]?.media_url}
             alt="post-image"
             layout="responsive"
             width={100}
             height={100}
+            onClick={() => dispatch(showImage(post?.content?.media[0]?.media_url))}
           />
         </ImageListItem>
       </ImageList>
@@ -26,11 +30,12 @@ const RenderImages = ({ post }) => {
         {post.content.media.map((media, index) => (
           <ImageListItem key={index}>
             <Image
-              src={media.media_url}
+              src={media?.media_url}
               alt={`post-image-${index}`}
               layout="responsive"
               width={260}
               height={200}
+              onClick={() => dispatch(showImage(media?.media_url))}
             />
           </ImageListItem>
         ))}
@@ -50,6 +55,7 @@ const RenderImages = ({ post }) => {
               width: "auto",
               height: 150,
             }}
+            onClick={() => dispatch(showImage(post?.content?.media[0].media_url))}
           />
         </ImageListItem>
         <ImageListItem>
@@ -59,6 +65,7 @@ const RenderImages = ({ post }) => {
             layout="responsive"
             width={100}
             height={100}
+            onClick={() => dispatch(showImage(post?.content?.media[1].media_url))}
           />
         </ImageListItem>
         <ImageListItem>
@@ -68,6 +75,7 @@ const RenderImages = ({ post }) => {
             layout="responsive"
             width={100}
             height={100}
+            onClick={() => dispatch(showImage(post?.content?.media[2].media_url))}
           />
         </ImageListItem>
       </ImageList>
@@ -83,6 +91,7 @@ const RenderImages = ({ post }) => {
               layout="responsive"
               width={100}
               height={100}
+              onClick={() => dispatch(showImage(media.media_url))}
             />
           </ImageListItem>
         ))}
@@ -95,6 +104,7 @@ const RenderImages = ({ post }) => {
                 layout="responsive"
                 width={100}
                 height={100}
+                onClick={() => dispatch(showImage(post.content.media[4].media_url))}
               />
               <Box
                 sx={{

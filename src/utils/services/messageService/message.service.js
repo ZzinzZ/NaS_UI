@@ -58,6 +58,29 @@ export const sendFile = async (
   }
 };
 
+export const createCallMessage = async ({senderId, chatId, callDuration, is_accepted, is_rejected, call_type}) => {
+  try {
+    const formData = {
+      senderId,
+      callDuration,
+      is_accepted,
+      is_rejected,
+      call_type,
+    }
+  
+    const message = await postRequest(
+      `${baseUrl}/messages/call/${chatId}`,
+      formData
+    );
+    return message.data;
+
+  } catch (error) {
+    // toast.error(error.response.data.message);
+    console.log("Error: ", error);
+    
+  }
+}
+
 export const getMessageByChatId = async ({ chatId, userId }) => {
   try {
     const message = await getRequest(
@@ -154,7 +177,6 @@ export const deleteChatMessages = async ({ chatId, userId }) => {
       chatId,
       userId,
     });
-    toast.info(response.message);
     return response.data;
   } catch (error) {
     toast.error(error.response.data.message);

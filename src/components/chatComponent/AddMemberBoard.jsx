@@ -10,18 +10,20 @@ import {
   Button,
 } from "@mui/material";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
-import PersonOffIcon from '@mui/icons-material/PersonOff';
+import PersonOffIcon from "@mui/icons-material/PersonOff";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getListFriends } from "@/utils/services/profileService/getListFriend";
 import { addGroupMember } from "@/utils/services/chatService/chatService";
+import { useSocket } from "@/contexts/SocketContext";
 
 const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
   const { user } = useSelector((state) => state.auth);
   const [listFriend, setListFriend] = useState([]);
-  const [selectedMembers, setSelectedMembers] = useState([]); // Trạng thái lưu thành viên được chọn
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const { joinGroupSocket } = useSocket();
 
   const getListFriend = async () => {
     try {
@@ -37,8 +39,8 @@ const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
   }, [user]);
 
   // Lọc listFriend để loại bỏ các thành viên đã có trong listMember
-  const filteredFriends = listFriend.filter(
-    (friend) => !listMember.some((member) => member.userId === friend.userId)
+  const filteredFriends = listFriend?.filter(
+    (friend) => !listMember?.some((member) => member.userId === friend.userId)
   );
 
   const handleSelectMember = (userId) => {
@@ -56,6 +58,16 @@ const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
         participants: selectedMembers,
       });
       onUpdate(response);
+      setSelectedMembers([]);
+      const recipient = listMember
+        ?.filter((member) => member.userId !== user?._id)
+        .map((member) => member.userId);
+      console.log("recipient", selectedMembers);
+
+      joinGroupSocket(selectedMembers, chat, [
+        ...selectedMembers,
+        ...recipient,
+      ]);
       handleClose();
     } catch (error) {
       console.log(error);
@@ -174,8 +186,13 @@ const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
               </Box>
             ))
           ) : (
-            <Stack spacing={1} alignItems="center" justifyContent="center" sx={{color:"#ccc"}}>
-              <PersonOffIcon/>
+            <Stack
+              spacing={1}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ color: "#ccc" }}
+            >
+              <PersonOffIcon />
               <Typography>No user available</Typography>
             </Stack>
           )}

@@ -15,13 +15,14 @@ import { useSocket } from "@/contexts/SocketContext";
 import { useSelector } from "react-redux";
 import { getChatDetails } from "@/utils/services/chatService/chatService";
 import ChatItemLoading from "./ChatItemLoading";
+import GroupsIcon from '@mui/icons-material/Groups';
 import {
   countUnreadMessages,
   deleteChatMessages,
 } from "@/utils/services/messageService/message.service";
 import moment from "moment";
 
-const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
+const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMessages }) => {
   const [isCurrent, setIsCurrent] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -88,14 +89,12 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
       }
     };
 
-    if(isCurrent) {
+    if (isCurrent) {
       setCountUnread(0);
-    }
-    else if (chat && user) {
-      console.log("receive");
+    } else if (chat && user) {
       fetchUnreadCount();
     }
-  }, [messages, newMessage,setIsReadMessage, chat]);
+  }, [messages, newMessage, setIsReadMessage, chat]);
 
   useEffect(() => {
     if (chat._id.toString() === chatId) {
@@ -116,9 +115,11 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
     } else if (chat?.last_message?.messId?.content?.text) {
       setLastMessage(chat.last_message.messId.content.text);
     } else if (chat?.last_message?.messId?.content?.image?.length > 0) {
-      setLastMessage("Image");
+      setLastMessage("Image 🖼️");
     } else if (chat?.last_message?.messId?.content?.file) {
-      setLastMessage("File");
+      setLastMessage("File 📁");
+    } else if (chat?.last_message?.messId?.content?.call) {
+      setLastMessage("Call 📞");
     }
   }, [chat]);
 
@@ -146,7 +147,8 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
 
   const handleDeleteMessage = async () => {
     try {
-      await deleteChatMessages({ chatId: chat._id, userId: user._id });
+      const response = await deleteChatMessages({ chatId: chat._id, userId: user._id });
+      onDeleteChatMessages(response?._id);
       setIsDeleteMessages(true);
     } catch (error) {
       console.log(error);
@@ -162,7 +164,7 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
       sx={{
         background: isCurrent ? "#EDEDED" : "transparent",
         padding: "0.5rem 1rem",
-        width: "18rem",
+        width: { md: "18rem", xs: "100%", sm: "100%" },
         cursor: "pointer",
         borderRadius: "0.7rem",
         "&:hover": {
@@ -186,6 +188,15 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
               overlap="circular"
               invisible={countUnread === 0}
             >
+              <Badge
+              color="info"
+                invisible={chat?.type === "private"}
+                badgeContent={<GroupsIcon sx={{fontSize:"1rem"}}/>}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+              >
               {isActive ? (
                 <ActiveAvatar
                   image_url={chat.type === "group" ? chat?.avatar : chatAvatar}
@@ -196,6 +207,7 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
                   src={chat.type === "group" ? chat?.avatar : chatAvatar}
                 />
               )}
+              </Badge>
             </Badge>
             <Stack>
               <Typography
@@ -208,7 +220,7 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
                   width: "10rem",
                 }}
               >
-                {chat?.type === "group" ? chat?.chat_name : chatName}
+                {chat?.chat_name ? chat?.chat_name : chatName}
               </Typography>
               <Stack direction="row" gap={0.5} alignItems="center">
                 <Typography
@@ -226,6 +238,10 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages }) => {
                     color: countUnread === 0 ? "#5e5e5e" : "#000",
                     fontSize: "0.8rem",
                     fontWeight: countUnread === 0 ? 400 : 600,
+                    maxWidth: "5rem",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                 >
                   {lastMessage}

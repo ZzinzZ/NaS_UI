@@ -1,19 +1,33 @@
 "use client";
-import { getListPost } from "@/utils/services/postService/PostFeature";
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import PostItem from "../postComponent/PostItem";
+import InboxIcon from '@mui/icons-material/Inbox';
 
 const PostList = ({posts}) => {
-  const { user } = useSelector((state) => state.auth);
+  const [listPost , setListPost] = useState(posts);
+
+  const handleDeletePost = (postId) => {
+    const newListPost = listPost.filter((post) => post._id!== postId);
+    setListPost(newListPost);
+  }
+
+  useEffect(() => {
+    if(posts?.length > 0) {
+      setListPost(posts);
+    }
+  },[posts])
 
   return (
     <Stack>
-      {posts?.length > 0 ? (
-        posts.map((post) => <PostItem key={post?._id} postItem={post} />)
+      {listPost?.length > 0 ? (
+        listPost?.map((post) => <PostItem key={post?._id} postItem={post} onDelete={handleDeletePost} />)
       ) : (
-        <>No post</>
+        <Stack alignItems="center" justifyContent="center">
+          <InboxIcon sx={{ fontSize: "3rem", color: "#ddd" }} />
+          <Typography variant="body1" sx={{ fontStyle: "italic" }}>No post</Typography>
+        </Stack>
       )}
     </Stack>
   );

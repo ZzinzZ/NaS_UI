@@ -31,20 +31,24 @@ const ChatBar = ({ setIsDeleteMessages }) => {
   const [isReadMessage, setIsReadMessage] = useState(false);
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText, 300);
-  const { newMessage, receiveMessage } = useSocket();
+  const { chatBarChange, newMessage, receiveMessage,chatDeleted } = useSocket();
 
   const getUserChat = async () => {
     try {
       const response = await getChatsList({ userId: user._id });
+
       setChats(response);
     } catch (error) {
       console.log(error);
-    } 
+    }
   };
+
+  const handleDeleteChatMessages = (chatId) => {
+    setChats(chats?.filter(chat => chat._id !== chatId ))
+  }
 
   const findChat = async (keyword) => {
     try {
-      setIsFetching(true);
       if (keyword !== "") {
         const response = await findChatByName({
           chatName: keyword,
@@ -56,15 +60,11 @@ const ChatBar = ({ setIsDeleteMessages }) => {
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      setIsFetching(false);
     }
   };
 
   useEffect(() => {
     getUserChat();
-    
-  
   }, [user, newMessage, receiveMessage]);
 
   const handleChatItemClick = (chatId) => {
@@ -90,17 +90,33 @@ const ChatBar = ({ setIsDeleteMessages }) => {
       getUserChat();
     }
   }, [debouncedSearchText]);
+
+  useEffect(() => {
+    if(chatBarChange !== null) {
+      setChats((prev) => [chatBarChange, ...prev]);
+    }
+  },[chatBarChange])
+
+  useEffect(() => {
+    if(chatDeleted !== null) {
+      const index = chats.findIndex((chat) => chat._id === chatDeleted);
+      if (index !== -1) {
+        setChats([...chats.slice(0, index),...chats.slice(index + 1)]);
+      }
+    }
+  },[chatDeleted])
+
   return (
     <Box
       sx={{
         background: "#fff",
-        width: "23rem",
+        width: { xs: "100%", md: "23rem", sm: "100%" },
         height: "100vh",
         boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
         display: "flex",
         flexDirection: "column",
         borderRight: "0.3px solid #bdbdbd",
-        marginTop:{md: 0, xs: "3rem", sm:"3rem"}
+        marginTop: { md: 0, xs: "3rem", sm: "3rem" },
       }}
     >
       <CreateGroupBoard
@@ -213,6 +229,7 @@ const ChatBar = ({ setIsDeleteMessages }) => {
                   isReadMessage={isReadMessage}
                   setIsReadMessage={setIsReadMessage}
                   setIsDeleteMessages={setIsDeleteMessages}
+                  onDeleteChatMessages={handleDeleteChatMessages}
                 />
               </Box>
             ))

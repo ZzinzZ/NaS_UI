@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -30,6 +30,7 @@ import {
   rejectFriendRequest,
   removeFriendRequest,
   sendFriendRequest,
+  unfriend,
   updateAvatar,
   updateBackground,
 } from "@/redux/thunks/profileThunk";
@@ -40,6 +41,11 @@ import {
   USER_BACKGROUND_ORIGINAL,
 } from "@/config/profileConfig";
 import GoChatButton from "../generals/GoChatButton";
+import ConfirmationDialog from "../generals/ConfirmationDialog";
+import { hideLoading, showLoading } from "@/redux/slices/LoadingSlice";
+import { useSocket } from "@/contexts/SocketContext";
+import { createUserNotification } from "@/utils/services/notification/notification.service";
+import { userAgentFromString } from "next/server";
 
 const ProfileHeader = ({ user, profile, listFriend }) => {
   const router = useRouter();
@@ -57,9 +63,20 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
   const [friendMenuAnchorEl, setFriendMenuAnchorEl] = useState(null);
   const [hoveredFriend, setHoveredFriend] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [openUnfriendMenu, setOpenUnfriendMenu] = useState(null);
+  const {sendFriendRequestSocket, acceptFriendRequestSocket, rejectFriendRequestSocket} = useSocket();
   const theme = useTheme();
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+
+
+  const handleOpenUnfriendMenu = (event) => {
+    setOpenUnfriendMenu(event.currentTarget);
+  };
+  const handleCloseUnfriendMenu = () => {
+    setOpenUnfriendMenu(null);
+  };
 
   const handleViewMoreClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -101,7 +118,10 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
       await dispatch(
         sendFriendRequest({ receptionId: userId, senderId: user?._id })
       );
+      const message = `${user?.name} has just sent you a friend request`;
+      const notify = await createUserNotification({userId:userId, message, refUser: user?._id});
       setIsRequesting(true);
+      sendFriendRequestSocket(userId, notify);
     } catch (error) {
       console.error(error);
     }
@@ -132,17 +152,23 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
         acceptFriendRequest({ receiverId: user?._id, senderId: userId })
       );
       setIsFriend(true);
+      const message = `${user?.name} has accepted the friend request`;
+      const notify = await createUserNotification({userId: userId, message, refUser: user?._id});
+      acceptFriendRequestSocket(userId, notify);
       closeResponseMenu();
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleRejectRequest = () => {
+  const handleRejectRequest = async () => {
     try {
       dispatch(
         rejectFriendRequest({ receiverId: user?._id, senderId: userId })
       );
+      const message = `${user?.name} has rejected the friend request`;
+      const notify = await createUserNotification({userId: userId, message, refUser: user?._id});
+      rejectFriendRequestSocket(userId, notify);
     } catch (error) {
       toast.error(error);
     }
@@ -163,10 +189,16 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
     const file = event.target.files[0];
     if (file) {
       try {
+        dispatch(showLoading());
         await dispatch(updateAvatar({ userId: user?._id, avatarFile: file }));
         await dispatch(getProfile(user?._id));
       } catch (error) {
         console.log(error);
+        toast.error("Upload failed ", error);
+        dispatch(hideLoading());
+      }
+      {
+        dispatch(hideLoading());
       }
     }
   };
@@ -175,14 +207,25 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
     const file = event.target.files[0];
     if (file) {
       try {
+        dispatch(showLoading());
         await dispatch(
           updateBackground({ userId: user?._id, backgroundFile: file })
         );
         await dispatch(getProfile(user?._id));
       } catch (error) {
+        toast.error("Upload failed ", error);
+        dispatch(hideLoading());
         console.log(error);
+      } finally {
+        dispatch(hideLoading());
       }
     }
+  };
+
+  const unfriendClick = () => {
+    dispatch(unfriend({ userId: user?._id, friendId: profile?.userId }));
+    setOpenUnfriendMenu(null);
+    setIsFriend(false);
   };
 
   const avatarUrl = isOtherProfile
@@ -230,7 +273,11 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                   }}
                   className="profile-edit-background-button"
                 >
-                  <Typography  sx={{display: { xs: "none", sm: "block", md: "block" }}}>Edit background</Typography>
+                  <Typography
+                    sx={{ display: { xs: "none", sm: "block", md: "block" } }}
+                  >
+                    Edit background
+                  </Typography>
                   <VisuallyHiddenInput
                     type="file"
                     onChange={handleBackgroundChange}
@@ -358,8 +405,33 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
             </Stack>
             {isOtherProfile ? (
               <Stack direction="row" alignItems="center" spacing={1}>
+                <Menu
+                  anchorEl={openUnfriendMenu}
+                  open={Boolean(openUnfriendMenu)}
+                  onClose={handleCloseUnfriendMenu}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                  transformOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                  }}
+                  disableScrollLock={true}
+                >
+                  <MenuItem onClick={unfriendClick}>
+                    <Stack direction="row" spacing={1}>
+                      <PersonRemoveIcon sx={{ color: "#ccc" }} />
+                      <Typography>Unfriend</Typography>
+                    </Stack>
+                  </MenuItem>
+                </Menu>
                 {isFriend ? (
-                  <Button variant="contained" startIcon={<CheckCircleIcon />}>
+                  <Button
+                    variant="contained"
+                    onClick={handleOpenUnfriendMenu}
+                    startIcon={<CheckCircleIcon />}
+                  >
                     Friend
                   </Button>
                 ) : isRequesting ? (
@@ -384,16 +456,17 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                       anchorEl={responseAnchorEl}
                       open={Boolean(responseAnchorEl)}
                       onClose={closeResponseMenu}
+                      disableScrollLock={true}
                     >
                       <MenuItem onClick={handleAcceptRequest}>
                         <Stack direction="row" alignItems="center" spacing={2}>
-                          <PersonAddAlt1Icon />
+                          <PersonAddAlt1Icon  sx={{ color: "#ccc" }} />
                           <Typography>Accept</Typography>
                         </Stack>
                       </MenuItem>
                       <MenuItem onClick={handleRejectRequest}>
                         <Stack direction="row" alignItems="center" spacing={2}>
-                          <PersonRemoveIcon />
+                          <PersonRemoveIcon  sx={{ color: "#ccc" }}/>
                           <Typography>Reject</Typography>
                         </Stack>
                       </MenuItem>
@@ -408,7 +481,7 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
                     Add Friend
                   </Button>
                 )}
-                <GoChatButton userId={userId}/>
+                <GoChatButton userId={userId} />
               </Stack>
             ) : (
               <Stack direction="row" alignItems="center" spacing={1}></Stack>

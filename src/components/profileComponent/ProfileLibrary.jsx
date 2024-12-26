@@ -1,9 +1,13 @@
+import { showImage } from "@/redux/slices/imageSlice";
 import { getListPhotos } from "@/utils/services/postService/getListPhoto";
 import { Box, Grid, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import HideImageIcon from '@mui/icons-material/HideImage';
 
 const ProfileLibrary = ({ userId }) => {
   const [listImage, setListImage] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getListImage = async () => {
@@ -39,6 +43,9 @@ const ProfileLibrary = ({ userId }) => {
                 component="img"
                 src={image.image}
                 alt={`image-${index}`}
+                onClick={() => {
+                  dispatch(showImage(image.image));
+                }}
                 sx={{
                   width: "100%", 
                   height: "200px", 
@@ -50,7 +57,20 @@ const ProfileLibrary = ({ userId }) => {
           ))}
         </Grid>
       ) : (
-        <Typography>No image</Typography>
+        <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "2rem",
+            }}
+          >
+            <HideImageIcon  sx={{ fontSize: "3rem", color: "#ddd" }} />
+            <Typography variant="body1" sx={{ fontStyle: "italic" }}>
+              Library empty
+            </Typography>
+          </Box>
       )}
     </Box>
   );

@@ -20,6 +20,7 @@ import {
 } from "@/utils/services/profileService/profileDetails";
 import { toast } from "react-toastify";
 import RelationshipIcon from "./RelationshipIcon";
+import { useSelector } from "react-redux";
 
 const initialState = {
   isFormOpen: false,
@@ -42,6 +43,7 @@ const AboutOverview = ({ profile, isOtherProfile }) => {
   const [relationship, setRelationship] = useState(profile.relationship);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
+  const {user} = useSelector((state) => state.auth);
 
 
 
@@ -183,13 +185,17 @@ const AboutOverview = ({ profile, isOtherProfile }) => {
     setState((prevState) => ({ ...prevState, isRelationshipFormOpen: false }));
   }, []);
 
+
   return (
     <Box>
       <Stack spacing={3}>
-        <Typography sx={{ color: "#707173" }}>
+        {
+          !isOtherProfile &&
+          <Typography sx={{ color: "#707173" }}>
           The information you choose will be Public and displayed at the top of
           your profile.
         </Typography>
+        }
         <ConfirmationDialog
           open={openConfirmDialog}
           title="Confirm Deletion"
@@ -302,93 +308,97 @@ const WorkSection = React.memo(
           </Box>
         )}
         <Stack spacing={2}>
-          {experienceList?.map((exp, index) =>
-            !isOtherProfile ? (
-              <Stack
-                key={index}
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                onClick={() => handleEditClick(exp)}
-                spacing={2}
-              >
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <WorkIcon />
-                  <Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography>Work at </Typography>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        {exp.company}
-                      </Typography>
-                    </Stack>
-                    <Typography className="note-small-text">
-                      position: {exp.position}
-                    </Typography>
-                  </Stack>
-                </Stack>
-                {!isOtherProfile ? (
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    {exp.status ? <PublicIcon /> : <LockIcon />}
-                    <IconButton onClick={() => handleEditClick(exp)}>
-                      <CreateIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() =>
-                        handleDeleteClick({ id: exp._id, type: "experience" })
-                      }
-                    >
-                      <DeleteForeverIcon />
-                    </IconButton>
-                  </Stack>
-                ) : exp.status ? (
-                  <PublicIcon />
-                ) : null}
-              </Stack>
-            ) : (
-              exp.status && (
-                <Stack
-                  key={index}
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  onClick={() => handleEditClick(exp)}
-                  spacing={2}
-                >
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <WorkIcon />
-                    <Stack>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Typography>Work at </Typography>
-                        <Typography sx={{ fontWeight: 600 }}>
-                          {exp.company}
+          {
+            experienceList?.length > 0 ? (
+              experienceList?.map((exp, index) =>
+                !isOtherProfile ? (
+                  <Stack
+                    key={index}
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    onClick={() => handleEditClick(exp)}
+                    spacing={2}
+                  >
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <WorkIcon />
+                      <Stack>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Typography>Work at </Typography>
+                          <Typography sx={{ fontWeight: 600 }}>
+                            {exp.company}
+                          </Typography>
+                        </Stack>
+                        <Typography className="note-small-text">
+                          position: {exp.position}
                         </Typography>
                       </Stack>
-                      <Typography className="note-small-text">
-                        position: {exp.position}
-                      </Typography>
                     </Stack>
+                    {!isOtherProfile ? (
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        {exp.status ? <PublicIcon /> : <LockIcon />}
+                        <IconButton onClick={() => handleEditClick(exp)}>
+                          <CreateIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() =>
+                            handleDeleteClick({ id: exp._id, type: "experience" })
+                          }
+                        >
+                          <DeleteForeverIcon />
+                        </IconButton>
+                      </Stack>
+                    ) : exp.status ? (
+                      <PublicIcon />
+                    ) : null}
                   </Stack>
-                  {!isOtherProfile ? (
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      {exp.status ? <PublicIcon /> : <LockIcon />}
-                      <IconButton onClick={() => handleEditClick(exp)}>
-                        <CreateIcon />
-                      </IconButton>
-                      <IconButton
-                        onClick={() =>
-                          handleDeleteClick({ id: exp._id, type: "experience" })
-                        }
-                      >
-                        <DeleteForeverIcon />
-                      </IconButton>
+                ) : (
+                  exp.status && (
+                    <Stack
+                      key={index}
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      onClick={() => handleEditClick(exp)}
+                      spacing={2}
+                    >
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <WorkIcon />
+                        <Stack>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Typography>Work at </Typography>
+                            <Typography sx={{ fontWeight: 600 }}>
+                              {exp.company}
+                            </Typography>
+                          </Stack>
+                          <Typography className="note-small-text">
+                            position: {exp.position}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                      {!isOtherProfile ? (
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          {exp.status ? <PublicIcon /> : <LockIcon />}
+                          <IconButton onClick={() => handleEditClick(exp)}>
+                            <CreateIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={() =>
+                              handleDeleteClick({ id: exp._id, type: "experience" })
+                            }
+                          >
+                            <DeleteForeverIcon />
+                          </IconButton>
+                        </Stack>
+                      ) : exp.status ? (
+                        <PublicIcon />
+                      ) : null}
                     </Stack>
-                  ) : exp.status ? (
-                    <PublicIcon />
-                  ) : null}
-                </Stack>
+                  )
+                )
               )
-            )
-          )}
+            ) : <Typography>No information to display</Typography>
+          }
         </Stack>
       </Stack>
     );
@@ -443,49 +453,9 @@ const EducationSection = React.memo(
         )}
 
         <Stack spacing={2}>
-          {educationList.map((edu, index) =>
-            !isOtherProfile ? (
-              <Stack
-                key={index}
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={2}
-              >
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <SchoolIcon />
-                  <Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography>Studied at </Typography>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        {edu.school}
-                      </Typography>
-                    </Stack>
-                    <Typography className="note-small-text">
-                      Start at {edu.from}
-                    </Typography>
-                  </Stack>
-                </Stack>
-                {!isOtherProfile ? (
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    {edu.status ? <PublicIcon /> : <LockIcon />}
-                    <IconButton onClick={() => handleEditEducationClick(edu)}>
-                      <CreateIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() =>
-                        handleDeleteClick({ id: edu._id, type: "education" })
-                      }
-                    >
-                      <DeleteForeverIcon />
-                    </IconButton>
-                  </Stack>
-                ) : edu.status ? (
-                  <PublicIcon />
-                ) : null}
-              </Stack>
-            ) : (
-              edu.status && (
+          {
+            educationList?.length > 0 ? educationList.map((edu, index) =>
+              !isOtherProfile ? (
                 <Stack
                   key={index}
                   direction="row"
@@ -525,9 +495,50 @@ const EducationSection = React.memo(
                     <PublicIcon />
                   ) : null}
                 </Stack>
+              ) : (
+                edu.status && (
+                  <Stack
+                    key={index}
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    spacing={2}
+                  >
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <SchoolIcon />
+                      <Stack>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Typography>Studied at </Typography>
+                          <Typography sx={{ fontWeight: 600 }}>
+                            {edu.school}
+                          </Typography>
+                        </Stack>
+                        <Typography className="note-small-text">
+                          Start at {edu.from}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                    {!isOtherProfile ? (
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        {edu.status ? <PublicIcon /> : <LockIcon />}
+                        <IconButton onClick={() => handleEditEducationClick(edu)}>
+                          <CreateIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() =>
+                            handleDeleteClick({ id: edu._id, type: "education" })
+                          }
+                        >
+                          <DeleteForeverIcon />
+                        </IconButton>
+                      </Stack>
+                    ) : edu.status ? (
+                      <PublicIcon />
+                    ) : null}
+                  </Stack>
+                )
               )
-            )
-          )}
+            ): <Typography>No information to display</Typography>          }
         </Stack>
       </Stack>
     );
@@ -582,69 +593,71 @@ const LocationSection = React.memo(
         )}
 
         <Stack spacing={2}>
-          {locationList.map((loc, index) =>
-            !isOtherProfile ? (
-              <Stack
-                key={index}
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={2}
-              >
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <PlaceIcon />
-                  <Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography>Location in </Typography>
-                      <Typography sx={{ fontWeight: 600 }}>{loc.city}</Typography>
-                    </Stack>
-                    <Typography className="note-small-text">
-                      {loc.type_location}
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  {
-                    loc.status? <PublicIcon /> : <LockIcon />
-                  }
-                  <IconButton onClick={() => handleEditLocationClick(loc)}>
-                    <CreateIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() =>
-                      handleDeleteClick({ id: loc._id, type: "location" })
-                    }
-                  >
-                    <DeleteForeverIcon />
-                  </IconButton>
-                </Stack>
-              </Stack>
-            ) : (
-              loc.status ? (
+          {
+            locationList?.length > 0 ? locationList.map((loc, index) =>
+              !isOtherProfile ? (
                 <Stack
-                key={index}
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={2}
-              >
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <PublicIcon />
-                  <Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography>Location in </Typography>
-                      <Typography sx={{ fontWeight: 600 }}>{loc.city}</Typography>
+                  key={index}
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={2}
+                >
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <PlaceIcon />
+                    <Stack>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography>Location in </Typography>
+                        <Typography sx={{ fontWeight: 600 }}>{loc.city}</Typography>
+                      </Stack>
+                      <Typography className="note-small-text">
+                        {loc.type_location}
+                      </Typography>
                     </Stack>
-                    <Typography className="note-small-text">
-                      {loc.type_location}
-                    </Typography>
+                  </Stack>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    {
+                      loc.status? <PublicIcon /> : <LockIcon />
+                    }
+                    <IconButton onClick={() => handleEditLocationClick(loc)}>
+                      <CreateIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() =>
+                        handleDeleteClick({ id: loc._id, type: "location" })
+                      }
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
                   </Stack>
                 </Stack>
-                <PublicIcon/>
-              </Stack>
-              ) : null
-            )
-          )}
+              ) : (
+                loc.status ? (
+                  <Stack
+                  key={index}
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={2}
+                >
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <PublicIcon />
+                    <Stack>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography>Location in </Typography>
+                        <Typography sx={{ fontWeight: 600 }}>{loc.city}</Typography>
+                      </Stack>
+                      <Typography className="note-small-text">
+                        {loc.type_location}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                  <PublicIcon/>
+                </Stack>
+                ) : null
+              )
+            ) : <Typography>No information to display</Typography>
+          }
         </Stack>
       </Stack>
     );

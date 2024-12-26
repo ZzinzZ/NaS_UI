@@ -118,7 +118,6 @@ export const unfriend = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }

@@ -51,8 +51,9 @@ const LandingContent = () => {
           }}
           variant="h5"
         >
-          Welcome to NaS – your social media. Chat, connect, and share moments
-          with ease. Join the NaS community today!
+          Welcome to NaS – your social media.
+          <br/>
+          Join the NaS community today!
         </Typography>
         <Stack>
           <Button

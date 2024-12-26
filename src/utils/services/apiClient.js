@@ -44,17 +44,17 @@ apiClient.interceptors.request.use(
   }
 );
 
-// apiClient.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   (error) => {
-//     if (error.response && error.response.status === 401) {
-//       console.log("not authorized");
-//       store.dispatch(logout());
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      console.log("not authorized");
+      store.dispatch(logout());
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default apiClient;

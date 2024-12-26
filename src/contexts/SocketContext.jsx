@@ -1,5 +1,6 @@
 "use client";
 import {
+  createCallMessage,
   getMessageByChatId,
   markAsRead,
   reactMessage,
@@ -8,6 +9,10 @@ import {
   sendFile,
   sendMessage,
 } from "@/utils/services/messageService/message.service";
+import {
+  createChatNotification,
+  getNotificationByUserId,
+} from "@/utils/services/notification/notification.service";
 import React, {
   createContext,
   useCallback,
@@ -16,6 +21,7 @@ import React, {
   useState,
 } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import { io } from "socket.io-client";
 
 const SocketContext = createContext();
@@ -29,6 +35,16 @@ export const SocketProvider = ({ children, userId }) => {
   const [receiveMessage, setReceiveMessage] = useState(0);
   const [reactedMessage, setReactedMessage] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [chatBarChange, setChatBarChange] = useState(null);
+  const [chatDeleted, setChatDeleted] = useState(null);
+  const [kickChat, setKickChat] = useState(null);
+  const [typing, setTyping] = useState([]);
+  const [micOff, setMicOff] = useState(null);
+  const [cameraOff, setCameraOff] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [countUnreadNotifications, setCountUnreadNotifications] = useState(0);
+  const [chatLibrary, setChatLibrary] = useState([]);
+
   const chat = useSelector((state) => state.chat.chatData);
   const { user } = useSelector((state) => state.auth);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -90,6 +106,137 @@ export const SocketProvider = ({ children, userId }) => {
     setNewMessage(null);
   };
 
+  const createChatSocket = (chat, recipient) => {
+    if (!chat || !recipient) return;
+    socket?.emit("createGroup", { chat, recipient });
+  };
+
+  const receiveSocketCreateGroup = async (newChat) => {
+    setChatBarChange(newChat);
+    const message = `You have just been added to the conversation '${newChat?.chat_name}'`;
+    const notify = await createChatNotification({
+      userId: user?._id,
+      message,
+      refChat: newChat?._id,
+    });
+    console.log("notify", notify);
+
+    setNotifications((prev) => [notify, ...prev]);
+  };
+
+  const deleteChatSocket = (chat, recipient) => {
+    if (!recipient) return;
+    socket?.emit("deleteGroup", { chat, recipient });
+  };
+  const receiveSocketDeleteGroup = async (deletedChat) => {
+    setChatDeleted(deletedChat);
+    const message = `The conversation '${deletedChat?.chat_name}' has been deleted`;
+    const notify = await createChatNotification({
+      userId: user?._id,
+      message,
+      refChat: deletedChat?._id,
+    });
+    setNotifications((prev) => [notify, ...prev]);
+    toast.info("Chat deleted!");
+  };
+  const kickChatSocket = (chat, kickedUser, recipient) => {
+    if (!recipient) return;
+    socket?.emit("kickGroup", { chat, kickedUser, recipient });
+  };
+
+  const receiveSocketKickGroup = async ({ chat, kickedUser }) => {
+    setKickChat({ chat, kickedUser });
+    let message = "";
+    if (kickedUser === user?._id && user._id !== chat?.created_by) {
+      message = `You have been removed from the conversation '${chat?.chat_name}'`;
+      const notify = await createChatNotification({
+        userId: user._id,
+        message,
+        refChat: null,
+      });
+      setNotifications((prev) => [notify, ...prev]);
+    } else {
+      message = `A member has been removed from the conversation '${chat?.chat_name}'`;
+      const notify = await createChatNotification({
+        userId: user._id,
+        message,
+        refChat: chat?._id,
+      });
+      setNotifications((prev) => [notify, ...prev]);
+    }
+  };
+
+  const joinGroupSocket = async (userId, chat, recipient) => {
+    if (!socket || !chat) return;
+    socket.emit("joinGroup", { chat, recipient, userId });
+  };
+
+  const typingSocket = (user, recipient) => {
+    if (!socket ||!recipient) return;
+    socket.emit("typing", { user, recipient });
+  }
+
+  const stopTypingSocket = (user, recipient) => {
+    if (!socket ||!recipient) return;
+    socket.emit("stopTyping", { user, recipient });
+  }
+
+  const micOffSocket = (user, recipient) => {
+    if (!socket ||!recipient) return;
+    socket.emit("micOff", { user, recipient });
+  }
+  const micOnSocket = (user, recipient) => {
+    if (!socket ||!recipient) return;
+    socket.emit("micOn", { user, recipient });
+  }
+  const cameraOffSocket = (user, recipient) => {
+    if (!socket ||!recipient) return;
+    socket.emit("cameraOff", { user, recipient });
+  }
+  const cameraOnSocket = (user, recipient) => {
+    if (!socket||!recipient) return;
+    socket.emit("cameraOn", { user, recipient });
+  }
+
+
+
+  const sendFriendRequestSocket = async (userId, notify) => {
+    if (!socket ||!userId) return;
+    socket.emit("sendFriendRequest", {userId, notify});
+  }
+
+  const acceptFriendRequestSocket = async (userId, notify) => {
+    if (!socket ||!userId) return;
+    socket.emit("acceptFriendRequest", {userId, notify});
+  }
+
+  const rejectFriendRequestSocket = async (userId, notify) => {
+    if (!socket ||!userId) return;
+    socket.emit("rejectFriendRequest", {userId, notify});
+  }
+
+
+  const receiveSocketJoinGroup = async ({ chat, userId }) => {
+    if (userId?.some((u) => u === user?._id)) {
+      setChatBarChange(chat);
+      const message = `You have joined the conversation '${chat?.chat_name}'`;
+      const notify = await createChatNotification({
+        userId: user?._id,
+        message,
+        refChat: chat?._id,
+      });
+      setNotifications((prev) => [notify, ...prev]);
+    } else {
+      const message = `New users has joined the conversation '${chat?.chat_name}'`;
+      const notify = await createChatNotification({
+        userId: user?._id,
+        message,
+        refChat: chat?._id,
+      });
+      setNotifications((prev) => [notify, ...prev]);
+    }
+  };
+
   const reactMessageSocket = () => {
     if (!socket || !chat) return;
     const recipients = chat.participants?.filter(
@@ -132,8 +279,10 @@ export const SocketProvider = ({ children, userId }) => {
   });
 
   const onDeleteMessage = (messageId) => {
-    setMessages((prevMessages) => prevMessages?.filter((msg) => msg._id !== messageId))
-  }
+    setMessages((prevMessages) =>
+      prevMessages?.filter((msg) => msg._id !== messageId)
+    );
+  };
 
   const handleSendMessage = useCallback(
     async (
@@ -171,7 +320,32 @@ export const SocketProvider = ({ children, userId }) => {
     }
   );
 
+  const handleSendHello = useCallback(
+    async (
+      senderId,
+      chatId,
+    ) => {
+      const tempMessage = {
+        sender_id: senderId,
+        chatId,
+        content: {
+          text: "Hello 🙌",
+        },
+      };
+      setMessages((prev) => [...prev, tempMessage]);
 
+      const response = await sendMessage({
+        senderId: senderId,
+        chatId: chatId,
+        text: "Hello 🙌",
+      });
+
+      setMessages((prev) =>
+        prev.map((msg) => (msg === tempMessage ? response : msg))
+      );
+      setNewMessage(response);
+    }
+  );
 
   const handleSendFile = useCallback(async (senderId, chatId, files) => {
     const tempMessage = {
@@ -191,6 +365,28 @@ export const SocketProvider = ({ children, userId }) => {
     );
     setNewMessage(response);
   });
+
+  const handleSendCallMessage = useCallback(
+    async (
+      senderId,
+      chatId,
+      callDuration,
+      is_accepted,
+      is_rejected,
+      call_type
+    ) => {
+      const response = await createCallMessage({
+        senderId,
+        chatId,
+        callDuration,
+        is_accepted,
+        is_rejected,
+        call_type,
+      });
+      setMessages((prev) => [...prev, response]);
+      setNewMessage(response);
+    }
+  );
 
   const handleReplyMessage = useCallback(
     async (
@@ -246,6 +442,19 @@ export const SocketProvider = ({ children, userId }) => {
   );
 
   useEffect(() => {
+    const listUnread = notifications?.filter(notification => !notification.seen);
+    setCountUnreadNotifications(listUnread?.length)
+  },[notifications]);
+
+  useEffect(() => {
+    const images = messages.flatMap((message) =>
+      message.content?.image || []
+    );
+    setChatLibrary(images);
+  },[messages]);
+  
+
+  useEffect(() => {
     if (socket === null) console.log("socket is null");
     socket?.on("receiveMessage", (message) => {
       if (chat?._id !== message?.chat_id) {
@@ -255,12 +464,28 @@ export const SocketProvider = ({ children, userId }) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
+    socket?.on("groupCreated", (newChat) => {
+      receiveSocketCreateGroup(newChat);
+    });
+
+    socket?.on("groupDeleted", (deletedChat) => {
+      receiveSocketDeleteGroup(deletedChat);
+    });
+
     socket?.on("receiveReact", (updatedMessage) => {
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           msg._id === updatedMessage._id ? updatedMessage : msg
         )
       );
+    });
+
+    socket?.on("groupKicked", ({ chat, kickedUser }) => {
+      receiveSocketKickGroup({ chat, kickedUser });
+    });
+
+    socket?.on("groupJoined", ({ chat, userId }) => {
+      receiveSocketJoinGroup({ chat, userId });
     });
 
     socket?.on("receiveRead", (message) => {
@@ -277,10 +502,59 @@ export const SocketProvider = ({ children, userId }) => {
       );
     });
 
+    socket?.on("receiveFriendRequest", (notify) => {
+      setNotifications((prev) => [notify,...prev])
+    });
+
+    socket?.on("receiveFriendAccept", (notify) => {
+      setNotifications((prev) => [notify,...prev])
+    });
+
+    socket?.on("receiveFriendReject", (notify) => {
+      setNotifications((prev) => [notify,...prev])
+    });
+
+    socket?.on("receiveTyping", (user) => {
+      setTyping((prev) => [user, ...prev])
+    });
+
+    socket?.on("receiveStopTyping", (user) => {
+      setTyping((prev) => prev.filter((u) => u._id!== user._id));
+    });
+
+    socket?.on("receiveMicOff", (user) => {
+      setMicOff(user);
+    })
+    socket?.on("receiveMicOn", (user) => {
+      setMicOff(null);
+    })
+
+    socket?.on("receiveCameraOff", (user) => {
+      setCameraOff(user);
+    });
+    socket?.on("receiveCameraOn", (user) => {
+      setCameraOff(null);
+    });
+
+
     return () => {
       socket?.off("receiveMessage");
       socket?.off("receiveReact");
       socket?.off("receiveRead");
+      socket?.off("receiveRemove");
+      socket?.off("groupCreated");
+      socket?.off("groupDeleted");
+      socket?.off("groupKicked");
+      socket?.off("receiveFriendReject");
+      socket?.off("receiveFriendAccept");
+      socket?.off("receiveFriendRequest");
+      socket?.off("receiveTyping");
+      socket?.off("receiveStopTyping");
+      socket?.off("receiveMicOff");
+      socket?.off("receiveMicOn");
+      socket?.off("receiveCameraOff");
+      socket?.off("receiveCameraOn");
+
     };
   }, [socket, chat]);
 
@@ -291,6 +565,17 @@ export const SocketProvider = ({ children, userId }) => {
   useEffect(() => {
     sendMessageSocket();
   }, [newMessage]);
+
+  useEffect(() => {
+    const getUserNotifications = async () => {
+      const response = await getNotificationByUserId({ userId: user?._id });
+      setNotifications(response);
+      console.log("notification", response);
+    };
+    if (user) {
+      getUserNotifications();
+    }
+  }, [user]);
 
   return (
     <SocketContext.Provider
@@ -311,7 +596,35 @@ export const SocketProvider = ({ children, userId }) => {
         uploadProgress,
         handleRemoveMessage,
         handleSendFile,
-        onDeleteMessage
+        onDeleteMessage,
+        handleSendCallMessage,
+        createChatSocket,
+        chatBarChange,
+        deleteChatSocket,
+        chatDeleted,
+        receiveSocketDeleteGroup,
+        kickChatSocket,
+        kickChat,
+        notifications,
+        setNotifications,
+        joinGroupSocket,
+        handleSendHello,
+        rejectFriendRequestSocket,
+        acceptFriendRequestSocket,
+        sendFriendRequestSocket,
+        typingSocket,
+        stopTypingSocket,
+        micOffSocket,
+        micOnSocket,
+        cameraOffSocket,
+        cameraOnSocket,
+        typing,
+        cameraOff,
+        micOff,
+        setCameraOff,
+        setMicOff,
+        countUnreadNotifications,
+        chatLibrary,
       }}
     >
       {children}

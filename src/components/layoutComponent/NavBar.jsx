@@ -26,6 +26,7 @@ import { logout } from "@/redux/slices/AuthSlice";
 import { getProfile } from "@/redux/thunks/profileThunk";
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
 import { usePathname } from "next/navigation";
+import { useSocket } from "@/contexts/SocketContext";
 
 const NavBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -35,6 +36,7 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { profileData } = useSelector((state) => state.profile);
+  const {countUnreadNotifications} = useSocket();
 
   const handlePopoverOpen = (event, id) => {
     setAnchorEl(event.currentTarget);
@@ -274,7 +276,7 @@ const NavBar = () => {
                 href="/user/posts"
                 style={{ color: "inherit", textDecoration: "none" }}
               >
-                <Badge badgeContent={4} color="error">
+                  <Badge badgeContent={countUnreadNotifications} color="error">
                   <FeedIcon
                     sx={{
                       color: {
@@ -285,7 +287,7 @@ const NavBar = () => {
                       fontSize: 30,
                     }}
                   />
-                </Badge>
+                  </Badge>
               </Link>
             </Button>
             <Popover
