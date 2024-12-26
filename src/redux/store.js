@@ -1,28 +1,31 @@
-import { configureStore,combineReducers } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import loadingReducer from './slices/LoadingSlice';
-import AuthReducer from './slices/AuthSlice';
-import ProfileReducer from './slices/profileSlice';
-import RegisterReducer from './slices/RegisterSlice';
-import PostReducer from './slices/PostSlice';
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import loadingReducer from "./slices/LoadingSlice";
+import AuthReducer from "./slices/AuthSlice";
+import ProfileReducer from "./slices/profileSlice";
+import PostReducer from "./slices/PostSlice";
+import chatReducer from "./slices/ChatSlice";
+import imageReducer from "./slices/imageSlice";
 
-// Cấu hình Redux Persist
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage,
-  whitelist: ['auth'],
+  whitelist: ["auth"],
+  stateReconciler: autoMergeLevel2,
 };
 
-const rootReducer = {
+const rootReducer = combineReducers({
   loading: loadingReducer,
   auth: AuthReducer,
   profile: ProfileReducer,
-  register: RegisterReducer,
-  posts: PostReducer
-};
+  posts: PostReducer,
+  chat: chatReducer,
+  image:imageReducer,
+});
 
-const persistedReducer = persistReducer(persistConfig, combineReducers(rootReducer));
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
   reducer: persistedReducer,

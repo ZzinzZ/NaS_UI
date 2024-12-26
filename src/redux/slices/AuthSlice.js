@@ -10,7 +10,8 @@ const AuthSlice = createSlice({
     user: null,
     error: null,
     loading: false,
-    token: Cookies.get('token') || null
+    token: Cookies.get('token') || null,
+    stringeeToken: Cookies.get('stringeeToken') || null
   },
   reducers: {
     logout: (state) => {
@@ -18,10 +19,10 @@ const AuthSlice = createSlice({
       state.error = null;
       state.loading = false;
       state.token = null;
-      console.log("remove token and logout");
-      
+      state.stringeeToken = null;
       Cookies.remove('token'); 
       Cookies.remove('refreshToken'); 
+      Cookies.remove('stringeeToken');
       resetProfile();
     },
     setToken: (state, action) => {
@@ -38,6 +39,7 @@ const AuthSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user || null;
         state.token = action.payload.token || null;
+        state.stringeeToken = action.payload.stringeeToken || null;
         resetProfile();
       })
       .addCase(login.rejected, (state, action) => {

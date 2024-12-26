@@ -13,7 +13,7 @@ export const registerUser = createAsyncThunk(
       const response = await postRequest(`${baseUrl}/users/register`, userData);
       return response.data;
     } catch (error) {
-      toast.error(`Failed to register: ${error.message}`);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.message);
     }
   }
@@ -25,17 +25,18 @@ export const login = createAsyncThunk(
     try {
       const response = await postRequest(`${baseUrl}/users/login`, userData);
       const expires = new Date(new Date().getTime() + 30 * 1000);
-      const { token, refreshToken } = response.data;
+      const { token, refreshToken,stringeeToken } = response.data;
       Cookies.set("token", token, { expires });
       Cookies.set("refreshToken", refreshToken, { expires: 365 });
+      Cookies.set("stringeeToken", stringeeToken, { expires: 30 });
       Cookies.set("tokenExpiry", expires.getTime(), { expires });
-
       dispatch(resetProfile());
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(`Failed to login: ${error.message}`);
-      console.error("Login error:", error);
+      console.log("error",error);
+      
+      toast.error(error.response.data.message);
       return rejectWithValue(error.message);
     }
   }

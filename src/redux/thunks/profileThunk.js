@@ -18,7 +18,7 @@ export const getProfile = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -33,7 +33,7 @@ export const getListFriends = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -47,11 +47,10 @@ export const sendFriendRequest = createAsyncThunk(
         `${baseUrl}/profiles/friends/friend_request/${receptionId}`,
         { senderId: senderId }
       );
-      console.log("friend request", response);
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -68,7 +67,7 @@ export const acceptFriendRequest = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -85,7 +84,7 @@ export const rejectFriendRequest = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -93,7 +92,7 @@ export const rejectFriendRequest = createAsyncThunk(
 
 export const removeFriendRequest = createAsyncThunk(
   "profile/removeRequest",
-  async ({ receiverId, senderId }, { rejectWithValue }) => {
+  async ({ senderId, receiverId }, { rejectWithValue }) => {
     try {
       const response = await putRequest(
         `${baseUrl}/profiles/friends/remove_friend_request/${receiverId}`,
@@ -102,7 +101,7 @@ export const removeFriendRequest = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -119,7 +118,6 @@ export const unfriend = createAsyncThunk(
       toast.info(response.message);
       return response.data;
     } catch (error) {
-      toast.error(error);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -144,7 +142,6 @@ export const updateAvatar = createAsyncThunk(
         toast.error(response.message);
       }
     } catch (error) {
-      toast.error("Failed to update");
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -170,7 +167,6 @@ export const updateBackground = createAsyncThunk(
       }
       
     } catch (error) {
-      toast.error("Failed to update");
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -193,7 +189,6 @@ export const updateBio= createAsyncThunk(
       else {
         toast.error(response.message);
       }
-      
     } catch (error) {
       toast.error("Failed to update");
       return rejectWithValue(error.response?.data || error.message);

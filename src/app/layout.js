@@ -6,20 +6,20 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ThemeProviderWarp from "@/components/provider/ThemeProvider";
 import Localization from "@/components/provider/LocalizationProvider";
+import ContextProvider from "@/components/provider/ContextProvider";
 
 const inter = Inter({ subsets: ["latin"] });
-const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-};
+// const viewport = {
+//   width: "device-width",
+//   initialScale: 1,
+//   maximumScale: 1,
+// };
 export const metadata = {
   title: "NaS",
   description: "Make it simple",
   icons: {
     icon: "/NA_logo.jpg",
   },
-  viewport,
 };
 function RootLayout({ children }) {
   return (
@@ -29,31 +29,37 @@ function RootLayout({ children }) {
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
-          crossorigin
+          crossOrigin="true"
         ></link>
         <link
-          href="https://fonts.googleapis.com/css2?family=Grey+Qo&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sankofa+Display&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
           rel="stylesheet"
         ></link>
+        <script
+          type="text/javascript"
+          src="https://cdn.stringee.com/sdk/web/latest/stringee-web-sdk.min.js"
+        ></script>
       </head>
       <body className={inter.className}>
         <ThemeProviderWarp>
           <Localization>
-          <ReduxProvider>
-            <ToastContainer
-              position="top-center"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss={false}
-              draggable={false}
-              pauseOnHover={false}
-            />
-            <FetchLoading />
-            {children}
-          </ReduxProvider>
+            <ReduxProvider>
+              <ContextProvider>
+                <ToastContainer
+                  position="top-center"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss={false}
+                  draggable={false}
+                  pauseOnHover={false}
+                />
+                <FetchLoading />
+                {children}
+              </ContextProvider>
+            </ReduxProvider>
           </Localization>
         </ThemeProviderWarp>
       </body>

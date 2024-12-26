@@ -1,5 +1,8 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Grey+Qo&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sankofa+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 * {
   margin: 0;
   padding: 0;
@@ -10,6 +13,7 @@ body {
   color: #000000;
   font-family: "Poppins", sans-serif !important;
   background: #f1f2f6;
+  padding: 0 !important;
 }
 
 
@@ -70,6 +74,25 @@ body {
   }
 }
 
+
+@keyframes search {
+  0% {
+    transform: translateX(0%) rotate(70deg);
+  }
+
+  100% {
+    transform: translateX(100px) rotate(10deg);
+  }
+}
+.svgIcon circle,
+line {
+  stroke: #1976d3;
+}
+.svgIcon circle {
+  fill: rgba(238, 239, 255, 0.3);
+}
+
+
 .link-button {
   text-decoration: none !important;
   color: #656567;
@@ -85,48 +108,15 @@ body {
   font-size: 0.8rem !important;
 }
 
+
+
+
 /* ------------------------------------ Nav Bar ------------------------------------------- */
 .App-logo {
   padding: 0.2rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
-  border: 1px solid #cccccc79;
-  box-shadow: 1px 1px 3px rgba(96, 96, 96, 0.5);
-}
-
-.nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-search {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: -0.2rem 0 0 0;
-  border-radius: 2rem;
-  padding: 0.15rem 0.5rem;
-  border: 1px solid #a5a5a579;
-  width: 10rem;
-  height: 2.5rem;
-  transition: 0.2s ease-in-out;
-}
-
-.nav-search-input {
-  flex: 1;
-}
-
-.nav-search-input:focus {
-  outline: none;
-}
-
-.nav-search:focus-within {
-  width: 20rem;
-  /* Increase width on focus */
-  border: 1px solid #027df84e;
-  ;
 }
 
 .user-logged {
@@ -155,22 +145,17 @@ body {
 }
 
 .nav-page-button {
-  width: 6rem;
+  width: 4.5rem;
   height: 2.5rem;
 }
 
 .current-page {
-  background: #f3fbff !important;
+  background: #ffffffca !important;
+  
 }
-.current-page::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #027ef8;
-  border-radius: 2px;
+
+.current-page-icon {
+  color: #1976D3 !important;
 }
 
 .nav-notification-button {
@@ -217,7 +202,7 @@ body {
   left: -3rem;
   width: 6rem;
   height: 90%;
-  background: white ;
+  background: #1976D3 ;
   border-radius: 1rem;
   box-shadow: rgba(110, 110, 110, 0.548) 1px 2px 2px 0px;
   z-index: 3;
@@ -228,7 +213,7 @@ body {
   writing-mode: vertical-rl;
   text-align: center;
   font-size: 1.8rem;
-  color: #1976D3;
+  color: #fff;
   font-weight: 600;
   letter-spacing: 0.7rem;
 }
@@ -236,8 +221,8 @@ body {
 .register-form {
   position: relative;
   background-color: #ffffff;
-  width: 38rem;
-  height: 35rem;
+  width: 35rem;
+  height: 33rem;
   padding: 2rem;
   border-radius: 1rem;
   border: 1px solid #ebebeb5a;
@@ -251,7 +236,7 @@ body {
   left: -3rem;
   width: 6rem;
   height: 90%;
-  background: white ;
+  background: #1976D3 ;
   border-radius: 1rem;
   box-shadow: rgba(110, 110, 110, 0.548) 1px 2px 2px 0px;
   z-index: 3;
@@ -259,12 +244,23 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  writing-mode: vertical-rl;
+  writing-mode: vertical-lr;
   text-align: center;
   font-size: 1.8rem;
-  color: #1976D3;
+  color: #fff;
   font-weight: 600;
   letter-spacing: 0.7rem;
+}
+
+.forgot-password-form{
+  position: relative;
+  background-color: #ffffff;
+  width: 30rem;
+  height:22rem;
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid #ebebeb5a;
+  box-shadow: rgba(110, 110, 110, 0.548) 1px 5px 15px 0px;
 }
 
 .otp-Form {
@@ -376,6 +372,151 @@ body {
   font-size: 1.1em;
   font-weight: 700;
 }
+
+/* From Uiverse.io by doniaskima */ 
+.btn-17,
+.btn-17 *,
+.btn-17 :after,
+.btn-17 :before,
+.btn-17:after,
+.btn-17:before {
+  border: 0 solid;
+  box-sizing: border-box;
+}
+
+.btn-17 {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: button;
+  background-color: #000;
+  background-image: none;
+  color: #fff;
+  cursor: pointer;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-size: 100%;
+  font-weight: 900;
+  line-height: 1.5;
+  margin: 0;
+  -webkit-mask-image: -webkit-radial-gradient(#000, #fff);
+  padding: 0;
+  text-transform: uppercase;
+  margin: 1rem 0 0 0;
+}
+
+.btn-17:disabled {
+  cursor: default;
+}
+
+.btn-17:-moz-focusring {
+  outline: auto;
+}
+
+.btn-17 svg {
+  display: block;
+  vertical-align: middle;
+}
+
+.btn-17 [hidden] {
+  display: none;
+}
+
+.btn-17 {
+  border-radius: 99rem;
+  border-width: 2px;
+  padding: 0.8rem 3rem;
+  z-index: 0;
+}
+
+.btn-17,
+.btn-17 .text-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.btn-17 .text-container {
+  display: block;
+  mix-blend-mode: difference;
+}
+
+.btn-17 .text {
+  display: block;
+  position: relative;
+}
+
+.btn-17:hover .text {
+  -webkit-animation: move-up-alternate 0.3s forwards;
+  animation: move-up-alternate 0.3s forwards;
+}
+
+@-webkit-keyframes move-up-alternate {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(80%);
+  }
+
+  51% {
+    transform: translateY(-80%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes move-up-alternate {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(80%);
+  }
+
+  51% {
+    transform: translateY(-80%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.btn-17:after,
+.btn-17:before {
+  --skew: 0.2;
+  background: #fff;
+  content: "";
+  display: block;
+  height: 102%;
+  left: calc(-50% - 50% * var(--skew));
+  pointer-events: none;
+  position: absolute;
+  top: -104%;
+  transform: skew(calc(150deg * var(--skew))) translateY(var(--progress, 0));
+  transition: transform 0.2s ease;
+  width: 100%;
+}
+
+.btn-17:after {
+  --progress: 0%;
+  left: calc(50% + 50% * var(--skew));
+  top: 102%;
+  z-index: -1;
+}
+
+.btn-17:hover:before {
+  --progress: 100%;
+}
+
+.btn-17:hover:after {
+  --progress: -102%;
+}
+
+
 
 /*-------------------------------Chats--------------------------------------*/
 

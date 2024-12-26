@@ -14,6 +14,7 @@ export const createArticlePost = createAsyncThunk(
       const response = await postRequest(`${baseUrl}/posts/article`, postData);
       return response.data;
     } catch (error) {
+      toast.error(error.response.data.message);
       rejectWithValue(error.response.data);
     }
   }
@@ -112,6 +113,7 @@ export const commentPost = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
+      toast.error(error.response.data.message);
       rejectWithValue(error.response.data);
     }
   }

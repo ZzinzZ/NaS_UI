@@ -6,6 +6,8 @@ import {
   Box,
   Button,
   IconButton,
+  Menu,
+  MenuItem,
   Stack,
   Typography,
 } from "@mui/material";
@@ -13,7 +15,6 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ReplyIcon from "@mui/icons-material/Reply";
-import { ReactionBarSelector } from "@charkour/react-reactions";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import { formatDistanceToNow, format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,6 +24,8 @@ import CommentBar from "./CommentBar";
 import ReactSelector from "../generals/ReactSelector";
 import PostCommentListDetail from "./PostCommentListDetail";
 import PostLoading from "../generals/PostLoading";
+import { Delete } from "@mui/icons-material";
+import { deletePost } from "@/utils/services/postService/PostFeature";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -39,7 +42,7 @@ const formatDate = (dateString) => {
   }
 };
 
-const PostItem = ({ profile, postItem }) => {
+const PostItem = ({ profile, postItem, onDelete  }) => {
   const [selectReact, setSelectReact] = useState(false);
   const [render, setRender] = useState(false);
   const [typeEmotion, setTypeEmotion] = useState("");
@@ -49,6 +52,8 @@ const PostItem = ({ profile, postItem }) => {
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [postUser, setPostUser] = useState();
   const [post, setPost] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
@@ -56,8 +61,7 @@ const PostItem = ({ profile, postItem }) => {
     setIsLoadingData(true);
     try {
       const post = await dispatch(getPostDetails(postItem?._id));
-      console.log(post.payload);
-      
+
       setPost(post.payload.post);
       setPostUser(post.payload.profile);
       setRender(true);
@@ -68,19 +72,17 @@ const PostItem = ({ profile, postItem }) => {
     }
   };
 
-  useEffect(() => {   
+  useEffect(() => {
     getPost();
-  },[profile, dispatch])
+  }, [profile, dispatch]);
 
   useEffect(() => {
-    if(!postItem) {
-      setIsLoadingData(true)
-    }
-    else{
+    if (!postItem) {
+      setIsLoadingData(true);
+    } else {
       setIsLoadingData(false);
     }
-    
-  },[postItem])
+  }, [postItem]);
 
   useEffect(() => {
     if (post && user) {
@@ -126,6 +128,25 @@ const PostItem = ({ profile, postItem }) => {
         break;
     }
   }, [typeEmotion]);
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  // Xử lý đóng menu
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  // Xử lý xóa post
+  const handleDeletePost = async () => {
+    try {
+      await deletePost({postId: post?._id})
+      handleMenuClose();
+      onDelete(post._id);
+    } catch (error) {
+      console.error("Failed to delete post", error);
+    }
+  };
 
   const handleOpenSelectReact = () => {
     setSelectReact(true);
@@ -160,12 +181,9 @@ const PostItem = ({ profile, postItem }) => {
   const handleCloseCommentList = () => {
     setOpenPostComments(false);
   };
-  console.log("postItem", profile);
-  
 
-  return (
-    post?.createdAt ? (
-      <Box
+  return post?.createdAt ? (
+    <Box
       sx={{
         background: "#fff",
         padding: "1rem",
@@ -192,9 +210,34 @@ const PostItem = ({ profile, postItem }) => {
               </Typography>
             </Stack>
           </Stack>
-          <IconButton>
-            <MoreHorizIcon />
-          </IconButton>
+          {user._id === postUser.userId && (
+            <>
+              <IconButton onClick={handleMenuOpen}>
+                <MoreHorizIcon />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleMenuClose}
+                disableScrollLock={true}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                <MenuItem onClick={handleDeletePost}>
+                <Stack direction="row" alignItems="center">
+                  <Typography>Delete post</Typography>
+                  <Delete/>
+                </Stack>
+                 </MenuItem>
+              </Menu>
+            </>
+          )}
         </Stack>
         {post?.content?.caption && (
           <Box>
@@ -326,6 +369,7 @@ const PostItem = ({ profile, postItem }) => {
             )}
           </Box>
           <Button
+          onClick={handleOpenCommentList}
             fullWidth
             startIcon={
               <Box
@@ -346,31 +390,13 @@ const PostItem = ({ profile, postItem }) => {
           >
             Comment
           </Button>
-          <Button
-            fullWidth
-            startIcon={
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 30,
-                  height: 30,
-                }}
-              >
-                <ReplyIcon sx={{ color: "#656567", fontSize: 30 }} />
-              </Box>
-            }
-            sx={{ color: "#656567" }}
-          >
-            Share
-          </Button>
         </Stack>
         <hr style={{ border: "0.5px solid #ccc" }} />
-        <CommentBar post={post} userId={user?._id} getPost={getPost}/>
+        <CommentBar post={post} userId={user?._id} getPost={getPost} />
       </Stack>
     </Box>
-    ) : (<PostLoading/>)
+  ) : (
+    <PostLoading />
   );
 };
 

@@ -80,13 +80,15 @@ const CommentBar = ({ post, comment, getPost }) => {
 
   const handleAddEmoji = (emojiObject) => {
     setContent((prevContent) => prevContent + emojiObject.emoji);
+    setPickerEmoji(false);
   };
 
   const handleSelectGif = (gif) => {
     if (gif) {
-      console.log("gif", gif);
+
       setGif(gif.url);
       setDisplayImage(gif.url);
+      setPickerGif(false);
     } else {
       console.error("Failed to get GIF URL");
     }
@@ -109,7 +111,6 @@ const CommentBar = ({ post, comment, getPost }) => {
     if (!content && !image && !gif) return;
     let result;
     if (comment) {
-      console.log(comment);
       
       result = await dispatch(
         replyCommentPost({

@@ -4,13 +4,34 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
+import { useSelector } from "react-redux";
+import { findChatByParticipants } from "@/utils/services/chatService/chatService";
 
 const FriendOverView = ({ profile }) => {
+  const {user} = useSelector((state) => state.auth)
   const router = useRouter();
   const handleViewProfile = () => {
     router.push(`/user/profile?id=${profile?.userId}`);
   };
-  console.log(profile);
+
+  const handleGoToChat = async () => {
+    if (!user?._id || !profile) {
+      return;
+    }
+
+    try {
+      // Tìm đoạn chat
+      const chat = await findChatByParticipants({
+        userId: user._id,
+        participantId: profile?.userId,
+      });
+      if (chat) {
+        router.push(`/user?chat-id=${chat?._id}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   
   return (
     <Box sx={{ background: "#fff", padding: "1rem" }}>
@@ -42,7 +63,7 @@ const FriendOverView = ({ profile }) => {
             >
               View Profile
             </Button>
-            <Button variant="contained" startIcon={<ChatIcon />}>
+            <Button variant="contained" startIcon={<ChatIcon />} onClick={handleGoToChat}>
               Message
             </Button>
           </Stack>

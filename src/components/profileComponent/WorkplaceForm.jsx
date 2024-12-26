@@ -10,16 +10,16 @@ import {
   MenuItem,
   Typography,
   FormControl,
-  InputLabel,
 } from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
 import LockIcon from "@mui/icons-material/Lock";
-import { addProfileExperience } from "@/utils/services/profileService/profileDetails";
+import { addProfileExperience, editProfileExperience } from "@/utils/services/profileService/profileDetails";
 import { useSearchParams } from "next/navigation";
 
 const WorkplaceForm = ({ initialData, onSave, onCancel }) => {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
+
   const [workplaceData, setWorkplaceData] = useState(
     initialData || {
       company: "",
@@ -40,30 +40,42 @@ const WorkplaceForm = ({ initialData, onSave, onCancel }) => {
 
   const handleCheckboxChange = (e) => {
     setIsCurrent(e.target.checked);
-    console.log(isCurrent);
   };
 
   const handleSubmit = async () => {
-    onSave(workplaceData);
-    console.log(workplaceData);
-
-    if (!isCurrent) {
-      await addProfileExperience({
+    let responseData;
+    if (initialData) {
+      responseData = await editProfileExperience({
         userId,
+        experienceId: initialData._id,
         company: workplaceData.company,
         position: workplaceData.position,
         status: workplaceData.status,
         start: workplaceData.from,
-        end: workplaceData.to,
+        end: isCurrent ? null : workplaceData.to,
       });
     } else {
-      await addProfileExperience({
-        userId,
-        company: workplaceData.company,
-        position: workplaceData.position,
-        status: workplaceData.status,
-        start: workplaceData.from,
-      });
+      if (!isCurrent) {
+        responseData = await addProfileExperience({
+          userId,
+          company: workplaceData.company,
+          position: workplaceData.position,
+          status: workplaceData.status,
+          start: workplaceData.from,
+          end: workplaceData.to,
+        });
+      } else {
+        responseData = await addProfileExperience({
+          userId,
+          company: workplaceData.company,
+          position: workplaceData.position,
+          status: workplaceData.status,
+          start: workplaceData.from,
+        });
+      }
+    }
+    if (responseData) {
+      onSave(responseData); 
     }
   };
 
@@ -89,11 +101,11 @@ const WorkplaceForm = ({ initialData, onSave, onCancel }) => {
         control={
           <Checkbox checked={isCurrent} onChange={handleCheckboxChange} />
         }
-        label="I worked here"
+        label="I currently work here"
       />
       <Stack direction="row" spacing={2}>
         <TextField
-          label="From(year)"
+          label="From (year)"
           name="from"
           value={workplaceData.from}
           onChange={handleChange}
@@ -101,9 +113,9 @@ const WorkplaceForm = ({ initialData, onSave, onCancel }) => {
           margin="normal"
           type="number"
         />
-        {isCurrent && (
+        {!isCurrent && (
           <TextField
-            label="To(year)"
+            label="To (year)"
             name="to"
             value={workplaceData.to}
             onChange={handleChange}

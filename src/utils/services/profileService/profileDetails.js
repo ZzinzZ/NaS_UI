@@ -2,9 +2,24 @@ import { toast } from "react-toastify";
 import {
   baseUrl,
   deleteRequest,
+  getRequest,
   patchRequest,
   postRequest,
+  putRequest,
 } from "../requestService";
+
+export const getUserProfile = async ({userId}) => {
+  try {
+    const response = await getRequest(
+      `${baseUrl}/profiles/find_by_userId/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    // toast.error(error.response.data.message);
+    console.error(error);
+    
+  }
+} 
 
 export const addProfileExperience = async ({
   userId,
@@ -21,7 +36,7 @@ export const addProfileExperience = async ({
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
     console.error(error);
   }
 };
@@ -34,7 +49,7 @@ export const addProfileEducation = async ({ userId, school, start, end }) => {
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
     console.error(error);
   }
 };
@@ -47,7 +62,7 @@ export const addProfileLocation = async ({ userId, type_location, city }) => {
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
     console.error(error);
   }
 };
@@ -68,7 +83,7 @@ export const editProfileExperience = async ({
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data);
     console.error(error);
   }
 };
@@ -88,7 +103,7 @@ export const editProfileEducation = async ({
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
     console.error(error);
   }
 };
@@ -107,7 +122,7 @@ export const editProfileLocation = async ({
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
     console.error(error);
   }
 };
@@ -120,7 +135,7 @@ export const editProfileRelationship = async ({ userId, type, status }) => {
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
     console.error(error);
   }
 };
@@ -133,7 +148,7 @@ export const deleteProfileExperience = async ({ userId, experienceId }) => {
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
     console.error(error);
   }
 };
@@ -146,7 +161,7 @@ export const deleteProfileEducation = async ({ userId, educationId }) => {
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
     console.error(error);
   }
 };
@@ -159,7 +174,33 @@ export const deleteProfileLocation = async ({ userId, locationId }) => {
     );
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
+    console.error(error);
+  }
+};
+
+export const blockUser = async ({ blockerId, blockedId }) => {
+  try {
+    const response = await putRequest(
+      `${baseUrl}/profiles/friends/block/${blockerId}`,
+      { blockedId }
+    );
+    return response.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+    console.error(error);
+  }
+};
+
+export const unblockUser = async ({ unblockerId, blockedId }) => {
+  try {
+    const response = await putRequest(
+      `${baseUrl}/profiles/friends/unblock/${unblockerId}`,
+      { blockedId }
+    );
+    return response.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
     console.error(error);
   }
 };

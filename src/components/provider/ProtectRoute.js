@@ -7,11 +7,12 @@ import Cookies from 'js-cookie';
 const ProtectedRoute = ({ children }) => {
   const router = useRouter();
   const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    if (!token) {
+    if (!token || !user) {
       const tokenFromCookie = Cookies.get('token');
-      if (!tokenFromCookie) {
+      if (!tokenFromCookie || !user) {
         router.push('/login');
       }
     }

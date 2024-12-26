@@ -1,9 +1,12 @@
-import Image from "next/image";
+import { BackgroundGradientAnimation } from "@/components/layoutComponent/BackgroundGradientAnimation ";
+import LandingContent from "@/components/layoutComponent/LandingContent";
 
 export default function Home() {
   return (
-    <>
-      Home
-    </>
+    <BackgroundGradientAnimation>
+      <div className="relative z-10">
+        <LandingContent />
+      </div>
+    </BackgroundGradientAnimation>
   );
 }
