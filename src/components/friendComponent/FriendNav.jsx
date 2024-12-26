@@ -55,7 +55,7 @@ const FriendNav = () => {
         <Box
           sx={{
             background: "#fff",
-            width: "20vw",
+            width: "23vw",
             height: "100vh",
             boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
           }}

@@ -1,36 +1,59 @@
-import { acceptFriendRequest, rejectFriendRequest } from "@/redux/thunks/profileThunk";
+import { useSocket } from "@/contexts/SocketContext";
+import {
+  acceptFriendRequest,
+  rejectFriendRequest,
+} from "@/redux/thunks/profileThunk";
 import { createPrivateChat } from "@/utils/services/chatService/chatService";
+import { createUserNotification } from "@/utils/services/notification/notification.service";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import Image from "next/image";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const FriendRequestItem = ({ profile, onRemove }) => {
-    const dispatch = useDispatch();
-    const {user} = useSelector(state => state.auth);
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const { acceptFriendRequestSocket, rejectFriendRequestSocket } = useSocket();
 
-    const handleAcceptRequest = async () => {
-        try {
-          await dispatch(
-            acceptFriendRequest({ receiverId: user._id, senderId: profile.userId })
-          );
-          await createPrivateChat({userId: user._id, participantId: profile.userId});
-          onRemove();
-        } catch (error) {
-            console.log(error);
-        }
-      };
-    
-      const handleRejectRequest = async () => {
-        try {
-          await dispatch(
-            rejectFriendRequest({ receiverId: user._id, senderId: profile.userId })
-          );
-          onRemove();
-        } catch (error) {
-          console.log(error);
-        }
-      };
+  const handleAcceptRequest = async () => {
+    try {
+      await dispatch(
+        acceptFriendRequest({ receiverId: user._id, senderId: profile?.userId })
+      );
+      await createPrivateChat({
+        userId: user._id,
+        participantId: profile?.userId,
+      });
+      const message = `${user?.name} has accepted the friend request`;
+      const notify = await createUserNotification({
+        userId: profile?.userId,
+        message,
+        refUser: user?._id,
+      });
+      acceptFriendRequestSocket(profile?.userId, notify);
+      onRemove();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleRejectRequest = async () => {
+    try {
+      await dispatch(
+        rejectFriendRequest({ receiverId: user._id, senderId: profile.userId })
+      );
+      const message = `${user?.name} has rejected the friend request`;
+      const notify = await createUserNotification({
+        userId: profile?.userId,
+        message,
+        refUser: user?._id,
+      });
+      rejectFriendRequestSocket(profile?.userId, notify);
+      onRemove();
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <Box
       sx={{
@@ -52,14 +75,19 @@ const FriendRequestItem = ({ profile, onRemove }) => {
           width={150}
           height={150}
           alt="profile avatar"
-          sx={{borderRadius:"0.5rem"}}
+          sx={{ borderRadius: "0.5rem" }}
         />
         <Typography>{profile.userName}</Typography>
-        <Stack sx={{width:"90%"}} spacing={1}>
+        <Stack sx={{ width: "90%" }} spacing={1}>
           <Button variant="contained" fullWidth onClick={handleAcceptRequest}>
             Accept
           </Button>
-          <Button variant="contained" fullWidth className="grey-profile-button" onClick={handleRejectRequest}>
+          <Button
+            variant="contained"
+            fullWidth
+            className="grey-profile-button"
+            onClick={handleRejectRequest}
+          >
             Decline
           </Button>
         </Stack>

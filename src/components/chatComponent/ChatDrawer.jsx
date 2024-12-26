@@ -20,6 +20,8 @@ import {
   Box,
   Button,
   IconButton,
+  ImageList,
+  ImageListItem,
   ListItem,
   Stack,
   TextField,
@@ -42,6 +44,9 @@ import {
   blockUser,
   unblockUser,
 } from "@/utils/services/profileService/profileDetails";
+import { useSocket } from "@/contexts/SocketContext";
+import Image from "next/image";
+import { showImage } from "@/redux/slices/imageSlice";
 
 const drawerWidth = 240;
 
@@ -66,16 +71,27 @@ const ChatDrawer = ({
   const [isAddMember, setIsAddMember] = useState(false);
   const [updatingName, setUpdatingName] = useState(false);
   const [showMember, setShowMember] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
   const [newChatName, setNewChatName] = useState("");
 
   const [otherParticipants, setOtherParticipants] = useState();
+  const [groupMember, setGroupMember] = useState([]);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const {
+    deleteChatSocket,
+    receiveSocketDeleteGroup,
+    kickChatSocket,
+    chatLibrary,
+  } = useSocket();
   const router = useRouter();
   const theme = useTheme();
 
   const handleShowMember = () => {
     setShowMember(!showMember);
+  };
+  const handleShowLibrary = () => {
+    setShowLibrary(!showLibrary);
   };
 
   const handleViewProfile = (userId) => {
@@ -86,6 +102,9 @@ const ChatDrawer = ({
     try {
       const response = await getChatDetails({ chatId: chat?._id });
       setLisMember(response?.participantProfiles);
+      if (response.chat.type === "group") {
+        setGroupMember(response.chat.participants);
+      }
       setOtherParticipants(
         response?.participantProfiles.find(
           (participant) => participant.userId !== user?._id
@@ -121,6 +140,10 @@ const ChatDrawer = ({
         creatorId: user?._id,
         userId: userId,
       });
+      const recipient = groupMember?.filter(
+        (member) => member.userId !== user?._id
+      );
+      kickChatSocket(chat, userId, recipient);
       setLisMember(response);
     } catch (error) {
       toast.error(error.message || error || "Failed to remove member.");
@@ -139,6 +162,7 @@ const ChatDrawer = ({
         userId: user?._id,
       });
       toast.info("Leave chat successfully");
+
       router.push("/user");
     } catch (error) {
       console.log(error);
@@ -147,11 +171,15 @@ const ChatDrawer = ({
 
   const handleDeleteChat = async () => {
     try {
+      const recipient = chat?.participants?.filter(
+        (participant) => participant?.userId !== user._id
+      );
       await deleteChat({
         chatId: chat?._id,
         userId: user._id,
       });
-      toast.info("Delete chat successfully");
+      receiveSocketDeleteGroup(chat);
+      deleteChatSocket(chat, recipient);
       router.push("/user");
     } catch (error) {
       toast.error(error.message || error || "Failed to delete chat.");
@@ -211,6 +239,7 @@ const ChatDrawer = ({
   useEffect(() => {
     if (chat) {
       chatDetails();
+      console.log("member", chat?.participants);
     }
   }, [chat]);
   return (
@@ -222,6 +251,7 @@ const ChatDrawer = ({
           width: drawerWidth,
           boxSizing: "border-box",
         },
+        overflowY: "scroll",
       }}
       variant="persistent"
       anchor="right"
@@ -240,7 +270,14 @@ const ChatDrawer = ({
         justifyContent="center"
         alignItems="center"
         spacing={1}
-        sx={{ padding: "0 1rem" }}
+        sx={{
+          padding: "0 1rem",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
       >
         <Stack direction="row" sx={{ position: "relative" }}>
           <Avatar
@@ -276,7 +313,12 @@ const ChatDrawer = ({
           )}
         </Stack>
         <Typography
-          sx={{ fontWeight: 500, fontSize: "0.8rem", color: "#686b68" }}
+          sx={{
+            fontWeight: 500,
+            fontSize: "0.8rem",
+            color: "#686b68",
+            textAlign: "center",
+          }}
         >
           {chat?.type === "private" ? "nick name" : "group name"}
         </Typography>
@@ -287,9 +329,9 @@ const ChatDrawer = ({
                 ? chat?.chat_name
                 : otherParticipants?.userName}
             </Typography>
-            <IconButton onClick={() => setUpdatingName(true)}>
+            {chat?.type === "group" && <IconButton onClick={() => setUpdatingName(true)}>
               <BorderColorIcon sx={{ fontSize: "1rem" }} />
-            </IconButton>
+            </IconButton>}
           </Stack>
         ) : (
           <Stack spacing={1}>
@@ -326,7 +368,7 @@ const ChatDrawer = ({
                 fullWidth
                 variant="outlined"
                 color="error"
-                endIcon={<BlockIcon/>}
+                endIcon={<BlockIcon />}
                 onClick={handleUnblockClick}
               >
                 Unblock
@@ -336,7 +378,7 @@ const ChatDrawer = ({
                 fullWidth
                 variant="outlined"
                 color="error"
-                endIcon={<BlockIcon/>}
+                endIcon={<BlockIcon />}
                 onClick={handleBlockClick}
               >
                 Block
@@ -440,6 +482,65 @@ const ChatDrawer = ({
                 Delete group
               </Button>
             )}
+          </Stack>
+        )}
+        {chatLibrary?.length > 0 && (
+          <Stack sx={{ width: "100%" }}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Typography
+                sx={{
+                  fontWeight: "500",
+                  color: "#686b68",
+                  fontSize: "0.8rem",
+                }}
+              >
+                Library
+              </Typography>
+              {showLibrary ? (
+                <IconButton onClick={handleShowLibrary}>
+                  {" "}
+                  <ExpandLess />
+                </IconButton>
+              ) : (
+                <IconButton onClick={handleShowLibrary}>
+                  {" "}
+                  <ExpandMore />
+                </IconButton>
+              )}
+            </Stack>
+            <Collapse in={showLibrary} timeout="auto" unmountOnExit>
+              <ImageList sx={{ width: "100%", height: "10rem" }} cols={2}>
+                {chatLibrary?.map((item, index) => (
+                  <ImageListItem
+                    key={index}
+                    sx={{
+                      overflow: "hidden",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Image
+                      src={item}
+                      alt="Picture"
+                      width={100}
+                      height={100}
+                      style={{
+                        width: "100%", // Kích thước vuông
+                        height: "5rem",
+                        objectFit: "cover", // Cắt hình ảnh thành vuông
+                        borderRadius: "8px", // Bo góc
+                      }}
+                      onClick={() => {
+                        dispatch(showImage(item))
+                      }}
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
+            </Collapse>
           </Stack>
         )}
       </Stack>

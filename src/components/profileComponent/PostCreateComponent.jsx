@@ -65,7 +65,7 @@ const PostCreateComponent = ({ onNew }) => {
           </Stack>
           <hr style={{ border: "0.5px solid #ccc" }} />
           <Stack direction="row" justifyContent="space-between">
-            <Button className="create-post-box-button" fullWidth>
+            <Button onClick={handleOpenDialog} className="create-post-box-button" fullWidth>
               <Stack direction="row" spacing={1} alignItems="end">
                 <PhotoLibrary sx={{ color: "#41bf5e", fontSize: 30 }} />
                 <Typography sx={{ fontWeight: "600", fontSize: "0.9rem" }}>
@@ -73,7 +73,7 @@ const PostCreateComponent = ({ onNew }) => {
                 </Typography>
               </Stack>
             </Button>
-            <Button className="create-post-box-button" fullWidth>
+            <Button onClick={handleOpenDialog} className="create-post-box-button" fullWidth>
               <Stack direction="row" spacing={1} alignItems="end">
                 <Event sx={{ color: "#03a4f2", fontSize: 30 }} />
                 <Typography sx={{ fontWeight: "600", fontSize: "0.9rem" }}>

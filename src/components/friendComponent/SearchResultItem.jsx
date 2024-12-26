@@ -23,6 +23,8 @@ import {
 } from "@/redux/thunks/profileThunk";
 import { useRouter } from "next/navigation";
 import { createPrivateChat } from "@/utils/services/chatService/chatService";
+import { useSocket } from "@/contexts/SocketContext";
+import { createUserNotification } from "@/utils/services/notification/notification.service";
 
 const SearchResultItem = ({ profile }) => {
   const { user } = useSelector((state) => state.auth);
@@ -32,14 +34,26 @@ const SearchResultItem = ({ profile }) => {
   const [isSentRequest, setIsSentRequested] = useState(false);
   const [isReceivedRequest, setIsReceivedRequest] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null); // State cho menu
+  const {
+    sendFriendRequestSocket,
+    acceptFriendRequestSocket,
+    rejectFriendRequestSocket,
+  } = useSocket();
   const router = useRouter();
 
   const handleSendRequest = async () => {
     try {
       await dispatch(
-        sendFriendRequest({ receptionId: profile.userId, senderId: user._id })
+        sendFriendRequest({ receptionId: profile?.userId, senderId: user._id })
       );
+      sendFriendRequestSocket(profile?.userId);
       setIsSentRequested(true);
+      const message = `${user?.name} has just sent you a friend request`;
+      await createUserNotification({
+        userId: profile?.userId,
+        message,
+        refUser: user?._id,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -71,9 +85,19 @@ const SearchResultItem = ({ profile }) => {
   const handleAcceptRequest = async () => {
     try {
       await dispatch(
-        acceptFriendRequest({ receiverId: user._id, senderId: profile.userId })
+        acceptFriendRequest({ receiverId: user._id, senderId: profile?.userId })
       );
-      await createPrivateChat({userId: user._id, participants:[profile.userId]});
+      await createPrivateChat({
+        userId: user._id,
+        participants: [profile?.userId],
+      });
+      const message = `${user?.name} has accepted the friend request`;
+      const notify = await createUserNotification({
+        userId: profile?.userId,
+        message,
+        refUser: user?._id,
+      });
+      acceptFriendRequestSocket(profile?.userId, notify);
       setIsReceivedRequest(false);
       setIsFriend(true);
       setAnchorEl(null);
@@ -86,9 +110,19 @@ const SearchResultItem = ({ profile }) => {
   const handleRejectRequest = async () => {
     try {
       await dispatch(
-        rejectFriendRequest({ receiverId: user._id, senderId: profile.userId })
+        rejectFriendRequest({
+          receiverId: user?._id,
+          senderId: profile?.userId,
+        })
       );
       setAnchorEl(null);
+      const message = `${user?.name} has rejected the friend request`;
+      const notify = await createUserNotification({
+        userId: profile?.userId,
+        message,
+        refUser: user?._id,
+      });
+      rejectFriendRequestSocket(profile?.userId, notify);
     } catch (error) {
       setAnchorEl(null);
       console.log(error);
@@ -96,11 +130,11 @@ const SearchResultItem = ({ profile }) => {
   };
 
   const handleClickResponse = (event) => {
-    setAnchorEl(event.currentTarget); // Mở menu
+    setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
-    setAnchorEl(null); // Đóng menu
+    setAnchorEl(null);
   };
 
   useEffect(() => {

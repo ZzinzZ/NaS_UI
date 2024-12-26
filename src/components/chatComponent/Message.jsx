@@ -12,10 +12,14 @@ import {
   Typography,
 } from "@mui/material";
 import Image from "next/image";
-import DescriptionIcon from "@mui/icons-material/Description";
+import CallIcon from "@mui/icons-material/Call";
+import PhoneMissedIcon from "@mui/icons-material/PhoneMissed";
+import PhoneDisabledIcon from "@mui/icons-material/PhoneDisabled";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import AddReactionIcon from "@mui/icons-material/AddReaction";
 import ReplyIcon from "@mui/icons-material/Reply";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import ReactSelector from "../generals/ReactSelector";
 import { useSocket } from "@/contexts/SocketContext";
@@ -24,9 +28,10 @@ import {
   getUserReactMessage,
   getUserSeenMessage,
 } from "@/utils/services/messageService/message.service";
-import CircularProgressWithLabel from "../generals/CircularProgressWithLabel";
 import formatBytes from "@/utils/middlewares/formatBytes";
 import Link from "next/link";
+import { formatCallDuration } from "@/utils/middlewares/formatTimes";
+import { showImage } from "@/redux/slices/imageSlice";
 
 const Message = forwardRef(
   ({ message, setRefMessage, scrollToMessage, isBlockedBy }, ref) => {
@@ -42,8 +47,9 @@ const Message = forwardRef(
       handleReadMessage,
       handleRemoveMessage,
       newMessage,
-      onDeleteMessage
+      onDeleteMessage,
     } = useSocket();
+    const dispatch = useDispatch();
     const isSentByCurrentUser =
       message?.sender_id?._id === user?._id || message?.sender_id === user?._id;
 
@@ -110,6 +116,10 @@ const Message = forwardRef(
       handleGetListReact();
     }, [newMessage]);
 
+    useEffect(() => {
+      console.log("Message", message);
+    }, []);
+
     const handleSetFileIcon = (type) => {
       if (type.includes("image")) return "/image.png";
       else if (type.includes("word")) return "/word.png";
@@ -131,7 +141,6 @@ const Message = forwardRef(
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
-          disableScrollLock={true}
           anchorOrigin={{
             vertical: "top",
             horizontal: "center",
@@ -202,8 +211,15 @@ const Message = forwardRef(
                         {message?.reply_to.sender_id?.name}
                       </Typography>
                     </Stack>
-                    <Typography>
-                      {message?.reply_to?.content?.image.length > 0
+                    <Typography
+                      sx={{
+                        maxWidth: "20rem", // Giới hạn chiều rộng
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {message?.reply_to?.content?.image?.length > 0
                         ? "Image"
                         : message?.reply_to?.content?.file
                         ? "File"
@@ -212,8 +228,55 @@ const Message = forwardRef(
                   </Stack>
                 )}
                 <Stack sx={{ width: "100%" }}>
+                  {message?.content?.call &&
+                    (message?.content?.call?.is_accepted ? (
+                      <Stack direction="row" spacing={1}>
+                        {message?.content?.call?.call_type === "audio" ? (
+                          <CallIcon />
+                        ) : (
+                          <VideocamIcon />
+                        )}
+                        <Stack>
+                          {message?.content?.call?.call_type === "audio" ? (
+                            <Typography>Audio call</Typography>
+                          ) : (
+                            <Typography>Video call</Typography>
+                          )}
+                          <Typography sx={{ fontSize: "0.8rem" }}>
+                            {formatCallDuration(
+                              message?.content?.call?.callDuration
+                            )}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                    ) : (
+                      <Stack
+                        direction="row"
+                        sx={{ color: isSentByCurrentUser ? "#ccc" : "#f44336" }}
+                      >
+                        {message?.content?.call?.call_type === "audio" ? (
+                          <PhoneDisabledIcon />
+                        ) : (
+                          <VideocamOffIcon />
+                        )}
+                        <Stack>
+                          {message?.content?.call?.call_type === "audio" ? (
+                            <Typography>Audio call</Typography>
+                          ) : (
+                            <Typography>Video call</Typography>
+                          )}
+                        </Stack>
+                      </Stack>
+                    ))}
                   {message?.content.text && (
-                    <Typography>{message?.content.text}</Typography>
+                    <Typography
+                      sx={{
+                        maxWidth: "20rem", // Giới hạn chiều rộng
+                        wordWrap: "break-word",
+                      }}
+                    >
+                      {message?.content.text}
+                    </Typography>
                   )}
                   {message?.isLoading ? (
                     // Nếu message đang trong quá trình tải, hiển thị "Loading..."
@@ -244,10 +307,13 @@ const Message = forwardRef(
                         {" "}
                         {/* Tỷ lệ 16:9 */}
                         <Image
-                          src={message.content.image[0]}
+                          src={message?.content?.image[0]}
                           alt="message-image-single"
                           fill
-                          style={{ objectFit: "cover", borderRadius: "8px" }} // Làm đầy và bo tròn
+                          style={{ objectFit: "cover", borderRadius: "8px" }}
+                          onClick={() => {
+                            dispatch(showImage(message?.content?.image[0]));
+                          }}
                         />
                       </Box>
                     ) : message?.content?.image?.length === 2 ? (
@@ -279,6 +345,9 @@ const Message = forwardRef(
                                 objectFit: "cover",
                                 borderRadius: "8px",
                               }}
+                              onClick={() => {
+                                dispatchEvent(showImage(image));
+                              }}
                             />
                           </Box>
                         ))}
@@ -309,6 +378,9 @@ const Message = forwardRef(
                               style={{
                                 objectFit: "cover",
                                 borderRadius: "4px",
+                              }}
+                              onClick={() => {
+                                dispatch(showFile(image));
                               }}
                             />
                           </Box>

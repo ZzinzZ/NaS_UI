@@ -11,7 +11,7 @@ const WaitingSlider = () => {
         height: "100vh",
         overflow: "hidden",
         position: "relative",
-        marginTop:{md: 0, xs: "3rem", sm:"3rem"}
+        marginTop:{md: 0, xs: "3rem", sm:"3rem"},
       }}
     >
       {/* Phần tử hình nền */}
@@ -35,15 +35,16 @@ const WaitingSlider = () => {
         spacing={2}
         sx={{ height: "100%", position: "relative", zIndex: 1 }} // Nội dung nằm trên hình nền
       >
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction={{md:"row", sm:"column"}} spacing={1} alignItems="center">
           <Typography
             sx={{
               fontWeight: 600,
               fontSize: "2rem",
               textShadow: "2px 2px 4px rgba(255, 255, 255, 0.7)",
+              textAlign: "center"
             }}
           >
-            Welcome to{" "}
+            Welcome to{" "} 
           </Typography>
           <Stack direction="row" alignItems="center">
             <Typography

@@ -80,6 +80,7 @@ const CommentBar = ({ post, comment, getPost }) => {
 
   const handleAddEmoji = (emojiObject) => {
     setContent((prevContent) => prevContent + emojiObject.emoji);
+    setPickerEmoji(false);
   };
 
   const handleSelectGif = (gif) => {
@@ -87,6 +88,7 @@ const CommentBar = ({ post, comment, getPost }) => {
 
       setGif(gif.url);
       setDisplayImage(gif.url);
+      setPickerGif(false);
     } else {
       console.error("Failed to get GIF URL");
     }

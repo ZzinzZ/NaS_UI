@@ -27,7 +27,13 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
   const [images, setImages] = useState([]);
   const [files, setFiles] = useState([]);
   const { user } = useSelector((state) => state.auth);
-  const { handleSendMessage, handleReplyMessage, handleSendFile } = useSocket();
+  const {
+    handleSendMessage,
+    handleReplyMessage,
+    handleSendFile,
+    typingSocket,
+    stopTypingSocket,
+  } = useSocket();
 
   const onEmojiClick = (emojiObject, event) => {
     setChatContent((prev) => prev + emojiObject.emoji);
@@ -53,10 +59,23 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
     setAnchorEl(null);
   };
 
+  const handleTypingEvent = () => {
+    const recipientIds = chat?.participants
+      .filter((participant) => participant?.userId !== user._id)
+      .map((participant) => participant?.userId);
+    typingSocket(user, recipientIds);
+  };
+
+  const handleStopTypingEvent = () => {
+    const recipientIds = chat?.participants
+      .filter((participant) => participant?.userId !== user?._id)
+      .map((participant) => participant.userId);
+    stopTypingSocket(user, recipientIds );
+  };
+
   const handleImageChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
-    
-    
+
     setImages((prevImages) => [...prevImages, ...selectedFiles]);
     handleMenuClose();
   };
@@ -65,7 +84,7 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
     const selectedFiles = Array.from(event.target.files);
     handleSendFile(user?._id, chat?._id, selectedFiles);
     handleMenuClose();
-  }
+  };
 
   const removeImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
@@ -117,7 +136,7 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
               <Typography>Reply to {refMessage?.sender_id?.name}</Typography>
             </Stack>
             <Typography sx={{ paddingLeft: "1.5rem" }}>
-              {refMessage?.content?.image.length > 0
+              {refMessage?.content?.image?.length > 0
                 ? "Image"
                 : refMessage?.content?.file
                 ? "File"
@@ -172,12 +191,11 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
         sx={{ padding: "0.5rem 0.5rem" }}
       >
         <IconButton
-        disabled={isBlockedBy}
+          disabled={isBlockedBy}
           onClick={handleMenuOpen}
           sx={{
             transition: "transform 0.3s",
             transform: openMenu ? "rotate(45deg)" : "rotate(0deg)",
-            
           }}
         >
           <AddCircleIcon sx={{ color: isBlockedBy ? "gray" : "#1976d3" }} />
@@ -266,11 +284,19 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
           }}
         >
           <TextField
-          disabled={isBlockedBy}
+            disabled={isBlockedBy}
             autoComplete="off"
             placeholder="Type a message..."
             value={chatContent}
             onChange={(e) => handleInputMessage(e)}
+            onFocus={handleTypingEvent}
+            onBlur={handleStopTypingEvent}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
             sx={{
               width: "100%",
               height: "2rem",
@@ -299,7 +325,9 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
             }}
           />
           <IconButton onClick={handleEmojiPickerOpen} disabled={isBlockedBy}>
-            <EmojiEmotionsIcon sx={{ color: isBlockedBy ? "gray" : "#1976d3" }} />
+            <EmojiEmotionsIcon
+              sx={{ color: isBlockedBy ? "gray" : "#1976d3" }}
+            />
           </IconButton>
           <Popover
             open={openEmojiPicker}

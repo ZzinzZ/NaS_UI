@@ -28,7 +28,7 @@ import { registerUser } from "@/redux/thunks/authThunk";
 import { showLoading, hideLoading } from "@/redux/slices/LoadingSlice";
 import { toast } from "react-toastify";
 import checkMail from "@/utils/middlewares/checkMailValid";
-import { sendOtp } from "@/utils/services/authService/otpService";
+import { checkMailExits, sendOtp } from "@/utils/services/authService/otpService";
 import { DatePicker } from "@mui/x-date-pickers";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
@@ -88,6 +88,11 @@ const RegisterForm = () => {
         isMailValid.status === "error"
       ) {
         toast.error("Invalid email");
+        return;
+      }
+      const isExits = await checkMailExits(formData.email);
+      if (isExits) {
+        toast.error("Email already exists");
         return;
       }
       await sendOtp({ email: formData.email });
@@ -152,6 +157,7 @@ const RegisterForm = () => {
         formData.email &&
           formData.password &&
           formData.confirmPassword &&
+          formData.confirmPassword === formData.password &&
           isVerified
       );
     } else if (activeStep === 1) {

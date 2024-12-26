@@ -2,10 +2,24 @@ import { toast } from "react-toastify";
 import {
   baseUrl,
   deleteRequest,
+  getRequest,
   patchRequest,
   postRequest,
   putRequest,
 } from "../requestService";
+
+export const getUserProfile = async ({userId}) => {
+  try {
+    const response = await getRequest(
+      `${baseUrl}/profiles/find_by_userId/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    // toast.error(error.response.data.message);
+    console.error(error);
+    
+  }
+} 
 
 export const addProfileExperience = async ({
   userId,

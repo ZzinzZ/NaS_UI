@@ -37,8 +37,8 @@ const ProfileIntroduce = ({ profile, isOtherProfile }) => {
         handleClose={handleCloseForm}
         profile={profile}
       />
-      <Stack direction="row">
-        <Stack spacing={1} textAlign="center" sx={{ marginRight: "1rem" }}>
+      <Stack direction={{md:"row", sm:"row", xs:"column"}}>
+        <Stack spacing={1} textAlign="center" alignItems="center" sx={{ marginRight: "1rem" }}>
           <Typography variant="h6">Introduce</Typography>
           <Avatar
             alt={profile.name}

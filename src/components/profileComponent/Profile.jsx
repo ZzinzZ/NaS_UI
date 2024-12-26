@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProfile, getListFriends } from "@/redux/thunks/profileThunk";
 import { toast } from "react-toastify";
-import { Box, Container, Stack } from "@mui/material";
+import { Box, Container, Stack, Typography } from "@mui/material";
 import ProfileHeader from "./ProfileHeader";
 import IntroduceOverView from "./IntroduceOverView";
 import ProfileImages from "./ProfileImages";
@@ -14,6 +14,7 @@ import ProfileIntroduce from "./ProfileIntroduce";
 import { getUserArticlePosts } from "@/redux/thunks/postThunk";
 import PostItem from "../postComponent/PostItem";
 import ProfileFriend from "./ProfileFriend";
+import InboxIcon from "@mui/icons-material/Inbox";
 import ProfileLibrary from "./ProfileLibrary";
 import { showLoading, hideLoading } from "@/redux/slices/LoadingSlice";
 import { baseUrl, getRequest } from "@/utils/services/requestService";
@@ -96,7 +97,9 @@ const Profile = () => {
     const getProfileInfo = async () => {
       dispatch(showLoading());
       try {
-        const response = await getRequest(`${baseUrl}/profiles/find_by_userId/${id}`);
+        const response = await getRequest(
+          `${baseUrl}/profiles/find_by_userId/${id}`
+        );
         setProfile(response.data);
       } catch (error) {
         toast.error(error.message);
@@ -108,7 +111,9 @@ const Profile = () => {
 
     const getListFriendsProfile = async () => {
       try {
-        const response = await getRequest(`${baseUrl}/profiles/friends/list/${id}`);
+        const response = await getRequest(
+          `${baseUrl}/profiles/friends/list/${id}`
+        );
         setListFriend(response.data);
       } catch (error) {
         toast.error(error.message);
@@ -116,12 +121,10 @@ const Profile = () => {
       }
     };
 
-
     if (id !== user?._id) {
       setIsOtherProfile(true);
     }
 
-    
     getPostList();
     getProfileInfo();
     getListFriendsProfile();
@@ -153,33 +156,65 @@ const Profile = () => {
       )}
       <Container maxWidth="content">
         {profile && isPostTab && (
-          <Stack direction="row" spacing={{xs: 0, sm: 0 , md: 2}}>
+          <Stack direction="row" spacing={{ xs: 0, sm: 0, md: 2 }}>
             <Stack
               sx={{
                 width: "35%",
+                height: "100vh",
+                overflow: "scroll",
                 display: { xs: "none", sm: "none", md: "block" },
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
               }}
             >
               <IntroduceOverView user={user} profile={profile} />
               <ProfileImages />
               <ProfileFriendOverview friendList={listFriend} />
             </Stack>
-            <Stack sx={{ width: { xs: "100%", sm: "100%", md: "65%" } }}>
-              {!isOtherProfile && (<PostCreateComponent onNew={handleUpdateListPost}/>)}
-              {posts &&
-                posts.map((post) => (
+            <Stack
+              sx={{
+                width: { xs: "100%", sm: "100%", md: "65%" },
+                height: "100vh",
+                overflow: "scroll",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
+            >
+              {!isOtherProfile && (
+                <PostCreateComponent onNew={handleUpdateListPost} />
+              )}
+              {posts?.length > 0 ? (
+                posts?.map((post) => (
                   <PostItem
-                    key={post._id} 
+                    key={post._id}
                     profile={profile}
                     postItem={post}
                     onDelete={handleUpdateListPost}
                   />
-                ))}
+                ))
+              ) : (
+                <Stack alignItems="center" justifyContent="center">
+                  <InboxIcon sx={{ fontSize: "3rem", color: "#ddd" }} />
+                  <Typography variant="body1" sx={{ fontStyle: "italic" }}>
+                    No post
+                  </Typography>
+                </Stack>
+              )}
             </Stack>
           </Stack>
         )}
         {profile && isIntroTab && (
-          <ProfileIntroduce profile={profile} user={user} isOtherProfile={isOtherProfile} />
+          <ProfileIntroduce
+            profile={profile}
+            user={user}
+            isOtherProfile={isOtherProfile}
+          />
         )}
         {profile && isFriendTab && <ProfileFriend listFriend={listFriend} />}
         {profile && isImageTab && <ProfileLibrary userId={id} />}
