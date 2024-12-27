@@ -1,6 +1,6 @@
+"use client"
 import {
   findChatByParticipants,
-  createPrivateChat,
 } from "@/utils/services/chatService/chatService";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";

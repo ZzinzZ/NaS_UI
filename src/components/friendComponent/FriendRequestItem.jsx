@@ -1,3 +1,4 @@
+"use client"
 import { useSocket } from "@/contexts/SocketContext";
 import {
   acceptFriendRequest,

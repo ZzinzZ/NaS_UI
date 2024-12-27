@@ -18,7 +18,6 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { login } from "@/redux/thunks/authThunk";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import { hideLoading, showLoading } from "@/redux/slices/LoadingSlice";
 
 const LoginForm = () => {

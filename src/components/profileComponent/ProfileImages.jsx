@@ -2,13 +2,11 @@
 import { getListPhotos } from "@/utils/services/postService/getListPhoto";
 import {
   Box,
-  Container,
   ImageList,
   ImageListItem,
   Stack,
   Typography,
 } from "@mui/material";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import FriendListOverViewLoading from "../generals/FriendListOverViewLoading";

@@ -1,3 +1,4 @@
+"use client"
 import { NEXT_IMAGE_ORIGINAL_AVATAR } from "@/config/profileConfig";
 import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
 import Image from "next/image";
