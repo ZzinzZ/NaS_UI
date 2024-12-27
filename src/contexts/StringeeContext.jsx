@@ -21,12 +21,12 @@ export const StringeeProvider = ({ children }) => {
 
   useEffect(() => {
     if (!stringeeToken) {
-      console.error("Token không tồn tại!");
+      console.log("Token không tồn tại!");
       return;
     }
 
     if (!window.StringeeClient) {
-      console.error("Stringee SDK chưa được tải.");
+      console.log("Stringee SDK chưa được tải.");
       return;
     }
 
