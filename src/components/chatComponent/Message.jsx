@@ -33,8 +33,18 @@ import Link from "next/link";
 import { formatCallDuration } from "@/utils/middlewares/formatTimes";
 import { showImage } from "@/redux/slices/imageSlice";
 
-const Message = forwardRef(
-  ({ message, setRefMessage, scrollToMessage, isBlockedBy }, ref) => {
+const Message = React.forwardRef(
+  (
+    {
+      message,
+      scrollToMessage,
+      setRefMessage,
+      isBlockedBy,
+      isSearchResult,
+      isCurrentSearchResult,
+    },
+    ref
+  ) => {
     const { user } = useSelector((state) => state.auth);
     const [reacted, setReacted] = useState(false);
     const [openReact, setOpenReact] = useState(false);
@@ -179,7 +189,11 @@ const Message = forwardRef(
                   handleMenuOpen(event);
                 }}
                 onClick={() => setOpenSeenList(!openSeenList)}
+                ref={ref}
                 sx={{
+                  border: isCurrentSearchResult ? "3px solid #46c8f9" : "none",
+                  transition: "border 0.3s ease",
+                  transition: "background-color 0.3s ease",
                   backgroundColor: isSentByCurrentUser ? "#1976d3" : "#fff",
                   color: isSentByCurrentUser ? "#fff" : "#000",
                   padding: "0.8rem",

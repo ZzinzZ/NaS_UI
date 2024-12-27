@@ -2,7 +2,6 @@ import React, { useEffect, useState, memo, useCallback } from "react";
 import {
   Avatar,
   Box,
-  IconButton,
   Menu,
   MenuItem,
   Stack,
@@ -58,9 +57,11 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
       );
       setIsActive(isChatActive);
     }
-  }, [onlineUsers, chat, user._id]);
+  }, [onlineUsers, chat]);
 
   const getParticipants = useCallback(async () => {
+    console.log("returning participants");
+    
     try {
       setIsLoadingChat(true);
       const response = await getChatDetails({ chatId: chat._id });
@@ -155,6 +156,7 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
     }
   };
 
+
   return (
     <Box
       onContextMenu={(event) => {
@@ -217,7 +219,7 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  width: "10rem",
+                  width: {md: "10rem", sm:"20rem", xs:"10rem"},
                 }}
               >
                 {chat?.chat_name ? chat?.chat_name : chatName}
@@ -226,7 +228,7 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
                 <Typography
                   sx={{
                     color: countUnread === 0 ? "#5e5e5e" : "#000",
-                    fontSize: "0.8rem",
+                    fontSize: "0.7rem",
                     fontWeight: 600,
                   }}
                 >
@@ -236,7 +238,7 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
                 <Typography
                   sx={{
                     color: countUnread === 0 ? "#5e5e5e" : "#000",
-                    fontSize: "0.8rem",
+                    fontSize: "0.7rem",
                     fontWeight: countUnread === 0 ? 400 : 600,
                     maxWidth: "5rem",
                     whiteSpace: "nowrap",

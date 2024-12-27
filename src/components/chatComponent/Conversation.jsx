@@ -2,19 +2,22 @@
 import {
   Avatar,
   Box,
-  Button,
   IconButton,
   Stack,
   Typography,
   useMediaQuery,
   useTheme,
+  Fab,
+  Badge,
 } from "@mui/material";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import ActiveAvatar from "./ActiveAvatar";
 import CallIcon from "@mui/icons-material/Call";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import AutoAwesomeMosaicIcon from "@mui/icons-material/AutoAwesomeMosaic";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import InputChat from "./InputChat";
 import { useDispatch, useSelector } from "react-redux";
 import ChatDrawer from "./ChatDrawer";
@@ -24,6 +27,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getChatDetails } from "@/redux/thunks/chatThunk";
 import { toast } from "react-toastify";
 import { useStringee } from "@/contexts/StringeeContext";
+import { findMessageByKeyword } from "@/utils/services/messageService/message.service";
+import SearchInput from "./SearchInput";
 
 const drawerWidth = 240;
 
@@ -39,6 +44,9 @@ const Conversation = ({ isDeleteMessages }) => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [isBlockedBy, setIsBlockedBy] = useState(false);
   const [stranger, setStranger] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
+  const [isSearching, setIsSearching] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const {
     onlineUsers,
@@ -55,6 +63,8 @@ const Conversation = ({ isDeleteMessages }) => {
   const router = useRouter();
   const lastMessageRef = useRef(null);
   const messageRefs = useRef({});
+  const conversationRef = useRef(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
 
   const handleDrawerOpen = () => setOpen(!open);
   const handleDrawerClose = () => setOpen(false);
@@ -184,6 +194,34 @@ const Conversation = ({ isDeleteMessages }) => {
     router.push("/user");
   };
 
+  const handleScroll = useCallback(() => {
+    if (conversationRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = conversationRef.current;
+      const bottomThreshold = 100; // pixels from bottom
+      setShowScrollButton(
+        scrollHeight - scrollTop - clientHeight > bottomThreshold
+      );
+    }
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
+  useEffect(() => {
+    const currentRef = conversationRef.current;
+    if (currentRef) {
+      currentRef.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (currentRef) {
+        currentRef.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [handleScroll]);
+
   useEffect(() => {
     if (chatDeleted === chat?._id) {
       handleBackToChatBar();
@@ -199,6 +237,46 @@ const Conversation = ({ isDeleteMessages }) => {
     }
   }, [kickChat]);
 
+  const handleSearch = async (keyword) => {
+    if (!chatId) return;
+    setIsSearching(true);
+    try {
+      const results = await findMessageByKeyword({ chatId, keyword });
+      setSearchResults(results);
+      setCurrentSearchIndex(0);
+      if (results.length > 0) {
+        scrollToMessage(results[0]._id);
+      } else {
+        toast.info("No messages found");
+      }
+    } catch (error) {
+      console.error("Error searching messages:", error);
+      toast.error("Failed to search messages");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchResults([]);
+    setCurrentSearchIndex(0);
+    setIsSearching(false);
+  };
+
+  const handleNextSearchResult = () => {
+    if (currentSearchIndex < searchResults.length - 1) {
+      setCurrentSearchIndex(currentSearchIndex + 1);
+      scrollToMessage(searchResults[currentSearchIndex + 1]._id);
+    }
+  };
+
+  const handlePreviousSearchResult = () => {
+    if (currentSearchIndex > 0) {
+      setCurrentSearchIndex(currentSearchIndex - 1);
+      scrollToMessage(searchResults[currentSearchIndex - 1]._id);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -209,7 +287,7 @@ const Conversation = ({ isDeleteMessages }) => {
       <Stack
         sx={{
           width: open ? `calc(100% - ${drawerWidth}px)` : "100%",
-          height: "100vh",
+          height: {md: "100vh", sm: "95vh", xs:"95vh"},
           transition: "width 0.3s ease-out",
         }}
       >
@@ -283,6 +361,29 @@ const Conversation = ({ isDeleteMessages }) => {
               </Stack>
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
+              <SearchInput
+                onSearch={handleSearch}
+                onClear={handleClearSearch}
+              />
+              {searchResults.length > 0 && (
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography variant="body2">
+                    {currentSearchIndex + 1} of {searchResults.length}
+                  </Typography>
+                  <IconButton
+                    onClick={handlePreviousSearchResult}
+                    disabled={currentSearchIndex === 0}
+                  >
+                    <KeyboardArrowUpIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={handleNextSearchResult}
+                    disabled={currentSearchIndex === searchResults.length - 1}
+                  >
+                    <KeyboardArrowDownIcon />
+                  </IconButton>
+                </Stack>
+              )}
               {chat?.type === "private" && (
                 <IconButton onClick={() => handleMakeVoiceCall()}>
                   <CallIcon sx={{ color: "#1976d3" }} />
@@ -299,8 +400,10 @@ const Conversation = ({ isDeleteMessages }) => {
             </Stack>
           </Stack>
         </Box>
+        <Box sx={{ padding: "0.5rem 1rem" }}></Box>
         {/* Conversation center */}
         <Box
+          ref={conversationRef}
           sx={{
             flexGrow: 1,
             overflowY: "auto",
@@ -323,8 +426,12 @@ const Conversation = ({ isDeleteMessages }) => {
             },
           }}
         >
-          {messages?.length > 0 ? (
-            messages.map((message) => (
+          {isSearching ? (
+            <Box sx={{ margin: "2rem 0" }}>
+              <Box className="loader"></Box>
+            </Box>
+          ) : (
+            messages?.map((message) => (
               <Message
                 scrollToMessage={scrollToMessage}
                 ref={(el) => (messageRefs.current[message?._id] = el)}
@@ -332,34 +439,14 @@ const Conversation = ({ isDeleteMessages }) => {
                 key={message?._id}
                 setRefMessage={setRefMessage}
                 isBlockedBy={isBlockedBy}
+                isSearchResult={searchResults.some(
+                  (result) => result._id === message._id
+                )}
+                isCurrentSearchResult={
+                  searchResults[currentSearchIndex]?._id === message._id
+                }
               />
             ))
-          ) : (
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-              height="100%"
-              textAlign="center"
-              color="text.secondary"
-              sx={{ opacity: 0.7 }} // Làm mờ nhẹ phần chữ
-            >
-              <Typography variant="h5" gutterBottom>
-                No messages yet!
-              </Typography>
-              <Typography variant="body1">
-                Send the first message to start the conversation 🎉
-              </Typography>
-              <button
-                className="btn-17"
-                onClick={() => handleSendHello(user?._id, chat?._id)}
-              >
-                <span className="text-container">
-                  <span className="text">Hello 🙌</span>
-                </span>
-              </button>
-            </Box>
           )}
           <Box ref={lastMessageRef} />
           {isBlockedBy && (
@@ -370,48 +457,65 @@ const Conversation = ({ isDeleteMessages }) => {
             </Stack>
           )}
         </Box>
-        {/* Conversation input */}
-        {typing?.length > 0 && (
-            <Box
+        {showScrollButton && (
+          <Stack sx={{ width: "100%", position: "relative" }}>
+            <Fab
+              size="small"
+              onClick={scrollToBottom}
               sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                borderRadius: "0.5rem",
-                padding: "0.5rem 1rem",
-                marginTop: "0.5rem",
-                maxWidth: "fit-content",
+                position: "absolute",
+                bottom: 10,
+                right: "50%",
+                zIndex: 2,
+                backgroundColor: "#fff",
+                color: "rgba(25, 118, 211,1)",
               }}
             >
-              <Box
-                sx={{
-                  width: "1rem",
-                  height: "1rem",
-                  borderRadius: "50%",
-                  backgroundColor: "#1976d3",
-                  animation: "typingAnimation 1.5s infinite",
-                }}
-              />
-              <Typography
-                sx={{
-                  color: "#64686b",
-                  fontSize: "0.9rem",
-                  fontWeight: "500",
-                }}
-              >
-                {typing[0]?.name} is typing...
-              </Typography>
-              <style>
-                {`
-        @keyframes typingAnimation {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.2); }
-          100% { transform: scale(1); }
-        }
-      `}
-              </style>
-            </Box>
-          )}
+              <KeyboardArrowDownIcon />
+            </Fab>
+          </Stack>
+        )}
+        {typing?.length > 0 && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              borderRadius: "0.5rem",
+              padding: "0.5rem 1rem",
+              marginTop: "0.5rem",
+              maxWidth: "fit-content",
+            }}
+          >
+            <Box
+              sx={{
+                width: "1rem",
+                height: "1rem",
+                borderRadius: "50%",
+                backgroundColor: "#1976d3",
+                animation: "typingAnimation 1.5s infinite",
+              }}
+            />
+            <Typography
+              sx={{
+                color: "#64686b",
+                fontSize: "0.9rem",
+                fontWeight: "500",
+              }}
+            >
+              {typing[0]?.name} is typing...
+            </Typography>
+            <style>
+              {`
+      @keyframes typingAnimation {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+      }
+    `}
+            </style>
+          </Box>
+        )}
         <Box
           sx={{
             position: "sticky",
@@ -419,7 +523,6 @@ const Conversation = ({ isDeleteMessages }) => {
             background: "#fff",
           }}
         >
-          
           <InputChat
             chat={chat}
             refMessage={refMessage}
