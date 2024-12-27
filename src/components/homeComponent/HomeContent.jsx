@@ -27,16 +27,13 @@ const HomeContent = () => {
           <ChatBar setIsDeleteMessages={setIsDeleteMessages} />
         )
       ) : isTablet ? (
-        <>
+        chatId ? (
+          <Box sx={{ width: "100%" }}>
+            <Conversation isDeleteMessages={isDeleteMessages} />
+          </Box>
+        ) : (
           <ChatBar setIsDeleteMessages={setIsDeleteMessages} />
-          {chatId ? (
-            <Box sx={{ width: "100%" }}>
-              <Conversation isDeleteMessages={isDeleteMessages} />
-            </Box>
-          ) : (
-            <WaitingSlider />
-          )}
-        </>
+        )
       ) : (
         <>
           <ChatBar setIsDeleteMessages={setIsDeleteMessages} />

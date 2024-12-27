@@ -207,3 +207,14 @@ export const getUserReactMessage = async ({ messageId }) => {
     console.log(error);
   }
 };
+
+export const findMessageByKeyword = async ({chatId, keyword}) => {
+  try {
+    const response = await getRequest(`${baseUrl}/messages/find/${chatId}?keyword=${keyword}`);
+    return response.data;
+  } catch (error) {
+    // toast.error(error.response.data.message);
+    console.log(error);
+    
+  }
+}
