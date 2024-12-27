@@ -288,6 +288,22 @@ line {
   letter-spacing: 0.7rem;
 }
 
+@media (max-width: 768px) {
+
+  .register-form{
+    height: 40rem;
+  }
+  .login-form{
+    height: 40rem;
+  }
+  .login-form::after {
+    display: none;
+  }
+  .register-form::after {
+    display: none;
+  }
+}
+
 .forgot-password-form{
   position: relative;
   background-color: #ffffff;

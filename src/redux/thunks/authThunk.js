@@ -7,7 +7,7 @@ import { resetProfile } from "../slices/profileSlice";
 import axios from "axios";
 
 export const registerUser = createAsyncThunk(
-  "signup/registerUser",
+  "auth/registerUser",
   async (userData, { rejectWithValue }) => {
     try {
       const response = await postRequest(`${baseUrl}/users/register`, userData);
@@ -20,7 +20,7 @@ export const registerUser = createAsyncThunk(
 );
 
 export const login = createAsyncThunk(
-  "login/login",
+  "auth/login",
   async (userData, { rejectWithValue, dispatch }) => {
     try {
       const response = await postRequest(`${baseUrl}/users/login`, userData);

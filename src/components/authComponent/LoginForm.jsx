@@ -38,7 +38,15 @@ const LoginForm = () => {
     let user = null;
     dispatch(showLoading());
     try {
-      user = await dispatch(login(formData)).unwrap();
+      user = await dispatch(login(formData))
+      .unwrap()
+      .then(() => {
+        setFormData({ email: "", password: "" })
+      })
+      .catch(() => {
+        console.log("Failed to login");
+        
+      })
       router.push("/user");
     } catch (err) {
       console.log(err);
@@ -65,7 +73,7 @@ const LoginForm = () => {
       <Box className="login-form">
         <Grid container>
           <Grid item xs={12} sm={12} md={12}>
-            <Stack spacing={3} sx={{ marginLeft: "2rem" }}>
+            <Stack spacing={3} sx={{ marginLeft: {md:"2rem", sm:"2rem"}, xs:0 }}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <Typography sx={{ fontWeight: 600, fontSize: "1.2rem"}}>Welcome to </Typography>
                 <Stack direction="row" alignItems="center">
