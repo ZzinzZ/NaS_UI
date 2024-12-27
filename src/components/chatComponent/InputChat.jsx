@@ -91,7 +91,9 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
   };
 
   const handleSend = () => {
+    if((!chatContent || chatContent.trim() === "") && images?.length === 0) return;
     if (refMessage !== null) {
+     
       handleReplyMessage(
         chatContent,
         user?._id,

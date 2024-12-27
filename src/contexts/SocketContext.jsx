@@ -53,7 +53,10 @@ export const SocketProvider = ({ children, userId }) => {
     if (!userId) return;
 
     if (!socket) {
-      const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_SERVER);
+      const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_SERVER, {
+        transports: ["websocket"], // Đảm bảo chỉ dùng WebSocket
+        withCredentials: true,    // Gửi cookie/session (nếu cần)
+      });
       setSocket(newSocket);
 
       return () => {
@@ -442,13 +445,13 @@ export const SocketProvider = ({ children, userId }) => {
   );
 
   useEffect(() => {
-    const listUnread = notifications?.filter(notification => !notification.seen);
+    const listUnread = notifications?.filter(notification => !notification?.seen);
     setCountUnreadNotifications(listUnread?.length)
   },[notifications]);
 
   useEffect(() => {
-    const images = messages.flatMap((message) =>
-      message.content?.image || []
+    const images = messages?.flatMap((message) =>
+      message?.content?.image || []
     );
     setChatLibrary(images);
   },[messages]);
@@ -475,7 +478,7 @@ export const SocketProvider = ({ children, userId }) => {
     socket?.on("receiveReact", (updatedMessage) => {
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
-          msg._id === updatedMessage._id ? updatedMessage : msg
+          msg._id === updatedMessage?._id ? updatedMessage : msg
         )
       );
     });

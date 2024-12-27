@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ActiveAvatar from "./ActiveAvatar";
 import ChatItem from "./ChatItem";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ import CreateGroupBoard from "./CreateGroupBoard";
 import ListChatLoading from "./ListChatLoading";
 import useDebounce from "@/customHooks/useDebounce";
 import { useSocket } from "@/contexts/SocketContext";
+import { memo } from "react";
 
 const ChatBar = ({ setIsDeleteMessages }) => {
   const router = useRouter();
@@ -34,6 +35,8 @@ const ChatBar = ({ setIsDeleteMessages }) => {
   const { chatBarChange, newMessage, receiveMessage,chatDeleted } = useSocket();
 
   const getUserChat = async () => {
+    console.log("GetUserChat");
+    
     try {
       const response = await getChatsList({ userId: user._id });
 
@@ -43,9 +46,9 @@ const ChatBar = ({ setIsDeleteMessages }) => {
     }
   };
 
-  const handleDeleteChatMessages = (chatId) => {
-    setChats(chats?.filter(chat => chat._id !== chatId ))
-  }
+  const handleDeleteChatMessages = useCallback((chatId) => {
+    setChats(prevChats => prevChats.filter(chat => chat._id !== chatId));
+  }, []);
 
   const findChat = async (keyword) => {
     try {
@@ -67,22 +70,23 @@ const ChatBar = ({ setIsDeleteMessages }) => {
     getUserChat();
   }, [user, newMessage, receiveMessage]);
 
-  const handleChatItemClick = (chatId) => {
+  const handleChatItemClick = useCallback((chatId) => {
     router.push(`/user?chat-id=${chatId}`);
     setIsReadMessage(true);
-  };
+  }, [router]);
 
-  const handleCreateBoardClick = () => {
+  const handleCreateBoardClick = useCallback(() => {
     setOpenCreateBoard(true);
-  };
+  }, []);
 
-  const handleCloseCreateBoard = () => {
+  const handleCloseCreateBoard = useCallback(() => {
     setOpenCreateBoard(false);
-  };
+  }, []);
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = useCallback((e) => {
     setSearchText(e.target.value);
-  };
+  }, []);
+
   useEffect(() => {
     if (debouncedSearchText) {
       findChat(debouncedSearchText);
@@ -99,12 +103,10 @@ const ChatBar = ({ setIsDeleteMessages }) => {
 
   useEffect(() => {
     if(chatDeleted !== null) {
-      const index = chats.findIndex((chat) => chat._id === chatDeleted);
-      if (index !== -1) {
-        setChats([...chats.slice(0, index),...chats.slice(index + 1)]);
-      }
+      setChats(prevChats => prevChats.filter(chat => chat._id !== chatDeleted));
     }
   },[chatDeleted])
+
 
   return (
     <Box
@@ -219,7 +221,7 @@ const ChatBar = ({ setIsDeleteMessages }) => {
           {isFetching ? (
             <ListChatLoading />
           ) : chats?.length > 0 ? (
-            chats?.map((chat) => (
+            chats.map((chat) => (
               <Box
                 key={chat?._id}
                 onClick={() => handleChatItemClick(chat?._id)}
@@ -242,4 +244,5 @@ const ChatBar = ({ setIsDeleteMessages }) => {
   );
 };
 
-export default ChatBar;
+export default memo(ChatBar);
+
