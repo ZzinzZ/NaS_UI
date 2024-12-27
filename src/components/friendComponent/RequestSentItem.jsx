@@ -1,3 +1,4 @@
+"use client"
 import {
   removeFriendRequest,
 } from "@/redux/thunks/profileThunk";

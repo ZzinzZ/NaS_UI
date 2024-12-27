@@ -1,3 +1,4 @@
+"use client"
 import { Box, Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 

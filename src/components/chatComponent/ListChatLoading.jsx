@@ -1,3 +1,4 @@
+"use client";
 import { IconButton, Skeleton, Stack } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import React from "react";

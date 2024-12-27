@@ -25,7 +25,6 @@ const CommentItem = ({ post, comment, isReply = false }) => {
 
   const handleOpenSelectReact = () => setSelectReact(true);
   const handleCloseSelectReact = () => setSelectReact(false);
-  const toggleReplyInput = () => setShowReplyInput(!showReplyInput);
 
   const getUserProfile = async () => {
     setIsLoadingData(true);

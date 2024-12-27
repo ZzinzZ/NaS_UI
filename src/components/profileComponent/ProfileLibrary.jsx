@@ -1,3 +1,4 @@
+"use client"
 import { showImage } from "@/redux/slices/imageSlice";
 import { getListPhotos } from "@/utils/services/postService/getListPhoto";
 import { Box, Grid, Typography } from "@mui/material";

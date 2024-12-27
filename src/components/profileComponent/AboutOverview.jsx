@@ -1,3 +1,4 @@
+"use client"
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import React, { useEffect, useState, useCallback } from "react";
 import PublicIcon from "@mui/icons-material/Public";

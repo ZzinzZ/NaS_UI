@@ -1,3 +1,4 @@
+"use client"
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";

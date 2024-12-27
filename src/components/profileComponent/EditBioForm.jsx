@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import PublicIcon from "@mui/icons-material/Public";
 import { Button, Stack, TextField, Typography } from "@mui/material";

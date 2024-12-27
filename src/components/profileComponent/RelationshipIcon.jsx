@@ -1,4 +1,4 @@
-
+"use client"
 import React from 'react'
 import GroupIcon from '@mui/icons-material/Group';
 import PersonIcon from '@mui/icons-material/Person';

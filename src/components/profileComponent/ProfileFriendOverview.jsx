@@ -1,3 +1,4 @@
+"use client"
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
 import {
   Box,

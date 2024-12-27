@@ -3,7 +3,6 @@ import { Avatar, Box, Stack, Typography } from "@mui/material";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import EditProfileForm from "./EditProfileForm";
 import IntroductionDetailsInfor from "./IntroductionDetailsInfor";
-import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import moment from "moment"; // Import moment
 

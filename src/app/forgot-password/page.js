@@ -1,10 +1,6 @@
+"use client";
 import React from 'react';
 import ForgotPasswordForm from '@/components/authComponent/ForgotPasswordForm';
-
-export const metadata = {
-  title: 'NaS-Login',
-  description: '',
-};
 
 const ForgotPassword = () => {
   return (

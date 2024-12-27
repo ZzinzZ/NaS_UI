@@ -33,7 +33,6 @@ const CommentBar = ({ post, comment, getPost }) => {
   const [image, setImage] = useState(null);
   const [gif, setGif] = useState(null);
   const [displayImage, setDisplayImage] = useState(null);
-  const [commentUser, setCommentUser] = useState(null);
   const { top, bottom } = useComponentPosition(ref);
   const { user } = useSelector((state) => state.auth);
   const { profileData } = useSelector(
@@ -52,11 +51,11 @@ const CommentBar = ({ post, comment, getPost }) => {
     setIsInputComment(true);
   };
 
-  const handleCloseInputComment = () => {
-    setIsInputComment(false);
-    setPickerEmoji(false);
-    setPickerGif(false);
-  };
+  // const handleCloseInputComment = () => {
+  //   setIsInputComment(false);
+  //   setPickerEmoji(false);
+  //   setPickerGif(false);
+  // };
 
   const handleOpenPickerEmoji = () => {
     setPickerEmoji(!pickerEmoji);
@@ -64,9 +63,9 @@ const CommentBar = ({ post, comment, getPost }) => {
     setPickerGif(false);
   };
 
-  const handleClosePickerEmoji = () => {
-    setPickerEmoji(false);
-  };
+  // const handleClosePickerEmoji = () => {
+  //   setPickerEmoji(false);
+  // };
 
   const handleOpenPickerGif = () => {
     setPickerGif(!pickerGif);
@@ -74,9 +73,9 @@ const CommentBar = ({ post, comment, getPost }) => {
     setPickerEmoji(false);
   };
 
-  const handleClosePickerGif = () => {
-    setPickerGif(false);
-  };
+  // const handleClosePickerGif = () => {
+  //   setPickerGif(false);
+  // };
 
   const handleAddEmoji = (emojiObject) => {
     setContent((prevContent) => prevContent + emojiObject.emoji);
