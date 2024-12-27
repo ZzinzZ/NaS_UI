@@ -15,7 +15,7 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "@/redux/slices/LoadingSlice";
 import { toast } from "react-toastify";
-import OtpForm from "./OtpForm";
+import OtpForm from "./OTPForm";
 import { sendOtp } from "@/utils/services/authService/otpService";
 import { resetPassword } from "@/utils/services/authService/userService";
 import { useRouter } from "next/navigation";
