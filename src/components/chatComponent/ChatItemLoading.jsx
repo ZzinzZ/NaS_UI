@@ -1,4 +1,5 @@
-import { Box, IconButton, Skeleton, Stack } from "@mui/material";
+"use client";
+import {  Skeleton, Stack } from "@mui/material";
 
 import React from "react";
 

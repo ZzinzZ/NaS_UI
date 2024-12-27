@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import { registerUser, login, refreshToken } from "../thunks/authThunk";
 import { resetProfile } from "./profileSlice";
 
+
 const AuthSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -42,16 +43,9 @@ const AuthSlice = createSlice({
         state.stringeeToken = action.payload.stringeeToken || null;
         resetProfile();
       })
-      .addCase(login.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
         state.token = action.payload.token;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.error = action.payload;
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
         state.token = action.payload.data.token;

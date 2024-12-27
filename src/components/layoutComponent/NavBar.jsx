@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import FeedIcon from "@mui/icons-material/Feed";
-import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import MessageIcon from '@mui/icons-material/Message';
 import GroupIcon from '@mui/icons-material/Group';
 import {

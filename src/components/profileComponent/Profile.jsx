@@ -83,7 +83,15 @@ const Profile = () => {
   const getPostList = async () => {
     if (user?._id) {
       try {
-        const userPost = await dispatch(getUserArticlePosts(id)).unwrap();
+        const userPost = await dispatch(getUserArticlePosts(id)).unwrap()
+        .then(() => {
+          console.log(" ");
+          
+        })
+        .catch(() => {
+          console.log("Failed to fetch posts");
+        })
+        ;
         setPosts(userPost);
       } catch (error) {
         console.error("Failed to fetch posts:", error);

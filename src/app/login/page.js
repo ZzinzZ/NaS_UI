@@ -1,10 +1,11 @@
+"use client";
 import React from 'react';
 import LoginForm from '@/components/authComponent/LoginForm';
 
-export const metadata = {
-  title: 'NaS-Login',
-  description: '',
-};
+// export const metadata = {
+//   title: 'NaS-Login',
+//   description: '',
+// };
 
 const Login = () => {
   return (
@@ -14,4 +15,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Login;

@@ -1,7 +1,6 @@
 "use client";
 import { Stack, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import PostItem from "../postComponent/PostItem";
 import InboxIcon from '@mui/icons-material/Inbox';
 

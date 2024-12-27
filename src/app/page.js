@@ -1,3 +1,4 @@
+"use client";
 import { BackgroundGradientAnimation } from "@/components/layoutComponent/BackgroundGradientAnimation ";
 import LandingContent from "@/components/layoutComponent/LandingContent";
 
