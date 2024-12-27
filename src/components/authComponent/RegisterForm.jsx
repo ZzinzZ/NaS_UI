@@ -367,7 +367,7 @@ const RegisterForm = () => {
       <FormControl className="register-form">
         <Grid container justifyContent="center" className="register-form">
           <Grid item xs={12} sm={12} md={12}>
-            <Stack spacing={2} sx={{ marginLeft: "2rem" }}>
+            <Stack spacing={2} sx={{ marginLeft: {md:"2rem", sm:"2rem"}, xs:0 }}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <Typography sx={{ fontWeight: 600, fontSize: "1.2rem" }}>
                   Welcome to{" "}
