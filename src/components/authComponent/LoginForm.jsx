@@ -35,10 +35,9 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let user = null;
     dispatch(showLoading());
     try {
-      user = await dispatch(login(formData))
+      dispatch(login(formData))
       .unwrap()
       .then(() => {
         setFormData({ email: "", password: "" })
