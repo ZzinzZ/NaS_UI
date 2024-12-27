@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Link from "next/link";
-import OtpForm from "./OtpForm";
+import OtpForm from "./OTPForm";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { useDispatch, useSelector } from "react-redux";
