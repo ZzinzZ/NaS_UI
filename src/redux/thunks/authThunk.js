@@ -20,7 +20,7 @@ export const registerUser = createAsyncThunk(
 );
 
 export const login = createAsyncThunk(
-  "auth/login",
+  "auth/loginUser",
   async (userData, { rejectWithValue, dispatch }) => {
     try {
       const response = await postRequest(`${baseUrl}/users/login`, userData);
