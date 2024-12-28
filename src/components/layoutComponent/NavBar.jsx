@@ -26,6 +26,7 @@ import { getProfile } from "@/redux/thunks/profileThunk";
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
 import { usePathname } from "next/navigation";
 import { useSocket } from "@/contexts/SocketContext";
+import { setProfileData } from "@/redux/slices/profileSlice";
 
 const NavBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -67,7 +68,11 @@ const NavBar = () => {
     if (!user) {
       Cookies.remove("token");
     } else if (user?._id) {
-      dispatch(getProfile(user._id));
+      dispatch(getProfile(user._id)).unwrap().then((response) => {
+        dispatch(setProfileData(response))
+      }).catch((error) => {
+        console.log("Get profile error", error);
+      });
     }
   }, [user]);
 

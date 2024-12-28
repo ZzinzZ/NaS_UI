@@ -31,9 +31,16 @@ const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
+      serializableCheck: {
+        ignoredActions: [
+          'persist/PERSIST',
+          'persist/REHYDRATE',
+          'persist/REGISTER',
+        ],
+        ignoredPaths: ['register.timestamp'], // Nếu có các path cần bỏ qua
+      },
     }),
-});
+})
 
 export const persistor = persistStore(store);
 export default store;
