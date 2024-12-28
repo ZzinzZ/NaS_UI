@@ -19,6 +19,7 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+
 export const login = async (userData) => {
   try {
     const response = await postRequest(`${baseUrl}/users/login`, userData);
@@ -34,6 +35,7 @@ export const login = async (userData) => {
     console.log("error", error);
 
     toast.error(error.response.data.message);
+
   }
 };
 
