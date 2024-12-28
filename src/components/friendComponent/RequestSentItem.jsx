@@ -1,7 +1,5 @@
-"use client"
-import {
-  removeFriendRequest,
-} from "@/redux/thunks/profileThunk";
+"use client";
+import { removeFriendRequest } from "@/redux/thunks/profileThunk";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import Image from "next/image";
 import React from "react";
@@ -13,13 +11,12 @@ const RequestSentItem = ({ profile, onRemove }) => {
 
   const handleRemoveRequest = async () => {
     try {
-        await dispatch(removeFriendRequest({receiverId:profile?.userId, senderId: user?._id }));
-        onRemove();
+      dispatch(removeFriendRequest({receiverId:profile?.userId, senderId: user?._id }));
+      onRemove();
     } catch (error) {
-        console.log(error);
-        
+      console.log(error);
     }
-  } 
+  };
   return (
     <Box
       sx={{
@@ -40,12 +37,17 @@ const RequestSentItem = ({ profile, onRemove }) => {
           }
           width={150}
           height={150}
-          sx={{borderRadius:"0.5rem"}}
+          sx={{ borderRadius: "0.5rem" }}
           alt="profile avatar"
         />
         <Typography>{profile.userName}</Typography>
         <Stack sx={{ width: "90%" }} spacing={1}>
-          <Button variant="contained" className="grey-profile-button" fullWidth onClick={handleRemoveRequest}>
+          <Button
+            variant="contained"
+            className="grey-profile-button"
+            fullWidth
+            onClick={handleRemoveRequest}
+          >
             Remove
           </Button>
         </Stack>

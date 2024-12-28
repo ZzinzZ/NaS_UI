@@ -16,16 +16,16 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
-import { login } from "@/redux/thunks/authThunk";
 import { useRouter } from "next/navigation";
 import { hideLoading, showLoading } from "@/redux/slices/LoadingSlice";
+import { login } from "@/redux/thunks/authThunk";
+import { loginState } from "@/redux/slices/AuthSlice";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const { isLoading, success } = useSelector((state) => state.auth);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -35,23 +35,19 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(showLoading());
+    dispatch(showLoading()); // Hiển thị loading.
+
     try {
-      dispatch(login(formData))
-      .unwrap()
-      .then(() => {
-        setFormData({ email: "", password: "" })
-      })
-      .catch(() => {
-        console.log("Failed to login");
-        
-      })
+      const response = await login(formData);
+      setFormData({ email: "", password: "" });
+      dispatch(loginState(response));
       router.push("/user");
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
+    }
+    finally {
+      dispatch(hideLoading()); 
       
-    } finally {
-      dispatch(hideLoading());
     }
   };
 
@@ -72,14 +68,31 @@ const LoginForm = () => {
       <Box className="login-form">
         <Grid container>
           <Grid item xs={12} sm={12} md={12}>
-            <Stack spacing={3} sx={{ marginLeft: {md:"2rem", sm:"2rem"}, xs:0 }}>
+            <Stack
+              spacing={3}
+              sx={{ marginLeft: { md: "2rem", sm: "2rem" }, xs: 0 }}
+            >
               <Stack direction="row" spacing={1} alignItems="center">
-                <Typography sx={{ fontWeight: 600, fontSize: "1.2rem"}}>Welcome to </Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: "1.2rem" }}>
+                  Welcome to{" "}
+                </Typography>
                 <Stack direction="row" alignItems="center">
-                  <Typography sx={{ color: "#1976D3", fontWeight: 700, fontSize: "1.2rem"}}>N</Typography>
-                  <Typography sx={{ fontWeight: 700, fontSize: "1.2rem"}}>A</Typography>
+                  <Typography
+                    sx={{
+                      color: "#1976D3",
+                      fontWeight: 700,
+                      fontSize: "1.2rem",
+                    }}
+                  >
+                    N
+                  </Typography>
+                  <Typography sx={{ fontWeight: 700, fontSize: "1.2rem" }}>
+                    A
+                  </Typography>
                 </Stack>
-                <Typography sx={{ fontWeight: 600, fontSize: "1.2rem"}}>Social</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: "1.2rem" }}>
+                  Social
+                </Typography>
               </Stack>
               <Typography
                 variant="h4"
@@ -131,7 +144,7 @@ const LoginForm = () => {
                   ),
                 }}
               />
-              <Typography sx={{textAlign:"start"}}>
+              <Typography sx={{ textAlign: "start" }}>
                 Forgot your password?{" "}
                 <Link href="/forgot-password">Reset password</Link>
               </Typography>
@@ -140,11 +153,9 @@ const LoginForm = () => {
                 variant="contained"
                 color="primary"
                 fullWidth
-                disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Login"}
+                Log in
               </Button>
-              {success && <Alert severity="success">Login successful!</Alert>}
               <Alert severity="info">
                 <p>
                   Don&#39;t have an account?{" "}

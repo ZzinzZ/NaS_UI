@@ -20,8 +20,8 @@ const EditBio = ({profile, CloseBio, user}) => {
     }
     const handleUpdateBio = async () => {
         try {
-            await dispatch(updateBio({profileId: profile?._id, bio: bioValue}))
-            await dispatch(getProfile(user?._id))
+             dispatch(updateBio({profileId: profile?._id, bio: bioValue}))
+             dispatch(getProfile(user?._id))
         } catch (error) {
             console.log("Update bio error", error);
         }   

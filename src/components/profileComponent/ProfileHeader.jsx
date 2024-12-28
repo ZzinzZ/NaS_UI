@@ -190,8 +190,8 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
     if (file) {
       try {
         dispatch(showLoading());
-        await dispatch(updateAvatar({ userId: user?._id, avatarFile: file }));
-        await dispatch(getProfile(user?._id));
+        dispatch(updateAvatar({ userId: user?._id, avatarFile: file }));
+        dispatch(getProfile(user?._id));
       } catch (error) {
         console.log(error);
         toast.error("Upload failed ", error);
@@ -208,10 +208,10 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
     if (file) {
       try {
         dispatch(showLoading());
-        await dispatch(
+         dispatch(
           updateBackground({ userId: user?._id, backgroundFile: file })
         );
-        await dispatch(getProfile(user?._id));
+         dispatch(getProfile(user?._id));
       } catch (error) {
         toast.error("Upload failed ", error);
         dispatch(hideLoading());

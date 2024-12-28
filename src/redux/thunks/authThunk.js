@@ -19,28 +19,23 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-export const login = createAsyncThunk(
-  "auth/loginUser",
-  async (userData, { rejectWithValue, dispatch }) => {
-    try {
-      const response = await postRequest(`${baseUrl}/users/login`, userData);
-      const expires = new Date(new Date().getTime() + 30 * 1000);
-      const { token, refreshToken,stringeeToken } = response.data;
-      Cookies.set("token", token, { expires });
-      Cookies.set("refreshToken", refreshToken, { expires: 365 });
-      Cookies.set("stringeeToken", stringeeToken, { expires: 30 });
-      Cookies.set("tokenExpiry", expires.getTime(), { expires });
-      dispatch(resetProfile());
-      toast.info(response.message);
-      return response.data;
-    } catch (error) {
-      console.log("error",error);
-      
-      toast.error(error.response.data.message);
-      return rejectWithValue(error.message);
-    }
+export const login = async (userData) => {
+  try {
+    const response = await postRequest(`${baseUrl}/users/login`, userData);
+    const expires = new Date(new Date().getTime() + 30 * 1000);
+    const { token, refreshToken, stringeeToken } = response.data;
+    Cookies.set("token", token, { expires });
+    Cookies.set("refreshToken", refreshToken, { expires: 365 });
+    Cookies.set("stringeeToken", stringeeToken, { expires: 30 });
+    Cookies.set("tokenExpiry", expires.getTime(), { expires });
+    toast.info(response.message);
+    return response.data;
+  } catch (error) {
+    console.log("error", error);
+
+    toast.error(error.response.data.message);
   }
-);
+};
 
 export const refreshToken = createAsyncThunk(
   "auth/refreshToken",
@@ -54,7 +49,7 @@ export const refreshToken = createAsyncThunk(
       const response = await axios.post(`${baseUrl}/users/refreshToken`, {
         refreshToken: refresh,
       });
-      
+
       const { token, refreshToken: newRefreshToken } = response.data.data;
       const expires = new Date(new Date().getTime() + 30 * 1000);
       Cookies.set("token", token, { expires });
