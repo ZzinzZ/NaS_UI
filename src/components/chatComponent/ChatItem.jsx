@@ -61,7 +61,6 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
   }, [onlineUsers, chat]);
 
   const getParticipants = useCallback(async () => {
-    console.log("returning participants");
     
     try {
       setIsLoadingChat(true);

@@ -36,8 +36,6 @@ const ChatBar = ({ setIsDeleteMessages }) => {
   const { chatBarChange, newMessage, receiveMessage,chatDeleted } = useSocket();
 
   const getUserChat = async () => {
-    console.log("GetUserChat");
-    
     try {
       const response = await getChatsList({ userId: user._id });
 

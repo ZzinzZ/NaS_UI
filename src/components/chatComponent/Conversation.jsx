@@ -433,17 +433,22 @@ const Conversation = ({ isDeleteMessages }) => {
           ) : (
             messages?.map((message) => (
               <Message
-                scrollToMessage={scrollToMessage}
-                ref={(el) => (messageRefs.current[message?._id] = el)}
-                message={message}
                 key={message?._id}
+                scrollToMessage={scrollToMessage}
+                ref={(el) => {
+                  // Safely assign the ref
+                  if (el) {
+                    messageRefs.current[message?._id] = el;
+                  }
+                }}
+                message={message}
                 setRefMessage={setRefMessage}
                 isBlockedBy={isBlockedBy}
-                isSearchResult={searchResults.some(
-                  (result) => result._id === message._id
+                isSearchResult={searchResults?.some(
+                  (result) => result?._id === message?._id
                 )}
                 isCurrentSearchResult={
-                  searchResults[currentSearchIndex]?._id === message._id
+                  searchResults[currentSearchIndex]?._id === message?._id
                 }
               />
             ))

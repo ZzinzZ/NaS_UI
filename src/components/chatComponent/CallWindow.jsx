@@ -71,7 +71,6 @@ const CallWindow = () => {
           setRemoteProfile(fromProfile);
           setOtherUserProfile(fromProfile);
         }
-        console.log(fromProfile);
       };
       fetchProfile();
     }

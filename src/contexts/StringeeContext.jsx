@@ -21,12 +21,10 @@ export const StringeeProvider = ({ children }) => {
 
   useEffect(() => {
     if (!stringeeToken) {
-      console.log("Token không tồn tại!");
       return;
     }
 
     if (!window.StringeeClient) {
-      console.log("Stringee SDK chưa được tải.");
       return;
     }
 
@@ -34,12 +32,10 @@ export const StringeeProvider = ({ children }) => {
     stringeeClient.connect(stringeeToken);
 
     stringeeClient.on("connect", () => {
-      console.log("Đã kết nối với Stringee");
       setIsConnected(true);
     });
 
     stringeeClient.on("disconnect", () => {
-      console.log("Mất kết nối");
       setIsConnected(false);
     });
 
@@ -48,7 +44,6 @@ export const StringeeProvider = ({ children }) => {
     });
 
     stringeeClient.on("incomingcall", (callInstance) => {
-      console.log("Có cuộc gọi đến:", callInstance);
       setupCallEvents(callInstance);
       setIncomingCall(callInstance);
       setIsCalling(true);
@@ -63,14 +58,9 @@ export const StringeeProvider = ({ children }) => {
 
   const setupCallEvents = (callInstance) => {
     if (!callInstance) {
-      console.log("Không có call instance");
       return;
     }
-
-    console.log("Thêm event cho cuộc gọi: ", callInstance);
-
     callInstance.on("addremotestream", (stream) => {
-      console.log("Thêm remote stream:", stream);
       const remoteVideo = document.getElementById("remoteVideo");
       setCalleeRemote(stream);
       if (remoteVideo) {
@@ -81,7 +71,6 @@ export const StringeeProvider = ({ children }) => {
     });
 
     callInstance.on("addlocalstream", (stream) => {
-      console.log("Thêm local stream:", stream);
       const localVideo = document.getElementById("localVideo");
       setCalleeLocal(stream);
       if (localVideo) {
@@ -93,7 +82,6 @@ export const StringeeProvider = ({ children }) => {
     });
 
     callInstance.on("signalingstate", (state) => {
-      console.log("Trạng thái tín hiệu:", state);
       if (state.code === 6 || state.code === 5) {
         resetCallState();
       }
@@ -105,15 +93,15 @@ export const StringeeProvider = ({ children }) => {
     });
     call;
     callInstance.on("mediastate", (state) => {
-      console.log("Trạng thái media:", state);
+      console.log( state);
     });
 
     callInstance.on("info", (info) => {
-      console.log("Thông tin cuộc gọi:", info);
+      console.log( info);
     });
 
     callInstance.on("otherdevice", (data) => {
-      console.log("Hoạt động từ thiết bị khác:", data);
+      console.log( data);
     });
   };
 
@@ -131,7 +119,6 @@ export const StringeeProvider = ({ children }) => {
 
   const makeCall = (callerId, calleeId, isVideoCall) => {
     if (!client) {
-      console.error("Chưa kết nối với Stringee");
       return;
     }
 
@@ -161,7 +148,6 @@ export const StringeeProvider = ({ children }) => {
     setupCallEvents(incomingCall);
     incomingCall.answer((res) => {
       if (res.r === 0) {
-        console.log("Đã trả lời cuộc gọi thành công");
         setCall(incomingCall);
         setIncomingCall(null);
         setIsCalling(false);
@@ -187,7 +173,6 @@ export const StringeeProvider = ({ children }) => {
   const rejectCall = () => {
     if (incomingCall) {
       incomingCall.reject((res) => {
-        console.log("Đã từ chối cuộc gọi:", res);
         setIs_rejected(true);
         setIs_accepted(false);
       });
@@ -212,7 +197,6 @@ export const StringeeProvider = ({ children }) => {
   const mute = () => {
     
     if (!call) {
-      console.error("Không có cuộc gọi hiện tại.");
       return;
     }
   
@@ -222,7 +206,6 @@ export const StringeeProvider = ({ children }) => {
 
   const upgradeToVideoCall = () => {
     if (!call) {
-      console.error("Không có cuộc gọi hiện tại.");
       return;
     }
     call.upgradeToVideoCall();
@@ -235,7 +218,6 @@ export const StringeeProvider = ({ children }) => {
     } else {
         success = call.enableLocalVideo(true);
     }
-    console.log('enableVideo result: ' + call.localVideoEnabled);
   }
 
   return (
