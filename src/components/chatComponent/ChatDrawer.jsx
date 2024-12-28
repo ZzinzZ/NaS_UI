@@ -239,7 +239,6 @@ const ChatDrawer = ({
   useEffect(() => {
     if (chat) {
       chatDetails();
-      console.log("member", chat?.participants);
     }
   }, [chat]);
   return (

@@ -12,7 +12,7 @@ import { useSocket } from "@/contexts/SocketContext";
 import VideocamIcon from '@mui/icons-material/Videocam';
 
 const ComingCall = () => {
-  const { incomingCall, isCalling, answerCall, rejectCall, endCall } =
+  const {currentCall, incomingCall, isCalling, answerCall, rejectCall, endCall } =
     useStringee();
   const [callerProfile, setCallerProfile] = useState(null);
   const [chat, setChat] = useState(null);
@@ -25,27 +25,41 @@ const ComingCall = () => {
   useEffect(() => {
     ringtoneRef.current = new Audio("/onepiece.mp3");
     ringtoneRef.current.loop = true;
-    console.log("ringtoneRef", ringtoneRef);
 
     if (incomingCall) {
-      console.log("Playing ringtone...");
       const playRingtone = async () => {
         try {
           await ringtoneRef.current.play();
         } catch (err) {
-          console.error("Failed to play ringtone:", err);
+          console.log("Failed to play ringtone:", err);
         }
       };
       playRingtone();
     }
     setIsCalled(user?._id.toString() === incomingCall?.toNumber.toString());
     const getChatOfCall = async () => {
-      const result = await findChatByParticipants({
-        userId: incomingCall?.fromNumber,
-        participantId: incomingCall?.toNumber,
-      });
-      setChat(result);
+      try {
+        // Kiểm tra nếu là người gọi
+        if (currentCall) {
+          const result = await findChatByParticipants({
+            userId: currentCall.fromNumber,
+            participantId: currentCall.toNumber
+          });
+          setChat(result);
+        }
+        // Kiểm tra nếu là người nhận
+        else if (incomingCall) {
+          const result = await findChatByParticipants({
+            userId: incomingCall.fromNumber,
+            participantId: incomingCall.toNumber
+          });
+          setChat(result);
+        }
+      } catch (error) {
+        console.log("Error getting chat:", error);
+      }
     };
+  
     getChatOfCall();
     return () => {
       if (ringtoneRef.current) {
@@ -53,7 +67,7 @@ const ComingCall = () => {
         ringtoneRef.current.currentTime = 0;
       }
     };
-  }, [incomingCall, isCalling]);
+  }, [incomingCall, isCalling, currentCall]);
 
   useEffect(() => {
     const getCallerProfile = async () => {
@@ -62,7 +76,6 @@ const ComingCall = () => {
           userId: incomingCall?.fromNumber,
         });
         setCallerProfile(response);
-        console.log("caller profile", incomingCall?.fromNumber);
       }
     };
     getCallerProfile();
@@ -80,14 +93,26 @@ const ComingCall = () => {
     if (ringtoneRef.current) {
       ringtoneRef.current.pause();
     }
-    await handleSendCallMessage(
-      incomingCall?.fromNumber,
-      chat?._id,
-      0,
-      false,
-      true,
-      callType
-    );
+    if(incomingCall){
+      await handleSendCallMessage(
+        incomingCall?.fromNumber,
+        chat?._id,
+        0,
+        false,
+        true,
+        callType
+      );
+    }
+    else if(currentCall){
+      await handleSendCallMessage(
+        currentCall?.fromNumber,
+        chat?._id,
+        0,
+        false,
+        true,
+        callType
+      );
+    }
     rejectCall();
   };
 

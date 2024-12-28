@@ -122,8 +122,6 @@ export const SocketProvider = ({ children, userId }) => {
       message,
       refChat: newChat?._id,
     });
-    console.log("notify", notify);
-
     setNotifications((prev) => [notify, ...prev]);
   };
 
@@ -573,7 +571,6 @@ export const SocketProvider = ({ children, userId }) => {
     const getUserNotifications = async () => {
       const response = await getNotificationByUserId({ userId: user?._id });
       setNotifications(response);
-      console.log("notification", response);
     };
     if (user) {
       getUserNotifications();
