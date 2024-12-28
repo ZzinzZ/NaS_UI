@@ -287,7 +287,7 @@ const Conversation = ({ isDeleteMessages }) => {
       <Stack
         sx={{
           width: open ? `calc(100% - ${drawerWidth}px)` : "100%",
-          height: {md: "100vh", sm: "95vh", xs:"95vh"},
+          height: { md: "100vh", sm: "95vh", xs: "95vh" },
           transition: "width 0.3s ease-out",
         }}
       >

@@ -43,7 +43,7 @@ const SearchResultItem = ({ profile }) => {
 
   const handleSendRequest = async () => {
     try {
-      await dispatch(
+      dispatch(
         sendFriendRequest({ receptionId: profile?.userId, senderId: user._id })
       );
       sendFriendRequestSocket(profile?.userId);
@@ -64,9 +64,7 @@ const SearchResultItem = ({ profile }) => {
 
   const handleRemoveRequest = async () => {
     try {
-      await dispatch(
-        removeFriendRequest({ receiverId: profile.userId, senderId: user._id })
-      );
+      removeFriendRequest({ receiverId: profile.userId, senderId: user._id });
       setIsSentRequested(false);
     } catch (error) {
       console.log(error);
@@ -75,7 +73,7 @@ const SearchResultItem = ({ profile }) => {
 
   const handleUnfriend = async () => {
     try {
-      await dispatch(unfriend({ userId: user._id, friendId: profile.userId }));
+      unfriend({ userId: user._id, friendId: profile.userId });
       setIsFriend(false);
     } catch (error) {
       console.log(error);
@@ -84,9 +82,9 @@ const SearchResultItem = ({ profile }) => {
 
   const handleAcceptRequest = async () => {
     try {
-      await dispatch(
+      dispatch(
         acceptFriendRequest({ receiverId: user._id, senderId: profile?.userId })
-      );
+      );      
       await createPrivateChat({
         userId: user._id,
         participants: [profile?.userId],
@@ -109,7 +107,7 @@ const SearchResultItem = ({ profile }) => {
 
   const handleRejectRequest = async () => {
     try {
-      await dispatch(
+      dispatch(
         rejectFriendRequest({
           receiverId: user?._id,
           senderId: profile?.userId,

@@ -42,7 +42,7 @@ const formatDate = (dateString) => {
   }
 };
 
-const PostItem = ({ profile, postItem, onDelete  }) => {
+const PostItem = ({ profile, postItem, onDelete }) => {
   const [selectReact, setSelectReact] = useState(false);
   const [render, setRender] = useState(false);
   const [typeEmotion, setTypeEmotion] = useState("");
@@ -140,7 +140,7 @@ const PostItem = ({ profile, postItem, onDelete  }) => {
   // Xử lý xóa post
   const handleDeletePost = async () => {
     try {
-      await deletePost({postId: post?._id})
+      await deletePost({ postId: post?._id });
       handleMenuClose();
       onDelete(post._id);
     } catch (error) {
@@ -230,11 +230,11 @@ const PostItem = ({ profile, postItem, onDelete  }) => {
                 }}
               >
                 <MenuItem onClick={handleDeletePost}>
-                <Stack direction="row" alignItems="center">
-                  <Typography>Delete post</Typography>
-                  <Delete/>
-                </Stack>
-                 </MenuItem>
+                  <Stack direction="row" alignItems="center">
+                    <Typography>Delete post</Typography>
+                    <Delete />
+                  </Stack>
+                </MenuItem>
               </Menu>
             </>
           )}
@@ -369,7 +369,7 @@ const PostItem = ({ profile, postItem, onDelete  }) => {
             )}
           </Box>
           <Button
-          onClick={handleOpenCommentList}
+            onClick={handleOpenCommentList}
             fullWidth
             startIcon={
               <Box

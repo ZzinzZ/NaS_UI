@@ -23,7 +23,7 @@ import Link from "next/link";
 import OtpForm from "./OTPForm";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { registerUser } from "@/redux/thunks/authThunk";
 import { showLoading, hideLoading } from "@/redux/slices/LoadingSlice";
 import { toast } from "react-toastify";

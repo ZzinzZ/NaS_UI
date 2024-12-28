@@ -22,7 +22,7 @@ const PostCommentListDetail = ({ open, handleClose, post, getPost }) => {
   };
 
   useEffect(() => {
-    if(post) {
+    if(post && open) {
       getUserProfile();
     }
   }, [post]);

@@ -18,6 +18,7 @@ import InboxIcon from "@mui/icons-material/Inbox";
 import ProfileLibrary from "./ProfileLibrary";
 import { showLoading, hideLoading } from "@/redux/slices/LoadingSlice";
 import { baseUrl, getRequest } from "@/utils/services/requestService";
+import { setProfileData } from "@/redux/slices/profileSlice";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ const Profile = () => {
   const [isOtherProfile, setIsOtherProfile] = useState(false);
   const { user, token } = useSelector((state) => state.auth);
   const [posts, setPosts] = useState([]);
-  const { profileData, isLoading, error } = useSelector(
+  const { profileData} = useSelector(
     (state) => state.profile
   );
 
@@ -83,15 +84,9 @@ const Profile = () => {
   const getPostList = async () => {
     if (user?._id) {
       try {
-        const userPost = await dispatch(getUserArticlePosts(id)).unwrap()
-        .then(() => {
-          console.log(" ");
-          
-        })
-        .catch(() => {
-          console.log("Failed to fetch posts");
-        })
-        ;
+        const userPost = await dispatch(getUserArticlePosts(id)).unwrap();
+        console.log("posts", userPost);
+
         setPosts(userPost);
       } catch (error) {
         console.error("Failed to fetch posts:", error);
@@ -129,29 +124,30 @@ const Profile = () => {
       }
     };
 
-    if (id !== user?._id) {
-      setIsOtherProfile(true);
-    }
+    setIsOtherProfile(id !== user?._id);
 
     getPostList();
     getProfileInfo();
     getListFriendsProfile();
   }, [id, dispatch, user]);
 
-  // Kiểm tra token đăng nhập
   useEffect(() => {
     if (!token) {
       router.push("/login");
     } else if (user?._id) {
-      dispatch(getProfile(user?._id));
+      dispatch(getProfile(user?._id))
+        .unwrap()
+        .then((response) => {
+          dispatch(setProfileData(response));
+        })
+        .catch((error) => {
+          console.error("Failed to fetch profile:", error);
+        });
     }
   }, [token, user, dispatch, router, id]);
 
-  useEffect(() => {
-    if (user && error) {
-      toast.info(error);
-    }
-  }, [user, profileData, isLoading, error, router]);
+
+
 
   const handleUpdateListPost = () => {
     getPostList();

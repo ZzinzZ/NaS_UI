@@ -29,66 +29,19 @@ const profileSlice = createSlice({
         Object.assign(state, initialState);
       }
     },
-    extraReducers: (builder) => {
-      builder
-        .addCase(getProfile.pending, (state) => {
-          state.isLoading = true;
-          state.error = null;
-        })
-        .addCase(getProfile.fulfilled, (state, action) => {
-          state.isLoading = false;
-          state.profileData = action.payload;
+    // extraReducers: (builder) => {
+    //   builder
+    //     // .addCase(getProfile?.fulfilled, (state, action) => {
+    //     //   state.isLoading = false;
+    //     //   state.profileData = action.payload;
           
-        })
-        .addCase(getProfile.rejected, (state, action) => {
-          state.isLoading = false;
-          state.error = action.payload || action.error.message;
-        })
-        .addCase(getListFriends.pending, (state) => {
-          state.isLoading = true;
-        })
-        .addCase(getListFriends.fulfilled, (state, action) => {
-          state.listFriend = action.payload;
-          console.log("List friends:",action.payload);
-          state.isLoading = false;
-        })
-        .addCase(getListFriends.rejected, (state, action) => {
-          state.isLoading = false;
-          state.error = action.payload || action.error.message;
-        })
-        .addCase(sendFriendRequest.pending, (state, action) => {
-          state.isLoading = true;
-        })
-        .addCase(sendFriendRequest.fulfilled, (state, action) => {
-          state.isLoading = false;
-        })
-        .addCase(sendFriendRequest.rejected, (state, action) => {
-          state.isLoading = false;
-          state.error = action.payload || action.error.message;
-        })
-        .addCase(acceptFriendRequest.pending, (state, action) => {
-          state.isLoading = true;
-        })
-        .addCase(acceptFriendRequest.fulfilled, (state, action) => {
-          state.isLoading = false;
-        })
-        .addCase(acceptFriendRequest.rejected, (state, action) => {
-          state.isLoading = false;
-          state.error = action.payload || action.error.message;
-        })
-        .addCase(unfriend.pending, (state, action) => {
-          state.isLoading = true;
-        })
-        .addCase(unfriend.fulfilled, (state, action) => {
-          state.isLoading = false;
-        })
-        .addCase(rejectFriendRequest.pending, (state, action) => {
-          state.isLoading = false;
-        })
-        .addCase(rejectFriendRequest.fulfilled, (state, action) => {
-          state.isLoading = false;
-        })
-    },
+    //     // })
+    //     .addCase(getListFriends?.fulfilled, (state, action) => {
+    //       state.listFriend = action.payload;
+    //       console.log("List friends:",action.payload);
+    //       state.isLoading = false;
+    //     })
+    // },
   });
   
   export const { setProfileData, setLoading, setError, resetProfile } = profileSlice.actions;

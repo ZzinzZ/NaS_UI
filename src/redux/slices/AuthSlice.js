@@ -1,7 +1,7 @@
 "use client";
 import { createSlice } from "@reduxjs/toolkit";
 import Cookies from 'js-cookie';
-import { registerUser, login, refreshToken } from "../thunks/authThunk";
+import { registerUser, refreshToken } from "../thunks/authThunk";
 import { resetProfile } from "./profileSlice";
 
 
@@ -26,36 +26,32 @@ const AuthSlice = createSlice({
       Cookies.remove('stringeeToken');
       resetProfile();
     },
+    loginState: (state, action) => {
+      state.loading = false;
+      state.user = action.payload.user || null;
+      state.token = action.payload.token || null;
+      state.stringeeToken = action.payload.stringeeToken || null;
+      resetProfile();
+    },
     setToken: (state, action) => {
       state.token = action.payload;
     },
   },
-  extraReducers: (builder) => { 
-    builder
-      .addCase(login.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user || null;
-        state.token = action.payload.token || null;
-        state.stringeeToken = action.payload.stringeeToken || null;
-        resetProfile();
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-      })
-      .addCase(refreshToken.fulfilled, (state, action) => {
-        state.token = action.payload.data.token;
-      })
-      .addCase(refreshToken.rejected, (state, action) => {
-        state.error = action.payload;
-        console.log("refresh error:",action.payload);
-      });
-  }
+  // extraReducers: (builder) => { 
+  //   builder
+  //     .addCase(registerUser?.fulfilled, (state, action) => {
+  //       state.user = action.payload.user;
+  //       state.token = action.payload.token;
+  //     })
+  //     .addCase(refreshToken?.fulfilled, (state, action) => {
+  //       state.token = action.payload.data.token;
+  //     })
+  //     .addCase(refreshToken?.rejected, (state, action) => {
+  //       state.error = action.payload;
+  //       console.log("refresh error:",action.payload);
+  //     });
+  // }
 });
 
-export const { logout, setToken } = AuthSlice.actions;
+export const { logout, setToken,loginState } = AuthSlice.actions;
 export default AuthSlice.reducer;
