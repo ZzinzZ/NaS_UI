@@ -50,7 +50,6 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      console.log("not authorized");
       store.dispatch(logout());
     }
     return Promise.reject(error);

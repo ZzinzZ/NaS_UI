@@ -21,12 +21,12 @@ const postSlice = createSlice({
       state.posts = state.posts.filter((post) => post.id !== action.payload);
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(getUserArticlePosts.fulfilled, (state, action) => {
-        console.log("list post", action.payload);
-      })
-  }
+  // extraReducers: (builder) => {
+  //   builder
+  //     .addCase(getUserArticlePosts.fulfilled, (state, action) => {
+  //       console.log("list post", action.payload);
+  //     })
+  // }
 });
 
 export const { setPosts, addPost, deletePost } = postSlice.actions;

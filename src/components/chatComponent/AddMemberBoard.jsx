@@ -63,7 +63,6 @@ const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
       const recipient = listMember
         ?.filter((member) => member.userId !== user?._id)
         .map((member) => member.userId);
-      console.log("recipient", selectedMembers);
 
       joinGroupSocket(selectedMembers, chat, [
         ...selectedMembers,

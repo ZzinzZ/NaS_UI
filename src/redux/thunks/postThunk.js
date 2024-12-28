@@ -94,7 +94,6 @@ export const commentPost = createAsyncThunk(
   "post/addComment",
   async ({ postId, userId, content, image, gif }, { rejectWithValue }) => {
     try {
-      console.log("image", image);
 
       const formData = new FormData();
       formData.append("userId", userId);

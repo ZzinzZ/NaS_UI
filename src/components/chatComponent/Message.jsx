@@ -127,10 +127,6 @@ const Message = React.forwardRef(
       handleGetListReact();
     }, [newMessage]);
 
-    useEffect(() => {
-      console.log("Message", message);
-    }, []);
-
     const handleSetFileIcon = (type) => {
       if (type.includes("image")) return "/image.png";
       else if (type.includes("word")) return "/word.png";

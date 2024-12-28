@@ -85,8 +85,6 @@ const Profile = () => {
     if (user?._id) {
       try {
         const userPost = await dispatch(getUserArticlePosts(id)).unwrap();
-        console.log("posts", userPost);
-
         setPosts(userPost);
       } catch (error) {
         console.error("Failed to fetch posts:", error);

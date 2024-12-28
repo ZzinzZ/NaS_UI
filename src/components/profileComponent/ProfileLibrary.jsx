@@ -13,8 +13,6 @@ const ProfileLibrary = ({ userId }) => {
   useEffect(() => {
     const getListImage = async () => {
       const response = await getListPhotos({ userId });
-      console.log(response);
-
       setListImage(response); // Set ảnh trả về từ API
     };
     getListImage();
