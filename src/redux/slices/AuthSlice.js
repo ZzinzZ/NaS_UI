@@ -37,6 +37,7 @@ const AuthSlice = createSlice({
       state.token = action.payload;
     },
   },
+
   // extraReducers: (builder) => { 
   //   builder
   //     .addCase(registerUser?.fulfilled, (state, action) => {
@@ -51,6 +52,7 @@ const AuthSlice = createSlice({
   //       console.log("refresh error:",action.payload);
   //     });
   // }
+
 });
 
 export const { logout, setToken,loginState } = AuthSlice.actions;

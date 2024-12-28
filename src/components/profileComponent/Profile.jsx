@@ -84,8 +84,10 @@ const Profile = () => {
   const getPostList = async () => {
     if (user?._id) {
       try {
+
         const userPost = await dispatch(getUserArticlePosts(id)).unwrap();
         console.log("posts", userPost);
+
 
         setPosts(userPost);
       } catch (error) {
