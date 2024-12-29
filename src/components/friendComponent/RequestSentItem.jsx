@@ -1,5 +1,7 @@
+
 "use client";
 import { removeFriendRequest } from "@/redux/thunks/profileThunk";
+
 import { Box, Button, Stack, Typography } from "@mui/material";
 import Image from "next/image";
 import React from "react";
