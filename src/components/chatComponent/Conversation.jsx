@@ -426,40 +426,69 @@ const Conversation = ({ isDeleteMessages }) => {
             },
           }}
         >
-          {isSearching ? (
-            <Box sx={{ margin: "2rem 0" }}>
-              <Box className="loader"></Box>
+          {messages?.length === 0 ? (
+            <Box
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              height="100%"
+              textAlign="center"
+              color="text.secondary"
+              sx={{ opacity: 0.7 }}
+            >
+              <Typography variant="h5" gutterBottom>
+                No messages yet!
+              </Typography>
+              <Typography variant="body1">
+                Send the first message to start the conversation 🎉
+              </Typography>
+              <button
+                className="btn-17"
+                onClick={() => handleSendHello(user?._id, chat?._id)}
+              >
+                <span className="text-container">
+                  <span className="text">Hello 🙌</span>
+                </span>
+              </button>
             </Box>
           ) : (
-            messages?.map((message) => (
-              <Message
-                key={message?._id}
-                scrollToMessage={scrollToMessage}
-                ref={(el) => {
-                  // Safely assign the ref
-                  if (el) {
-                    messageRefs.current[message?._id] = el;
-                  }
-                }}
-                message={message}
-                setRefMessage={setRefMessage}
-                isBlockedBy={isBlockedBy}
-                isSearchResult={searchResults?.some(
-                  (result) => result?._id === message?._id
-                )}
-                isCurrentSearchResult={
-                  searchResults[currentSearchIndex]?._id === message?._id
-                }
-              />
-            ))
-          )}
-          <Box ref={lastMessageRef} />
-          {isBlockedBy && (
-            <Stack justifyContent="center" sx={{ width: "100%" }}>
-              <Typography sx={{ color: "red", textAlign: "center" }}>
-                Messages cannot currently be sent to this user
-              </Typography>
-            </Stack>
+            <>
+              {isSearching ? (
+                <Box sx={{ margin: "2rem 0" }}>
+                  <Box className="loader"></Box>
+                </Box>
+              ) : (
+                messages?.map((message) => (
+                  <Message
+                    key={message?._id}
+                    scrollToMessage={scrollToMessage}
+                    ref={(el) => {
+                      if (el) {
+                        messageRefs.current[message?._id] = el;
+                      }
+                    }}
+                    message={message}
+                    setRefMessage={setRefMessage}
+                    isBlockedBy={isBlockedBy}
+                    isSearchResult={searchResults?.some(
+                      (result) => result?._id === message?._id
+                    )}
+                    isCurrentSearchResult={
+                      searchResults[currentSearchIndex]?._id === message?._id
+                    }
+                  />
+                ))
+              )}
+              <Box ref={lastMessageRef} />
+              {isBlockedBy && (
+                <Stack justifyContent="center" sx={{ width: "100%" }}>
+                  <Typography sx={{ color: "red", textAlign: "center" }}>
+                    Messages cannot currently be sent to this user
+                  </Typography>
+                </Stack>
+              )}
+            </>
           )}
         </Box>
         {showScrollButton && (
@@ -480,7 +509,7 @@ const Conversation = ({ isDeleteMessages }) => {
             </Fab>
           </Stack>
         )}
-        {typing?.length > 0 && (
+        {typing?.filter(t => t.chatId === chatId)?.length > 0 && (
           <Box
             sx={{
               display: "flex",
@@ -490,6 +519,7 @@ const Conversation = ({ isDeleteMessages }) => {
               padding: "0.5rem 1rem",
               marginTop: "0.5rem",
               maxWidth: "fit-content",
+              backgroundColor: "transparent",
             }}
           >
             <Box
@@ -508,16 +538,44 @@ const Conversation = ({ isDeleteMessages }) => {
                 fontWeight: "500",
               }}
             >
-              {typing[0]?.name} is typing...
+              {typing.filter(t => t.chatId === chatId).map(t => t.user.name).join(", ")} {typing.filter(t => t.chatId === chatId).length === 1 ? 'is' : 'are'} typing...
             </Typography>
             <style>
               {`
-      @keyframes typingAnimation {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.2); }
-        100% { transform: scale(1); }
-      }
-    `}
+        @keyframes typingAnimation {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.2); }
+          100% { transform: scale(1); }
+        }
+        .btn-17 {
+          background: rgb(251, 33, 117);
+          background: linear-gradient(0deg, rgba(251, 33, 117, 1) 0%, rgba(234, 76, 137, 1) 100%);
+          border: none;
+          z-index: 1;
+        }
+        .btn-17:after {
+          position: absolute;
+          content: "";
+          width: 100%;
+          height: 0;
+          bottom: 0;
+          left: 0;
+          z-index: -1;
+          background: rgb(251, 33, 117);
+          background: linear-gradient(0deg, rgba(234, 76, 137, 1) 0%, rgba(251, 33, 117, 1) 100%);
+          transition: all 0.3s ease;
+        }
+        .btn-17:hover {
+          color: #fff;
+        }
+        .btn-17:hover:after {
+          top: 0;
+          height: 100%;
+        }
+        .btn-17:active {
+          top: 2px;
+        }
+      `}
             </style>
           </Box>
         )}
@@ -551,3 +609,4 @@ const Conversation = ({ isDeleteMessages }) => {
 };
 
 export default Conversation;
+

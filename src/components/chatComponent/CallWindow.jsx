@@ -13,6 +13,9 @@ import { getUserProfile } from "@/utils/services/profileService/profileDetails";
 import { useSocket } from "@/contexts/SocketContext";
 import { findChatByParticipants } from "@/utils/services/chatService/chatService";
 
+import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+
 const CallWindow = () => {
   const {
     endCall,
@@ -34,6 +37,7 @@ const CallWindow = () => {
   const [otherUserProfile, setOtherUserProfile] = useState(null);
   const [callType, setCallType] = useState("");
   const [chat, setChat] = useState(null);
+  const [isMinimized, setIsMinimized] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const {
     handleSendCallMessage,
@@ -164,23 +168,34 @@ const CallWindow = () => {
     endCall();
   };
 
+  const handleMinimize = () => {
+    setIsMinimized(true);
+  };
+
+  const handleMaximize = () => {
+    setIsMinimized(false);
+  };
+
   return (
     <Box
       sx={{
-        position: "absolute",
-        width: "80vw",
-        height: "80vh",
+        position: "fixed",
+        width: isMinimized ? "300px" : "80vw",
+        height: isMinimized ? "200px" : "80vh",
         backgroundColor: "white",
         borderRadius: 4,
         boxShadow: 6,
         overflow: "hidden",
-        margin: "auto",
-        top: "10%",
-        left: "10%",
+        margin: isMinimized ? 0 : "auto",
+        top: isMinimized ? "auto" : "10%",
+        left: isMinimized ? "auto" : "10%",
+        bottom: isMinimized ? "4rem" : "auto",
+        right: isMinimized ? "20px" : "auto",
         zIndex: 100,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        transition: "all 0.3s ease-in-out",
       }}
     >
       {/* Remote Video */}
@@ -213,8 +228,8 @@ const CallWindow = () => {
           position: "absolute",
           top: 16,
           right: 16,
-          width: "120px",
-          height: "90px",
+          width: isMinimized ? "80px" : "120px",
+          height: isMinimized ? "60px" : "90px",
           borderRadius: 2,
           overflow: "hidden",
           boxShadow: currentCall?.isVideoCall ? 3 : 0,
@@ -317,10 +332,10 @@ const CallWindow = () => {
 
       <Stack
         direction="row"
-        spacing={2}
+        spacing={isMinimized ? 1 : 2}
         sx={{
           position: "absolute",
-          bottom: 16,
+          bottom: isMinimized ? 8 : 16,
           left: "50%",
           transform: "translateX(-50%)",
         }}
@@ -330,11 +345,11 @@ const CallWindow = () => {
           sx={{
             backgroundColor: "red",
             color: "white",
-            padding: 1.5,
+            padding: isMinimized ? 1 : 1.5,
             "&:hover": { backgroundColor: "darkred" },
           }}
         >
-          <CallEndIcon sx={{ fontSize: 28 }} />
+          <CallEndIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
         </IconButton>
 
         <IconButton
@@ -342,24 +357,25 @@ const CallWindow = () => {
           sx={{
             backgroundColor: isMicMuted ? "gray" : "white",
             color: isMicMuted ? "white" : "black",
-            padding: 1.5,
+            padding: isMinimized ? 1 : 1.5,
             "&:hover": {
               backgroundColor: isMicMuted ? "darkgray" : "lightgray",
             },
           }}
         >
           {isMicMuted ? (
-            <MicOffIcon sx={{ fontSize: 28 }} />
+            <MicOffIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
           ) : (
-            <MicIcon sx={{ fontSize: 28 }} />
+            <MicIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
           )}
         </IconButton>
+
 
         <IconButton
           sx={{
             backgroundColor: isCameraOff ? "gray" : "white",
             color: isCameraOff ? "white" : "black",
-            padding: 1.5,
+            padding: isMinimized ? 1 : 1.5,
             "&:hover": {
               backgroundColor: isCameraOff ? "darkgray" : "lightgray",
             },
@@ -367,11 +383,27 @@ const CallWindow = () => {
           onClick={handleToggleCamera}
         >
           {isCameraOff ? (
-            <VideocamOffIcon sx={{ fontSize: 28 }} />
+            <VideocamOffIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
           ) : (
-            <VideocamIcon sx={{ fontSize: 28 }} />
+            <VideocamIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
           )}
         </IconButton>
+        <IconButton
+        onClick={isMinimized ? handleMaximize : handleMinimize}
+        sx={{
+          backgroundColor: "rgba(255, 255, 255, 1)",
+          "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.9)" },
+          
+          padding: isMinimized ? 1 : 1.5,
+          borderRadius: "50%",
+        }}
+      >
+        {isMinimized ? (
+          <OpenInFullIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
+        ) : (
+          <CloseFullscreenIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
+        )}
+      </IconButton>
       </Stack>
 
       {/* Call Duration */}
@@ -388,8 +420,10 @@ const CallWindow = () => {
       >
         {formatTime(callDuration)}
       </Typography>
+      
     </Box>
   );
 };
 
 export default CallWindow;
+

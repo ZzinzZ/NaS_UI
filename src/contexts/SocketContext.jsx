@@ -172,14 +172,14 @@ export const SocketProvider = ({ children, userId }) => {
     socket.emit("joinGroup", { chat, recipient, userId });
   };
 
-  const typingSocket = (user, recipient) => {
+  const typingSocket = (user,chatId, recipient) => {
     if (!socket ||!recipient) return;
-    socket.emit("typing", { user, recipient });
+    socket.emit("typing", { user,chatId, recipient });
   }
 
-  const stopTypingSocket = (user, recipient) => {
+  const stopTypingSocket = (user,chatId, recipient) => {
     if (!socket ||!recipient) return;
-    socket.emit("stopTyping", { user, recipient });
+    socket.emit("stopTyping", { user, chatId, recipient });
   }
 
   const micOffSocket = (user, recipient) => {
@@ -515,12 +515,28 @@ export const SocketProvider = ({ children, userId }) => {
       setNotifications((prev) => [notify,...prev])
     });
 
-    socket?.on("receiveTyping", (user) => {
-      setTyping((prev) => [user, ...prev])
+    socket?.on("receiveTyping", (res) => {
+      setTyping((prev) => {
+        const existingIndex = prev.findIndex(
+          (item) => item.user?._id === res.user?._id && item.chatId === res.chatId
+        );
+        
+        if (existingIndex !== -1) {
+          const updatedTyping = [...prev];
+          updatedTyping.splice(existingIndex, 1);
+          return [res, ...updatedTyping];
+        } else {
+          return [res, ...prev];
+        }
+      });
     });
 
-    socket?.on("receiveStopTyping", (user) => {
-      setTyping((prev) => prev.filter((u) => u._id!== user._id));
+    socket?.on("receiveStopTyping", (res) => {
+      const { user, chatId } = res;
+    
+      setTyping((prevTyping) =>
+        prevTyping.filter((t) => !(t.user?._id === user._id && t.chatId === chatId))
+      );
     });
 
     socket?.on("receiveMicOff", (user) => {

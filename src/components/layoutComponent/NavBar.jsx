@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import FeedIcon from "@mui/icons-material/Feed";
-import MessageIcon from '@mui/icons-material/Message';
-import GroupIcon from '@mui/icons-material/Group';
+import MessageIcon from "@mui/icons-material/Message";
+import GroupIcon from "@mui/icons-material/Group";
 import {
   Stack,
   Badge,
@@ -24,7 +24,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { logout } from "@/redux/slices/AuthSlice";
 import { getProfile } from "@/redux/thunks/profileThunk";
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useSocket } from "@/contexts/SocketContext";
 import { setProfileData } from "@/redux/slices/profileSlice";
 
@@ -33,10 +33,12 @@ const NavBar = () => {
   const [popoverId, setPopoverId] = useState(null);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
   const path = usePathname();
+  const searchParams = useSearchParams();
+  const chatId = searchParams.get("chat-id");
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { profileData } = useSelector((state) => state.profile);
-  const {countUnreadNotifications} = useSocket();
+  const { countUnreadNotifications } = useSocket();
 
   const handlePopoverOpen = (event, id) => {
     setAnchorEl(event.currentTarget);
@@ -68,11 +70,14 @@ const NavBar = () => {
     if (!user) {
       Cookies.remove("token");
     } else if (user?._id) {
-      dispatch(getProfile(user._id)).unwrap().then((response) => {
-        dispatch(setProfileData(response))
-      }).catch((error) => {
-        console.log("Get profile error", error);
-      });
+      dispatch(getProfile(user._id))
+        .unwrap()
+        .then((response) => {
+          dispatch(setProfileData(response));
+        })
+        .catch((error) => {
+          console.log("Get profile error", error);
+        });
     }
   }, [user]);
 
@@ -93,7 +98,11 @@ const NavBar = () => {
           sm: "rgba(255, 255, 255, 0.2)",
           md: "#1976d3",
         },
-        display: { xs: "flex", sm: "block" },
+        display: {
+          xs: chatId ? "none" : "block",
+          sm: chatId ? "none" : "block",
+          md: "block",
+        },
         alignItems: "center",
         backdropFilter: "blur(10px)",
       }}
@@ -129,7 +138,11 @@ const NavBar = () => {
         <Stack
           justifyContent="space-between"
           alignItems="center"
-          sx={{ height: "100%", width: {sm: "100%", xs: "100%"}, padding: {sm: "1rem"} }}
+          sx={{
+            height: "100%",
+            width: { sm: "100%", xs: "100%" },
+            padding: { sm: "1rem" },
+          }}
           direction={{ xs: "row", sm: "row", md: "column" }}
         >
           <Stack
@@ -280,7 +293,7 @@ const NavBar = () => {
                 href="/user/posts"
                 style={{ color: "inherit", textDecoration: "none" }}
               >
-                  <Badge badgeContent={countUnreadNotifications} color="error">
+                <Badge badgeContent={countUnreadNotifications} color="error">
                   <FeedIcon
                     sx={{
                       color: {
@@ -291,7 +304,7 @@ const NavBar = () => {
                       fontSize: 30,
                     }}
                   />
-                  </Badge>
+                </Badge>
               </Link>
             </Button>
             <Popover
@@ -324,14 +337,13 @@ const NavBar = () => {
               open={userMenuOpen}
               onClose={handleUserMenuClose}
               anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+                vertical: "top",
+                horizontal: "right",
               }}
               transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+                vertical: "top",
+                horizontal: "right",
               }}
-          
               disableScrollLock={true}
               sx={{
                 mt: 1, // Tạo khoảng cách nhỏ trên đỉnh
@@ -385,7 +397,6 @@ const NavBar = () => {
                 }
               />
             </IconButton>
-            
           </Stack>
         </Stack>
       </Stack>
