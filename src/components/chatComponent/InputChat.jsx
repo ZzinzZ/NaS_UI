@@ -63,14 +63,14 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
     const recipientIds = chat?.participants
       .filter((participant) => participant?.userId !== user._id)
       .map((participant) => participant?.userId);
-    typingSocket(user, recipientIds);
+    typingSocket(user,chat?._id, recipientIds);
   };
 
   const handleStopTypingEvent = () => {
     const recipientIds = chat?.participants
       .filter((participant) => participant?.userId !== user?._id)
       .map((participant) => participant.userId);
-    stopTypingSocket(user, recipientIds );
+    stopTypingSocket(user,chat?._id, recipientIds );
   };
 
   const handleImageChange = (event) => {
