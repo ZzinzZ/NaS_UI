@@ -36,8 +36,10 @@ const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
   };
 
   useEffect(() => {
-    getListFriend();
-  }, [user]);
+    if(open) {
+      getListFriend();
+    }
+  }, [open]);
 
   // Lọc listFriend để loại bỏ các thành viên đã có trong listMember
   const filteredFriends = listFriend?.filter(
