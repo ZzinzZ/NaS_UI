@@ -9,6 +9,7 @@ import {
   useTheme,
   Fab,
   Badge,
+  Button,
 } from "@mui/material";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import ActiveAvatar from "./ActiveAvatar";
@@ -57,6 +58,9 @@ const Conversation = ({ isDeleteMessages }) => {
     kickChat,
     handleSendHello,
     typing,
+    loadMoreChatMessage,
+    hasMore,
+    blockedChat
   } = useSocket();
   const { makeCall } = useStringee();
   const dispatch = useDispatch();
@@ -77,7 +81,7 @@ const Conversation = ({ isDeleteMessages }) => {
       const response = await dispatch(getChatDetails({ chatId })).unwrap();
 
       setChat(response?.chat);
-      setLisMember(response?.participantProfiles || []);
+      setLisMember(response?.chat?.participants || []);
     } catch (error) {
       toast.error("Không thể lấy chi tiết cuộc trò chuyện:", error);
     }
@@ -105,23 +109,20 @@ const Conversation = ({ isDeleteMessages }) => {
       setIsActive(isChatActive);
       if (
         !chat?.participants.some(
-          (participant) => participant.userId === user?._id
+          (participant) => participant?.userId?._id === user?._id
         )
       ) {
         router.push("/user");
       }
     }
     if (chat?.type === "private") {
-      const otherParticipant = chat.participants.find(
-        (participant) => participant.userId !== user._id
+      const otherParticipant = listMember?.find(
+        (participant) => participant?.userId?._id !== user._id
       );
-      setOtherParticipant(
-        listMember?.find(
-          (participant) => participant.userId === otherParticipant.userId
-        )
-      );
-      const isChatActive = onlineUsers.some(
-        (onlineUser) => onlineUser.userId === otherParticipant.userId
+      
+      setOtherParticipant(otherParticipant);
+      const isChatActive = onlineUsers?.some(
+        (onlineUser) => onlineUser?.userId === otherParticipant?.userId
       );
       setIsActive(isChatActive);
     }
@@ -152,15 +153,15 @@ const Conversation = ({ isDeleteMessages }) => {
   useEffect(() => {
     if (chat?.type === "private") {
       setIsBlocked(
-        otherParticipant?.blockedBy?.some((block) => block.userId === user?._id)
+        otherParticipant?.userId?.profileId?.blockedBy?.some((block) => block.userId === user?._id)
       );
       setIsBlockedBy(
-        otherParticipant?.blockedUsers?.some(
+        otherParticipant?.userId?.profileId?.blockedUsers?.some(
           (block) => block.userId === user?._id
         )
       );
       setStranger(
-        !otherParticipant?.friends?.some(
+        !otherParticipant?.userId?.profileId?.friends?.some(
           (friend) => friend.userId === user?._id
         )
       );
@@ -169,6 +170,11 @@ const Conversation = ({ isDeleteMessages }) => {
       setStranger(false);
     }
   }, [otherParticipant, chat]);
+
+  useEffect(() => {
+      setIsBlockedBy(blockedChat === chat?._id);
+      return;
+  },[blockedChat])
 
   const handleMakeVoiceCall = () => {
     if (isBlockedBy) {
@@ -186,7 +192,7 @@ const Conversation = ({ isDeleteMessages }) => {
       return;
     }
     if (otherParticipant) {
-      makeCall(user?._id, otherParticipant?.userId, true);
+      makeCall(user?._id, otherParticipant?.userId?._id, true);
     }
   };
 
@@ -277,6 +283,12 @@ const Conversation = ({ isDeleteMessages }) => {
     }
   };
 
+  const handleLoadMore = useCallback(() => {
+    if (hasMore && chatId && user?._id) {
+      loadMoreChatMessage(chatId, user._id);
+    }
+  }, [hasMore, chatId, user?._id, loadMoreChatMessage]);
+
   return (
     <Box
       sx={{
@@ -316,7 +328,7 @@ const Conversation = ({ isDeleteMessages }) => {
                 <ActiveAvatar
                   image_url={
                     chat?.type === "private"
-                      ? otherParticipant?.avatar?.content?.media[0].media_url
+                      ? otherParticipant?.userId?.profileId.avatar?.content?.media[0].media_url
                       : chat?.avatar
                   }
                 />
@@ -325,7 +337,7 @@ const Conversation = ({ isDeleteMessages }) => {
                   sx={{ width: 50, height: 50 }}
                   src={
                     chat?.type === "private"
-                      ? otherParticipant?.avatar?.content?.media[0].media_url
+                      ? otherParticipant?.userId?.profileId.avatar?.content?.media[0].media_url
                       : chat?.avatar
                   }
                 />
@@ -335,7 +347,7 @@ const Conversation = ({ isDeleteMessages }) => {
                   <Typography sx={{ fontWeight: 600 }}>
                     {chat?.chat_name !== null
                       ? chat?.chat_name
-                      : otherParticipant?.userName}
+                      : otherParticipant?.userId?.name}
                   </Typography>
                   {stranger && (
                     <Typography
@@ -426,6 +438,23 @@ const Conversation = ({ isDeleteMessages }) => {
             },
           }}
         >
+          {hasMore && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "1rem",
+              }}
+            >
+              <Button
+                onClick={handleLoadMore}
+                variant="outlined"
+                disabled={!hasMore}
+              >
+                Load More
+              </Button>
+            </Box>
+          )}
           {messages?.length === 0 ? (
             <Box
               display="flex"
@@ -509,7 +538,7 @@ const Conversation = ({ isDeleteMessages }) => {
             </Fab>
           </Stack>
         )}
-        {typing?.filter(t => t.chatId === chatId)?.length > 0 && (
+        {typing?.filter((t) => t.chatId === chatId)?.length > 0 && (
           <Box
             sx={{
               display: "flex",
@@ -538,7 +567,14 @@ const Conversation = ({ isDeleteMessages }) => {
                 fontWeight: "500",
               }}
             >
-              {typing.filter(t => t.chatId === chatId).map(t => t.user.name).join(", ")} {typing.filter(t => t.chatId === chatId).length === 1 ? 'is' : 'are'} typing...
+              {typing
+                .filter((t) => t.chatId === chatId)
+                .map((t) => t.user.name)
+                .join(", ")}{" "}
+              {typing.filter((t) => t.chatId === chatId).length === 1
+                ? "is"
+                : "are"}{" "}
+              typing...
             </Typography>
             <style>
               {`
@@ -609,4 +645,3 @@ const Conversation = ({ isDeleteMessages }) => {
 };
 
 export default Conversation;
-

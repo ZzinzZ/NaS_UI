@@ -63,17 +63,13 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
   const getParticipants = useCallback(async () => {
     
     try {
-      setIsLoadingChat(true);
-      const response = await getChatDetails({ chatId: chat._id });
-      const otherParticipants = response.participantProfiles.find(
-        (participant) => participant.userId !== user._id
+      const otherParticipants = chat?.participants.find(
+        (participant) => participant.userId?.profileId?.userId !== user._id
       );
-      setChatName(otherParticipants.userName);
-      setChatAvatar(otherParticipants.avatar?.content?.media[0].media_url);
+      setChatName(otherParticipants?.userId?.profileId?.userName);
+      setChatAvatar(otherParticipants?.userId?.profileId?.avatar?.content?.media[0].media_url);
     } catch (error) {
       console.log(error);
-    } finally {
-      setIsLoadingChat(false);
     }
   }, [chat._id, user._id]);
 

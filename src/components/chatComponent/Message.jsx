@@ -357,7 +357,7 @@ const Message = React.forwardRef(
                                 borderRadius: "8px",
                               }}
                               onClick={() => {
-                                dispatchEvent(showImage(image));
+                                dispatch(showImage(image));
                               }}
                             />
                           </Box>
