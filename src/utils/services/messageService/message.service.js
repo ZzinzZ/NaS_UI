@@ -81,10 +81,10 @@ export const createCallMessage = async ({senderId, chatId, callDuration, is_acce
   }
 }
 
-export const getMessageByChatId = async ({ chatId, userId }) => {
+export const getMessageByChatId = async ({ chatId, userId,limit = 15, skip = 0 }) => {
   try {
     const message = await getRequest(
-      `${baseUrl}/messages/conversation/${chatId}/${userId}`
+      `${baseUrl}/messages/conversation/${chatId}/${userId}?limit=${limit}&skip=${skip}`
     );
     return message.data;
   } catch (error) {

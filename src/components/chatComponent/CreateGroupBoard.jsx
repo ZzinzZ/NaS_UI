@@ -16,7 +16,6 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getListFriends } from "@/utils/services/profileService/getListFriend";
 import { createGroupChat } from "@/utils/services/chatService/chatService";
-import InboxIcon from '@mui/icons-material/Inbox';
 import { useSocket } from "@/contexts/SocketContext";
 
 const CreateGroupBoard = ({ open, handleClose, reloadChat }) => {
@@ -68,8 +67,10 @@ const CreateGroupBoard = ({ open, handleClose, reloadChat }) => {
   };
 
   useEffect(() => {
-    getListFriend();
-  }, [user]);
+    if(open) {
+      getListFriend();
+    }
+  }, [open]);
 
   return (
     <Dialog

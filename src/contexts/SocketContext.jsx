@@ -44,6 +44,8 @@ export const SocketProvider = ({ children, userId }) => {
   const [notifications, setNotifications] = useState([]);
   const [countUnreadNotifications, setCountUnreadNotifications] = useState(0);
   const [chatLibrary, setChatLibrary] = useState([]);
+  const [hasMore, setHasMore] = useState(false);
+  const [blockedChat, setBlockedChat] = useState(null);
 
   const chat = useSelector((state) => state.chat.chatData);
   const { user } = useSelector((state) => state.auth);
@@ -54,8 +56,8 @@ export const SocketProvider = ({ children, userId }) => {
 
     if (!socket) {
       const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_SERVER, {
-        transports: ["websocket"], // Đảm bảo chỉ dùng WebSocket
-        withCredentials: true,    // Gửi cookie/session (nếu cần)
+        transports: ["websocket"], 
+        withCredentials: true,  
       });
       setSocket(newSocket);
 
@@ -84,14 +86,33 @@ export const SocketProvider = ({ children, userId }) => {
         chatId: chat?._id,
         userId: userId,
       });
-      setMessages(response);
+      setMessages(response?.messages);
+      setHasMore(response?.hasMore)
     } catch (error) {
       console.log(error);
     }
   };
 
+  const loadMoreChatMessage = async (chatId, userId) => {
+    if (hasMore) {
+      try {
+        const response = await getMessageByChatId({
+          chatId,
+          userId,
+          limit: 15,
+          skip: messages.length,
+        });
+        setMessages(prevMessages => [...response.messages,...prevMessages]);
+        setHasMore(response?.hasMore)
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
+
   useEffect(() => {
     if (user && chat) {
+      setMessages([])
       getChatMessage();
     }
   }, [chat, userId]);
@@ -151,7 +172,7 @@ export const SocketProvider = ({ children, userId }) => {
     if (kickedUser === user?._id && user._id !== chat?.created_by) {
       message = `You have been removed from the conversation '${chat?.chat_name}'`;
       const notify = await createChatNotification({
-        userId: user._id,
+        userId: user?._id,
         message,
         refChat: null,
       });
@@ -182,6 +203,16 @@ export const SocketProvider = ({ children, userId }) => {
     socket.emit("stopTyping", { user, chatId, recipient });
   }
 
+  const blockUserSocket = (chatId, recipient, notify) => {
+    if (!socket ||!recipient) return;
+    socket.emit("blockUser", { chatId, recipient, notify });
+  }
+
+  const unBlockUserSocket = (chatId, recipient, notify) => {
+    if (!socket ||!recipient) return;
+    socket.emit("unblockUser", { chatId, recipient, notify });
+  }
+
   const micOffSocket = (user, recipient) => {
     if (!socket ||!recipient) return;
     socket.emit("micOff", { user, recipient });
@@ -198,8 +229,6 @@ export const SocketProvider = ({ children, userId }) => {
     if (!socket||!recipient) return;
     socket.emit("cameraOn", { user, recipient });
   }
-
-
 
   const sendFriendRequestSocket = async (userId, notify) => {
     if (!socket ||!userId) return;
@@ -539,6 +568,16 @@ export const SocketProvider = ({ children, userId }) => {
       );
     });
 
+    socket?.on("receiveBlocked", (res) => {
+      const {chatId, notify} = res;
+      setNotifications((prev) => [notify,...prev])
+      setBlockedChat(chatId);
+    } )
+
+    socket?.on("receiveUnblocked", (chatId) => {
+      setBlockedChat(null);
+    })
+
     socket?.on("receiveMicOff", (user) => {
       setMicOff(user);
     })
@@ -571,6 +610,8 @@ export const SocketProvider = ({ children, userId }) => {
       socket?.off("receiveMicOn");
       socket?.off("receiveCameraOff");
       socket?.off("receiveCameraOn");
+      socket?.off("receiveBlocked");
+      socket?.off("receiveUnblocked");
 
     };
   }, [socket, chat]);
@@ -641,6 +682,11 @@ export const SocketProvider = ({ children, userId }) => {
         setMicOff,
         countUnreadNotifications,
         chatLibrary,
+        loadMoreChatMessage,
+        hasMore,
+        blockUserSocket,
+        blockedChat,
+        unBlockUserSocket
       }}
     >
       {children}
