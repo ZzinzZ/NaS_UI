@@ -220,9 +220,9 @@ export const SocketProvider = ({ children, userId }) => {
     socket.emit("blockUser", { chatId, recipient, notify });
   }
 
-  const unBlockUserSocket = (chatId, recipient, notify) => {
+  const unBlockUserSocket = (chatId, recipient) => {
     if (!socket ||!recipient) return;
-    socket.emit("unblockUser", { chatId, recipient, notify });
+    socket.emit("unblockUser", { chatId, recipient });
   }
 
   const micOffSocket = (user, recipient) => {

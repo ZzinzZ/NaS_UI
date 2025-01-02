@@ -245,7 +245,8 @@ const ChatDrawer = ({
         unblockerId: user?._id,
         blockedId: otherParticipants?.userId?.profileId?.userId,
       });
-      unBlockUserSocket(chat?._id, otherParticipants?.userId?._id, notify );
+
+      unBlockUserSocket(chat?._id, otherParticipants?.userId?._id);
       setIsBlocked(false);
     } catch (error) {
       console.log(error);
