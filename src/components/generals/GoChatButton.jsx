@@ -1,7 +1,5 @@
-"use client"
-import {
-  findChatByParticipants,
-} from "@/utils/services/chatService/chatService";
+"use client";
+import { findChatByParticipants } from "@/utils/services/chatService/chatService";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import ChatIcon from "@mui/icons-material/Chat";
@@ -9,7 +7,8 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 const GoChatButton = ({ userId }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const router = useRouter();
 
   const handleGoToChat = async () => {

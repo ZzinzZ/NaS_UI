@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useSocket } from "@/contexts/SocketContext";
 import {
   acceptFriendRequest,
@@ -13,7 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 const FriendRequestItem = ({ profile, onRemove }) => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const { acceptFriendRequestSocket, rejectFriendRequestSocket } = useSocket();
 
   const handleAcceptRequest = async () => {

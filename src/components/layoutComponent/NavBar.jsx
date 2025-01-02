@@ -36,7 +36,8 @@ const NavBar = () => {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("chat-id");
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const { profileData } = useSelector((state) => state.profile);
   const { countUnreadNotifications } = useSocket();
 

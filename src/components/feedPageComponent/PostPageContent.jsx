@@ -9,7 +9,8 @@ import { useSelector } from "react-redux";
 import Notifications from "./Notifications";
 
 const PostPageContent = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const [posts, setPosts] = useState([]);
   const theme = useTheme();
   const isPhone = useMediaQuery(theme.breakpoints.down("sm"));
@@ -36,7 +37,7 @@ const PostPageContent = () => {
   const renderContent = () => {
     if (isTablet || isPhone) {
       return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: "100%" }}>
           <Tabs value={activeTab} onChange={handleTabChange} centered>
             <Tab label="Posts" />
             <Tab label="Notifications" />
@@ -83,12 +84,12 @@ const PostPageContent = () => {
   };
 
   return (
-    <Stack 
-      direction="row" 
-      spacing={2} 
-      sx={{ 
+    <Stack
+      direction="row"
+      spacing={2}
+      sx={{
         padding: "1rem 1rem 0 1rem",
-        justifyContent: isTablet ? 'center' : 'flex-start'
+        justifyContent: isTablet ? "center" : "flex-start",
       }}
     >
       {!isPhone && !isTablet && (
@@ -102,4 +103,3 @@ const PostPageContent = () => {
 };
 
 export default PostPageContent;
-

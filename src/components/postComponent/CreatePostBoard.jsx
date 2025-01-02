@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import {
   Avatar,
@@ -22,10 +22,11 @@ import { toast } from "react-toastify";
 import { createPost } from "@/utils/services/postService/PostFeature";
 
 const CreatePostBoard = ({ open, handleClose, onNew, profile }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const [content, setContent] = useState("");
   const [pictures, setPictures] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null); 
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const handlePostSubmit = async () => {
     if (!content && pictures.length === 0) {
@@ -59,24 +60,23 @@ const CreatePostBoard = ({ open, handleClose, onNew, profile }) => {
 
   const onEmojiClick = (emojiObject, event) => {
     setContent((prevContent) => prevContent + emojiObject.emoji);
-    
   };
 
   const handleEmojiPickerOpen = (event) => {
-    setAnchorEl(event.currentTarget); 
+    setAnchorEl(event.currentTarget);
   };
 
   const handleEmojiPickerClose = () => {
-    setAnchorEl(null); 
+    setAnchorEl(null);
   };
 
   const clearAndClose = () => {
     setContent("");
     setPictures([]);
     handleClose();
-  }
+  };
 
-  const openEmojiPicker = Boolean(anchorEl); 
+  const openEmojiPicker = Boolean(anchorEl);
 
   return (
     <Dialog
@@ -127,7 +127,7 @@ const CreatePostBoard = ({ open, handleClose, onNew, profile }) => {
           <Stack justifyContent="space-between" sx={{ height: "100%" }}>
             <Stack spacing={2}>
               <Stack direction="row" spacing={1} alignItems="center">
-                <Avatar src={profile.avatar?.content?.media[0].media_url}/>
+                <Avatar src={profile.avatar?.content?.media[0].media_url} />
                 <Typography>{user?.name}</Typography>
               </Stack>
               <TextField
