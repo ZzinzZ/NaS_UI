@@ -46,6 +46,7 @@ import { hideLoading, showLoading } from "@/redux/slices/LoadingSlice";
 import { useSocket } from "@/contexts/SocketContext";
 import { createUserNotification } from "@/utils/services/notification/notification.service";
 import { userAgentFromString } from "next/server";
+import { updateProfileAvatar, updateProfileBackground } from "@/redux/slices/profileSlice";
 
 const ProfileHeader = ({ user, profile, listFriend }) => {
   const router = useRouter();
@@ -187,11 +188,15 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
   };
   const handleAvatarChange = async (event) => {
     const file = event.target.files[0];
+    dispatch(showLoading());
     if (file) {
       try {
-        dispatch(showLoading());
-        dispatch(updateAvatar({ userId: user?._id, avatarFile: file }));
+        
+        const res = await dispatch(updateAvatar({ userId: user?._id, avatarFile: file })).unwrap();
+        console.log("new avatar file", res);
+        
         dispatch(getProfile(user?._id));
+        dispatch(updateProfileAvatar(res.avatar))
       } catch (error) {
         console.log(error);
         toast.error("Upload failed ", error);
@@ -205,13 +210,15 @@ const ProfileHeader = ({ user, profile, listFriend }) => {
 
   const handleBackgroundChange = async (event) => {
     const file = event.target.files[0];
+    dispatch(showLoading());
     if (file) {
       try {
-        dispatch(showLoading());
-         dispatch(
+        
+         const res = await dispatch(
           updateBackground({ userId: user?._id, backgroundFile: file })
-        );
+        ).unwrap();
          dispatch(getProfile(user?._id));
+         dispatch(updateProfileBackground(res.background))
       } catch (error) {
         toast.error("Upload failed ", error);
         dispatch(hideLoading());
