@@ -38,7 +38,7 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const { user = null } = useSelector((state) => state.auth ?? {});
 
-  const { profileData } = useSelector((state) => state.profile);
+  const { profileData = null } = useSelector((state) => state.profile ?? {});
   const { countUnreadNotifications } = useSocket();
 
   const handlePopoverOpen = (event, id) => {
