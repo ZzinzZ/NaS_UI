@@ -27,6 +27,12 @@ const profileSlice = createSlice({
       },
       resetProfile(state) {
         Object.assign(state, initialState);
+      },
+      updateProfileAvatar(state, action) {
+        state.profileData.avatar = action.payload;
+      },
+      updateProfileBackground(state, action) {
+        state.profileData.background = action.payload;
       }
     },
     // extraReducers: (builder) => {
@@ -44,6 +50,6 @@ const profileSlice = createSlice({
     // },
   });
   
-  export const { setProfileData, setLoading, setError, resetProfile } = profileSlice.actions;
+  export const { setProfileData, setLoading, setError, resetProfile,updateProfileAvatar,updateProfileBackground } = profileSlice.actions;
   
   export default profileSlice.reducer;
