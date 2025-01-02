@@ -7,7 +7,8 @@ import RequestSentItem from "./RequestSentItem";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 
 const RequestSentList = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const [listRequest, setListRequest] = useState([]);
 
   const getListRequestSent = async () => {
@@ -24,8 +25,17 @@ const RequestSentList = () => {
   }, []);
 
   return (
-    <Stack sx={{ padding: "1.5rem", backgroundColor: "#f9f9f9", borderRadius: "0.8rem" }}>
-      <Typography variant="h6" sx={{ marginBottom: "1rem", color: "#333", fontWeight: "bold" }}>
+    <Stack
+      sx={{
+        padding: "1.5rem",
+        backgroundColor: "#f9f9f9",
+        borderRadius: "0.8rem",
+      }}
+    >
+      <Typography
+        variant="h6"
+        sx={{ marginBottom: "1rem", color: "#333", fontWeight: "bold" }}
+      >
         Requests Sent
       </Typography>
       <Stack
@@ -46,11 +56,19 @@ const RequestSentList = () => {
                 },
               }}
             >
-              <RequestSentItem profile={request} onRemove={getListRequestSent} />
+              <RequestSentItem
+                profile={request}
+                onRemove={getListRequestSent}
+              />
             </Box>
           ))
         ) : (
-          <Stack spacing={1} alignItems="center" justifyContent="center" sx={{ color: "#aaa" }}>
+          <Stack
+            spacing={1}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ color: "#aaa" }}
+          >
             <PersonOffIcon sx={{ fontSize: "3rem", color: "#ddd" }} />
             <Typography variant="body1" sx={{ fontStyle: "italic" }}>
               No requests sent

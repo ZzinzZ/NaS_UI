@@ -48,7 +48,8 @@ const Conversation = ({ isDeleteMessages }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const {
     onlineUsers,
     newMessage,
@@ -60,7 +61,7 @@ const Conversation = ({ isDeleteMessages }) => {
     typing,
     loadMoreChatMessage,
     hasMore,
-    blockedChat
+    blockedChat,
   } = useSocket();
   const { makeCall } = useStringee();
   const dispatch = useDispatch();
@@ -119,7 +120,7 @@ const Conversation = ({ isDeleteMessages }) => {
       const otherParticipant = listMember?.find(
         (participant) => participant?.userId?._id !== user._id
       );
-      
+
       setOtherParticipant(otherParticipant);
       const isChatActive = onlineUsers?.some(
         (onlineUser) => onlineUser?.userId === otherParticipant?.userId?._id
@@ -153,7 +154,9 @@ const Conversation = ({ isDeleteMessages }) => {
   useEffect(() => {
     if (chat?.type === "private") {
       setIsBlocked(
-        otherParticipant?.userId?.profileId?.blockedBy?.some((block) => block.userId === user?._id)
+        otherParticipant?.userId?.profileId?.blockedBy?.some(
+          (block) => block.userId === user?._id
+        )
       );
       setIsBlockedBy(
         otherParticipant?.userId?.profileId?.blockedUsers?.some(
@@ -172,9 +175,9 @@ const Conversation = ({ isDeleteMessages }) => {
   }, [otherParticipant, chat]);
 
   useEffect(() => {
-      setIsBlockedBy(blockedChat === chat?._id);
-      return;
-  },[blockedChat])
+    setIsBlockedBy(blockedChat === chat?._id);
+    return;
+  }, [blockedChat]);
 
   const handleMakeVoiceCall = () => {
     if (isBlockedBy) {
@@ -328,7 +331,8 @@ const Conversation = ({ isDeleteMessages }) => {
                 <ActiveAvatar
                   image_url={
                     chat?.type === "private"
-                      ? otherParticipant?.userId?.profileId.avatar?.content?.media[0].media_url
+                      ? otherParticipant?.userId?.profileId.avatar?.content
+                          ?.media[0].media_url
                       : chat?.avatar
                   }
                 />
@@ -337,7 +341,8 @@ const Conversation = ({ isDeleteMessages }) => {
                   sx={{ width: 50, height: 50 }}
                   src={
                     chat?.type === "private"
-                      ? otherParticipant?.userId?.profileId.avatar?.content?.media[0].media_url
+                      ? otherParticipant?.userId?.profileId.avatar?.content
+                          ?.media[0].media_url
                       : chat?.avatar
                   }
                 />
@@ -419,7 +424,7 @@ const Conversation = ({ isDeleteMessages }) => {
           sx={{
             flexGrow: 1,
             overflowY: "auto",
-            padding: {md:"1rem", sm:"0.5rem", xs:"0.2rem"},
+            padding: { md: "1rem", sm: "0.5rem", xs: "0.2rem" },
             backgroundColor: "#f1f2f6",
             "&::-webkit-scrollbar": {
               width: "6px",
@@ -448,8 +453,8 @@ const Conversation = ({ isDeleteMessages }) => {
             >
               <Button
                 onClick={handleLoadMore}
-                variant="outlined"
                 disabled={!hasMore}
+                
               >
                 Load More
               </Button>

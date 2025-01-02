@@ -12,14 +12,12 @@ import ClearIcon from "@mui/icons-material/Clear";
 import SearchLoading from "../generals/SearchLoading";
 import SearchResultItem from "./SearchResultItem";
 
-
 const SearchFriend = () => {
   const [searchHistories, setSearchHistories] = useState([]);
   const [searchKeywords, setSearchKeywords] = useState("");
   const [profileList, setProfileList] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const { user } = useSelector((state) => state.auth);
-
+  const { user = null } = useSelector((state) => state.auth ?? {});
 
   const getSearchHistories = async () => {
     try {
@@ -50,9 +48,7 @@ const SearchFriend = () => {
           userId: user?._id,
         });
         setProfileList(profiles);
-        setSearchHistories([
-         ...searchHistories,
-        ]);
+        setSearchHistories([...searchHistories]);
       }
     } catch (error) {
       console.log(error);
@@ -70,8 +66,6 @@ const SearchFriend = () => {
   useEffect(() => {
     getSearchHistories();
   }, []);
-
-  
 
   return (
     <Box>
@@ -129,7 +123,7 @@ const SearchFriend = () => {
               </Stack>
             </Stack>
             <Stack spacing={1} sx={{ padding: "1rem" }}>
-              <Typography sx={{color:"#ccc"}}>Search Histories</Typography>
+              <Typography sx={{ color: "#ccc" }}>Search Histories</Typography>
               <Stack
                 direction="row"
                 spacing={1}
@@ -174,17 +168,15 @@ const SearchFriend = () => {
           </Stack>
         </Box>
         {isSearching && <SearchLoading />}
-        {
-          !isSearching && (
-            <Stack spacing={1}>
-              {profileList?.map((profile) => (
-                <Box key={profile._id}>
-                    <SearchResultItem  profile={profile} />
-                </Box>
-              ))}
-            </Stack>
-          )
-        }
+        {!isSearching && (
+          <Stack spacing={1}>
+            {profileList?.map((profile) => (
+              <Box key={profile._id}>
+                <SearchResultItem profile={profile} />
+              </Box>
+            ))}
+          </Stack>
+        )}
       </Stack>
     </Box>
   );

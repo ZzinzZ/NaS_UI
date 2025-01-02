@@ -27,7 +27,8 @@ import { useSocket } from "@/contexts/SocketContext";
 import { createUserNotification } from "@/utils/services/notification/notification.service";
 
 const SearchResultItem = ({ profile }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state) => state.profile);
   const [isFriend, setIsFriend] = useState(false);
@@ -84,7 +85,7 @@ const SearchResultItem = ({ profile }) => {
     try {
       dispatch(
         acceptFriendRequest({ receiverId: user._id, senderId: profile?.userId })
-      );      
+      );
       await createPrivateChat({
         userId: user._id,
         participants: [profile?.userId],

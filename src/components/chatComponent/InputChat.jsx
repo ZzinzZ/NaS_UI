@@ -26,7 +26,8 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
   const [chatContent, setChatContent] = useState("");
   const [images, setImages] = useState([]);
   const [files, setFiles] = useState([]);
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const {
     handleSendMessage,
     handleReplyMessage,
@@ -63,14 +64,14 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
     const recipientIds = chat?.participants
       .filter((participant) => participant?.userId._id !== user._id)
       .map((participant) => participant?.userId._id);
-    typingSocket(user,chat?._id, recipientIds);
+    typingSocket(user, chat?._id, recipientIds);
   };
 
   const handleStopTypingEvent = () => {
     const recipientIds = chat?.participants
       .filter((participant) => participant?.userId._id !== user?._id)
       .map((participant) => participant.userId._id);
-    stopTypingSocket(user,chat?._id, recipientIds );
+    stopTypingSocket(user, chat?._id, recipientIds);
   };
 
   const handleImageChange = (event) => {
@@ -91,9 +92,9 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
   };
 
   const handleSend = () => {
-    if((!chatContent || chatContent.trim() === "") && images?.length === 0) return;
+    if ((!chatContent || chatContent.trim() === "") && images?.length === 0)
+      return;
     if (refMessage !== null) {
-     
       handleReplyMessage(
         chatContent,
         user?._id,

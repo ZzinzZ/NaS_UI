@@ -10,7 +10,8 @@ import CommentBar from "./CommentBar";
 import { baseUrl, getRequest } from "@/utils/services/requestService";
 
 const CommentItem = ({ post, comment, isReply = false }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const dispatch = useDispatch();
 
   const [selectReact, setSelectReact] = useState(false);
@@ -120,8 +121,13 @@ const CommentItem = ({ post, comment, isReply = false }) => {
 
   return isLoadingData ? (
     <Stack direction="row" spacing={1} sx={{ margin: "1rem 0" }}>
-      <Skeleton variant="circular" width={40} height={40}/>
-      <Skeleton variant="rounded" sx={{borderRadius:"1rem"}} width={230} height={60} />
+      <Skeleton variant="circular" width={40} height={40} />
+      <Skeleton
+        variant="rounded"
+        sx={{ borderRadius: "1rem" }}
+        width={230}
+        height={60}
+      />
     </Stack>
   ) : (
     <Stack direction="row" spacing={1} sx={{ margin: "1rem 0" }}>

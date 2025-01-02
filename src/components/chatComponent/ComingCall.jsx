@@ -9,15 +9,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserProfile } from "@/utils/services/profileService/profileDetails";
 import { findChatByParticipants } from "@/utils/services/chatService/chatService";
 import { useSocket } from "@/contexts/SocketContext";
-import VideocamIcon from '@mui/icons-material/Videocam';
+import VideocamIcon from "@mui/icons-material/Videocam";
 
 const ComingCall = () => {
-  const {currentCall, incomingCall, isCalling, answerCall, rejectCall, endCall } =
-    useStringee();
+  const {
+    currentCall,
+    incomingCall,
+    isCalling,
+    answerCall,
+    rejectCall,
+    endCall,
+  } = useStringee();
   const [callerProfile, setCallerProfile] = useState(null);
   const [chat, setChat] = useState(null);
   const [callType, setCallType] = useState("");
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const [isCalled, setIsCalled] = useState(false);
   const { handleSendCallMessage } = useSocket();
   const ringtoneRef = useRef(null);
@@ -43,7 +50,7 @@ const ComingCall = () => {
         if (currentCall) {
           const result = await findChatByParticipants({
             userId: currentCall.fromNumber,
-            participantId: currentCall.toNumber
+            participantId: currentCall.toNumber,
           });
           setChat(result);
         }
@@ -51,7 +58,7 @@ const ComingCall = () => {
         else if (incomingCall) {
           const result = await findChatByParticipants({
             userId: incomingCall.fromNumber,
-            participantId: incomingCall.toNumber
+            participantId: incomingCall.toNumber,
           });
           setChat(result);
         }
@@ -59,7 +66,7 @@ const ComingCall = () => {
         console.log("Error getting chat:", error);
       }
     };
-  
+
     getChatOfCall();
     return () => {
       if (ringtoneRef.current) {
@@ -79,21 +86,18 @@ const ComingCall = () => {
       }
     };
     getCallerProfile();
-    if(incomingCall?.isVideoCall) {
+    if (incomingCall?.isVideoCall) {
       setCallType("video");
-    }
-    else {
+    } else {
       setCallType("audio");
     }
-
   }, [incomingCall]);
-
 
   const handleRejectCall = async () => {
     if (ringtoneRef.current) {
       ringtoneRef.current.pause();
     }
-    if(incomingCall){
+    if (incomingCall) {
       await handleSendCallMessage(
         incomingCall?.fromNumber,
         chat?._id,
@@ -102,8 +106,7 @@ const ComingCall = () => {
         true,
         callType
       );
-    }
-    else if(currentCall){
+    } else if (currentCall) {
       await handleSendCallMessage(
         currentCall?.fromNumber,
         chat?._id,
@@ -166,7 +169,7 @@ const ComingCall = () => {
               "&:hover": { backgroundColor: "darkgreen" },
             }}
           >
-            {incomingCall.isVideoCall ? <VideocamIcon/> : <PhoneInTalkIcon />}
+            {incomingCall.isVideoCall ? <VideocamIcon /> : <PhoneInTalkIcon />}
           </IconButton>
         )}
       </Stack>

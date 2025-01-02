@@ -13,8 +13,8 @@ import { getUserProfile } from "@/utils/services/profileService/profileDetails";
 import { useSocket } from "@/contexts/SocketContext";
 import { findChatByParticipants } from "@/utils/services/chatService/chatService";
 
-import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
-import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 
 const CallWindow = () => {
   const {
@@ -38,7 +38,8 @@ const CallWindow = () => {
   const [callType, setCallType] = useState("");
   const [chat, setChat] = useState(null);
   const [isMinimized, setIsMinimized] = useState(false);
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const {
     handleSendCallMessage,
     micOffSocket,
@@ -271,7 +272,8 @@ const CallWindow = () => {
       {/* Controls */}
       <Stack
         sx={{
-          background: micOff !== null || cameraOff !== null ? "#323232" : "transparent",
+          background:
+            micOff !== null || cameraOff !== null ? "#323232" : "transparent",
           color: "#fff",
           position: "absolute",
           bottom: "100px",
@@ -370,7 +372,6 @@ const CallWindow = () => {
           )}
         </IconButton>
 
-
         <IconButton
           sx={{
             backgroundColor: isCameraOff ? "gray" : "white",
@@ -389,21 +390,21 @@ const CallWindow = () => {
           )}
         </IconButton>
         <IconButton
-        onClick={isMinimized ? handleMaximize : handleMinimize}
-        sx={{
-          backgroundColor: "rgba(255, 255, 255, 1)",
-          "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.9)" },
-          
-          padding: isMinimized ? 1 : 1.5,
-          borderRadius: "50%",
-        }}
-      >
-        {isMinimized ? (
-          <OpenInFullIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
-        ) : (
-          <CloseFullscreenIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
-        )}
-      </IconButton>
+          onClick={isMinimized ? handleMaximize : handleMinimize}
+          sx={{
+            backgroundColor: "rgba(255, 255, 255, 1)",
+            "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.9)" },
+
+            padding: isMinimized ? 1 : 1.5,
+            borderRadius: "50%",
+          }}
+        >
+          {isMinimized ? (
+            <OpenInFullIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
+          ) : (
+            <CloseFullscreenIcon sx={{ fontSize: isMinimized ? 20 : 28 }} />
+          )}
+        </IconButton>
       </Stack>
 
       {/* Call Duration */}
@@ -420,10 +421,8 @@ const CallWindow = () => {
       >
         {formatTime(callDuration)}
       </Typography>
-      
     </Box>
   );
 };
 
 export default CallWindow;
-

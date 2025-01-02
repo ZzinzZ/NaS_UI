@@ -25,14 +25,16 @@ import { memo } from "react";
 
 const ChatBar = ({ setIsDeleteMessages }) => {
   const router = useRouter();
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const [chats, setChats] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [openCreateBoard, setOpenCreateBoard] = useState(false);
   const [isReadMessage, setIsReadMessage] = useState(false);
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText, 300);
-  const { chatBarChange, newMessage, receiveMessage,chatDeleted } = useSocket();
+  const { chatBarChange, newMessage, receiveMessage, chatDeleted } =
+    useSocket();
 
   const getUserChat = async () => {
     try {
@@ -45,7 +47,7 @@ const ChatBar = ({ setIsDeleteMessages }) => {
   };
 
   const handleDeleteChatMessages = useCallback((chatId) => {
-    setChats(prevChats => prevChats.filter(chat => chat._id !== chatId));
+    setChats((prevChats) => prevChats.filter((chat) => chat._id !== chatId));
   }, []);
 
   const findChat = async (keyword) => {
@@ -68,10 +70,13 @@ const ChatBar = ({ setIsDeleteMessages }) => {
     getUserChat();
   }, [user, newMessage, receiveMessage]);
 
-  const handleChatItemClick = useCallback((chatId) => {
-    router.push(`/user?chat-id=${chatId}`);
-    setIsReadMessage(true);
-  }, [router]);
+  const handleChatItemClick = useCallback(
+    (chatId) => {
+      router.push(`/user?chat-id=${chatId}`);
+      setIsReadMessage(true);
+    },
+    [router]
+  );
 
   const handleCreateBoardClick = useCallback(() => {
     setOpenCreateBoard(true);
@@ -94,24 +99,25 @@ const ChatBar = ({ setIsDeleteMessages }) => {
   }, [debouncedSearchText]);
 
   useEffect(() => {
-    if(chatBarChange !== null) {
+    if (chatBarChange !== null) {
       setChats((prev) => [chatBarChange, ...prev]);
     }
-  },[chatBarChange])
+  }, [chatBarChange]);
 
   useEffect(() => {
-    if(chatDeleted !== null) {
-      setChats(prevChats => prevChats.filter(chat => chat._id !== chatDeleted));
+    if (chatDeleted !== null) {
+      setChats((prevChats) =>
+        prevChats.filter((chat) => chat._id !== chatDeleted)
+      );
     }
-  },[chatDeleted])
-
+  }, [chatDeleted]);
 
   return (
     <Box
       sx={{
         background: "#fff",
         width: { xs: "100%", md: "23rem", sm: "100%" },
-        height: { xs: "95vh", sm:"95vh",md: "100vh"},
+        height: { xs: "95vh", sm: "95vh", md: "100vh" },
         boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
         display: "flex",
         flexDirection: "column",
@@ -243,4 +249,3 @@ const ChatBar = ({ setIsDeleteMessages }) => {
 };
 
 export default memo(ChatBar);
-

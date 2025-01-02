@@ -5,11 +5,12 @@ import { useSelector } from "react-redux";
 import { StringeeProvider } from "@/contexts/StringeeContext";
 
 const ContextProvider = ({ children }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   return (
-      <StringeeProvider>
-        <SocketProvider userId={user?._id}>{children}</SocketProvider>
-      </StringeeProvider>
+    <StringeeProvider>
+      <SocketProvider userId={user?._id}>{children}</SocketProvider>
+    </StringeeProvider>
   );
 };
 

@@ -15,14 +15,19 @@ import { useSocket } from "@/contexts/SocketContext";
 import { useSelector } from "react-redux";
 import { getChatDetails } from "@/utils/services/chatService/chatService";
 import ChatItemLoading from "./ChatItemLoading";
-import GroupsIcon from '@mui/icons-material/Groups';
+import GroupsIcon from "@mui/icons-material/Groups";
 import {
   countUnreadMessages,
   deleteChatMessages,
 } from "@/utils/services/messageService/message.service";
 import moment from "moment";
 
-const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMessages }) => {
+const ChatItem = ({
+  chat,
+  setIsReadMessage,
+  setIsDeleteMessages,
+  onDeleteChatMessages,
+}) => {
   const [isCurrent, setIsCurrent] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -33,7 +38,7 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
   const [lastMessage, setLastMessage] = useState("");
   const searchParams = useSearchParams();
   const chatId = searchParams.get("chat-id");
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
 
   const { onlineUsers, messages, newMessage } = useSocket();
 
@@ -58,17 +63,18 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
       );
       setIsActive(isChatActive);
     }
-    
   }, [onlineUsers, chat]);
 
   const getParticipants = useCallback(async () => {
-    
     try {
       const otherParticipants = chat?.participants.find(
         (participant) => participant.userId?._id !== user._id
       );
       setChatName(otherParticipants?.userId?.name);
-      setChatAvatar(otherParticipants?.userId?.profileId?.avatar?.content?.media[0].media_url);
+      setChatAvatar(
+        otherParticipants?.userId?.profileId?.avatar?.content?.media[0]
+          .media_url
+      );
     } catch (error) {
       console.log(error);
     }
@@ -145,14 +151,16 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
 
   const handleDeleteMessage = async () => {
     try {
-      const response = await deleteChatMessages({ chatId: chat._id, userId: user._id });
+      const response = await deleteChatMessages({
+        chatId: chat._id,
+        userId: user._id,
+      });
       onDeleteChatMessages(response?._id);
       setIsDeleteMessages(true);
     } catch (error) {
       console.log(error);
     }
   };
-
 
   return (
     <Box
@@ -188,24 +196,26 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
               invisible={countUnread === 0}
             >
               <Badge
-              color="info"
+                color="info"
                 invisible={chat?.type === "private"}
-                badgeContent={<GroupsIcon sx={{fontSize:"1rem"}}/>}
+                badgeContent={<GroupsIcon sx={{ fontSize: "1rem" }} />}
                 anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
+                  vertical: "bottom",
+                  horizontal: "left",
                 }}
               >
-              {isActive ? (
-                <ActiveAvatar
-                  image_url={chat.type === "group" ? chat?.avatar : chatAvatar}
-                />
-              ) : (
-                <Avatar
-                  sx={{ width: 50, height: 50 }}
-                  src={chat.type === "group" ? chat?.avatar : chatAvatar}
-                />
-              )}
+                {isActive ? (
+                  <ActiveAvatar
+                    image_url={
+                      chat.type === "group" ? chat?.avatar : chatAvatar
+                    }
+                  />
+                ) : (
+                  <Avatar
+                    sx={{ width: 50, height: 50 }}
+                    src={chat.type === "group" ? chat?.avatar : chatAvatar}
+                  />
+                )}
               </Badge>
             </Badge>
             <Stack>
@@ -216,7 +226,7 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  width: {md: "10rem", sm:"20rem", xs:"10rem"},
+                  width: { md: "10rem", sm: "20rem", xs: "10rem" },
                 }}
               >
                 {chat?.chat_name ? chat?.chat_name : chatName}

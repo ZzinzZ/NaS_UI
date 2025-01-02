@@ -46,7 +46,8 @@ const Message = React.forwardRef(
     },
     ref
   ) => {
-    const { user } = useSelector((state) => state.auth);
+    const { user = null } = useSelector((state) => state.auth ?? {});
+
     const [reacted, setReacted] = useState(false);
     const [openReact, setOpenReact] = useState(false);
     const [listSeen, setListSeen] = useState([]);

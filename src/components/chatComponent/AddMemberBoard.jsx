@@ -21,7 +21,8 @@ import { addGroupMember } from "@/utils/services/chatService/chatService";
 import { useSocket } from "@/contexts/SocketContext";
 
 const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const [listFriend, setListFriend] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const { joinGroupSocket } = useSocket();
@@ -36,14 +37,15 @@ const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
   };
 
   useEffect(() => {
-    if(open) {
+    if (open) {
       getListFriend();
     }
-  }, [user,open]);
+  }, [user, open]);
 
   // Lọc listFriend để loại bỏ các thành viên đã có trong listMember
   const filteredFriends = listFriend?.filter(
-    (friend) => !listMember?.some((member) => member.userId._id === friend.userId)
+    (friend) =>
+      !listMember?.some((member) => member.userId._id === friend.userId)
   );
 
   const handleSelectMember = (userId) => {

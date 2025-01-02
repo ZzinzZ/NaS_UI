@@ -34,13 +34,11 @@ const CommentBar = ({ post, comment, getPost }) => {
   const [gif, setGif] = useState(null);
   const [displayImage, setDisplayImage] = useState(null);
   const { top, bottom } = useComponentPosition(ref);
-  const { user } = useSelector((state) => state.auth);
-  const { profileData } = useSelector(
-    (state) => state.profile
-  );
-  
-  const shouldDisplayAbove = bottom > window.innerHeight / 2;
+  const { user = null } = useSelector((state) => state.auth ?? {});
 
+  const { profileData } = useSelector((state) => state.profile);
+
+  const shouldDisplayAbove = bottom > window.innerHeight / 2;
 
   const handleRemoveImage = () => {
     setImage(null);
@@ -84,7 +82,6 @@ const CommentBar = ({ post, comment, getPost }) => {
 
   const handleSelectGif = (gif) => {
     if (gif) {
-
       setGif(gif.url);
       setDisplayImage(gif.url);
       setPickerGif(false);
@@ -110,7 +107,6 @@ const CommentBar = ({ post, comment, getPost }) => {
     if (!content && !image && !gif) return;
     let result;
     if (comment) {
-      
       result = await dispatch(
         replyCommentPost({
           postId: post?._id,
@@ -164,7 +160,7 @@ const CommentBar = ({ post, comment, getPost }) => {
         justifyContent="space-between"
         alignItems="center"
       >
-        <Avatar src={profileData.avatar?.content?.media[0].media_url}/>
+        <Avatar src={profileData.avatar?.content?.media[0].media_url} />
         <Box
           sx={{
             background: "#f1f2f6",
@@ -186,7 +182,6 @@ const CommentBar = ({ post, comment, getPost }) => {
                 multiline
                 placeholder="Write comment..."
                 value={content}
-                
                 onChange={(e) => setContent(e.target.value)}
                 sx={{
                   "& .MuiOutlinedInput-root": {
@@ -209,7 +204,11 @@ const CommentBar = ({ post, comment, getPost }) => {
                 </Typography>
               </Button>
             )}
-            <Stack direction="column" justifyContent="start" sx={{width: isInputComment ? "100%" : "auto"}}>
+            <Stack
+              direction="column"
+              justifyContent="start"
+              sx={{ width: isInputComment ? "100%" : "auto" }}
+            >
               <Stack
                 ref={ref}
                 direction="row"
@@ -219,55 +218,54 @@ const CommentBar = ({ post, comment, getPost }) => {
                 }}
                 justifyContent="space-between"
               >
-                <Stack direction="row" >
-                <EmojiPicker
-                  open={pickerEmoji}
-                  onEmojiClick={handleAddEmoji}
-                  previewConfig={{ showPreview: false }}
-                  searchDisabled={true}
-                  height={300}
-                  style={{
-                    position: "absolute",
-                    zIndex: 2,
-                    top: shouldDisplayAbove ? "auto" : "100%",
-                    bottom: shouldDisplayAbove ? "100%" : "auto",
-                  }}
-                />
-                {pickerGif && (
-                  <Box
-                    sx={{
+                <Stack direction="row">
+                  <EmojiPicker
+                    open={pickerEmoji}
+                    onEmojiClick={handleAddEmoji}
+                    previewConfig={{ showPreview: false }}
+                    searchDisabled={true}
+                    height={300}
+                    style={{
                       position: "absolute",
                       zIndex: 2,
                       top: shouldDisplayAbove ? "auto" : "100%",
                       bottom: shouldDisplayAbove ? "100%" : "auto",
                     }}
-                  >
-                    <GifPicker
-                      height={300}
-                      tenorApiKey={process.env.NEXT_PUBLIC_TENOR_API_KEY}
-                      onGifClick={handleSelectGif}
-                    />
-                  </Box>
-                )}
-                <IconButton onClick={handleOpenPickerEmoji}>
-                  <InsertEmoticonIcon />
-                </IconButton>
-                <IconButton onClick={handleOpenPickerGif}>
-                  <GifBoxIcon />
-                </IconButton>
-                <IconButton
-                  className="choose-comment-button"
-                  component="label"
-                  variant="contained"
-                  tabIndex={-1}
-                >
-                  <CameraAltIcon />
-                  <VisuallyHiddenInput
-                    type="file"
-                    onChange={handleSelectImage}
                   />
-                </IconButton>
-                
+                  {pickerGif && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        zIndex: 2,
+                        top: shouldDisplayAbove ? "auto" : "100%",
+                        bottom: shouldDisplayAbove ? "100%" : "auto",
+                      }}
+                    >
+                      <GifPicker
+                        height={300}
+                        tenorApiKey={process.env.NEXT_PUBLIC_TENOR_API_KEY}
+                        onGifClick={handleSelectGif}
+                      />
+                    </Box>
+                  )}
+                  <IconButton onClick={handleOpenPickerEmoji}>
+                    <InsertEmoticonIcon />
+                  </IconButton>
+                  <IconButton onClick={handleOpenPickerGif}>
+                    <GifBoxIcon />
+                  </IconButton>
+                  <IconButton
+                    className="choose-comment-button"
+                    component="label"
+                    variant="contained"
+                    tabIndex={-1}
+                  >
+                    <CameraAltIcon />
+                    <VisuallyHiddenInput
+                      type="file"
+                      onChange={handleSelectImage}
+                    />
+                  </IconButton>
                 </Stack>
                 {isInputComment && (
                   <IconButton onClick={handleSubmitComment}>

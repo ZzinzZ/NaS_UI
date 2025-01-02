@@ -1,4 +1,3 @@
-
 "use client";
 import { removeFriendRequest } from "@/redux/thunks/profileThunk";
 
@@ -9,11 +8,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 const RequestSentItem = ({ profile, onRemove }) => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
 
   const handleRemoveRequest = async () => {
     try {
-      dispatch(removeFriendRequest({receiverId:profile?.userId, senderId: user?._id }));
+      dispatch(
+        removeFriendRequest({
+          receiverId: profile?.userId,
+          senderId: user?._id,
+        })
+      );
       onRemove();
     } catch (error) {
       console.log(error);
