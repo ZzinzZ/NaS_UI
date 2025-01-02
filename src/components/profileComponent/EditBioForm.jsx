@@ -4,6 +4,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import { Button, Stack, TextField, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { getProfile, updateBio } from "@/redux/thunks/profileThunk";
+import { updateProfileBio } from "@/redux/slices/profileSlice";
 
 const EditBio = ({profile, CloseBio, user}) => {
     
@@ -20,8 +21,9 @@ const EditBio = ({profile, CloseBio, user}) => {
     }
     const handleUpdateBio = async () => {
         try {
-             dispatch(updateBio({profileId: profile?._id, bio: bioValue}))
+             const res = await dispatch(updateBio({profileId: profile?._id, bio: bioValue})).unwrap();
              dispatch(getProfile(user?._id))
+             dispatch(updateProfileBio(res.bio))
         } catch (error) {
             console.log("Update bio error", error);
         }   

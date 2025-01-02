@@ -3,10 +3,11 @@ import {
   IconButton,
   Popover,
   Stack,
-  TextField,
+  // TextField,
   Button,
   Box,
   Typography,
+  TextareaAutosize,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ReplyIcon from "@mui/icons-material/Reply";
@@ -276,55 +277,46 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
 
         <Stack
           direction="row"
-          alignItems="center"
+          alignItems="flex-end"
           justifyContent="center"
           sx={{
             width: "90%",
             background: "#EAEAEA",
             borderRadius: "1rem",
-            height: "2.5rem",
+            minHeight: "2.5rem",
             padding: "0.5rem 0.8rem",
+            maxHeight: "120px",
+            overflowY: "auto",
           }}
         >
-          <TextField
+          <TextareaAutosize
             disabled={isBlockedBy}
-            autoComplete="off"
             placeholder="Type a message..."
             value={chatContent}
             onChange={(e) => handleInputMessage(e)}
             onFocus={handleTypingEvent}
             onBlur={handleStopTypingEvent}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
+              if (e.key === "Enter") {
+                if (e.shiftKey) {
+                  return; // Allow new line for Shift+Enter
+                } else {
+                  e.preventDefault();
+                  handleSend();
+                }
               }
             }}
-            sx={{
+            style={{
               width: "100%",
-              height: "2rem",
-              padding: "0 0.2rem !important",
-              "& .MuiOutlinedInput-root": {
-                display: "flex",
-                alignItems: "center",
-                padding: "0 !important",
-                height: "100%",
-                "& input": {
-                  padding: "4px 0 0 0",
-                  display: "flex",
-                  alignItems: "flex-end",
-                  height: "100%",
-                },
-                "& fieldset": {
-                  border: "none",
-                },
-                "&:hover fieldset": {
-                  border: "none",
-                },
-                "&.Mui-focused fieldset": {
-                  border: "none",
-                },
-              },
+              resize: "none",
+              border: "none",
+              outline: "none",
+              backgroundColor: "transparent",
+              fontFamily: "inherit",
+              fontSize: "inherit",
+              padding: "4px 0",
+              maxHeight: "100px",
+              overflowY: "auto",
             }}
           />
           <IconButton onClick={handleEmojiPickerOpen} disabled={isBlockedBy}>
@@ -365,3 +357,4 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
 };
 
 export default InputChat;
+

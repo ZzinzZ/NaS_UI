@@ -71,6 +71,11 @@ const LocationForm = ({ initialData, onSave, onCancel }) => {
           onChange={handleChange}
           label="Type of Location"
           required
+          MenuProps= {
+            {
+              disableScrollLock: true,
+            }
+          }
         >
           <MenuItem value="hometown">Hometown</MenuItem>
           <MenuItem value="current">Current</MenuItem>

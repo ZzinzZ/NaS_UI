@@ -139,6 +139,11 @@ const WorkplaceForm = ({ initialData, onSave, onCancel }) => {
               onChange={(e) =>
                 setWorkplaceData({ ...workplaceData, status: e.target.value })
               }
+              MenuProps= {
+                {
+                  disableScrollLock: true,
+                }
+              }
             >
               <MenuItem value={true}>
                 <Stack direction="row" alignItems="center" spacing={1}>

@@ -127,11 +127,12 @@ const ChatDrawer = ({
         toast.error("Chat name cannot be empty.");
         return;
       }
-
       const response = await updateChatName({
         chatId: chat?._id,
         chatName: newChatName,
       });
+      console.log("Chat name updated", response);
+      
       onUpdate(response);
       setUpdatingName(false);
     } catch (error) {
