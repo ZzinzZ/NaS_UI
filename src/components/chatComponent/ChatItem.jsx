@@ -40,33 +40,34 @@ const ChatItem = ({ chat, setIsReadMessage, setIsDeleteMessages, onDeleteChatMes
   useEffect(() => {
     if (chat.type === "group") {
       const otherParticipants = chat.participants.filter(
-        (participant) => participant.userId !== user._id
+        (participant) => participant?.userId?._id !== user._id
       );
       const isChatActive = otherParticipants.some((participant) =>
         onlineUsers.some(
-          (onlineUser) => onlineUser.userId === participant.userId
+          (onlineUser) => onlineUser.userId === participant?.userId?._id
         )
       );
       setIsActive(isChatActive);
     }
     if (chat.type === "private") {
       const otherParticipant = chat.participants.find(
-        (participant) => participant.userId !== user._id
+        (participant) => participant.userId?._id !== user._id
       );
       const isChatActive = onlineUsers.some(
-        (onlineUser) => onlineUser.userId === otherParticipant.userId
+        (onlineUser) => onlineUser.userId === otherParticipant.userId?._id
       );
       setIsActive(isChatActive);
     }
+    
   }, [onlineUsers, chat]);
 
   const getParticipants = useCallback(async () => {
     
     try {
       const otherParticipants = chat?.participants.find(
-        (participant) => participant.userId?.profileId?.userId !== user._id
+        (participant) => participant.userId?._id !== user._id
       );
-      setChatName(otherParticipants?.userId?.profileId?.userName);
+      setChatName(otherParticipants?.userId?.name);
       setChatAvatar(otherParticipants?.userId?.profileId?.avatar?.content?.media[0].media_url);
     } catch (error) {
       console.log(error);

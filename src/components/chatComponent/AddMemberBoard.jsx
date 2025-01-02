@@ -39,11 +39,11 @@ const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
     if(open) {
       getListFriend();
     }
-  }, [open]);
+  }, [user,open]);
 
   // Lọc listFriend để loại bỏ các thành viên đã có trong listMember
   const filteredFriends = listFriend?.filter(
-    (friend) => !listMember?.some((member) => member.userId === friend.userId)
+    (friend) => !listMember?.some((member) => member.userId._id === friend.userId)
   );
 
   const handleSelectMember = (userId) => {
@@ -63,8 +63,8 @@ const AddMemberBoard = ({ open, handleClose, chat, onUpdate, listMember }) => {
       onUpdate(response);
       setSelectedMembers([]);
       const recipient = listMember
-        ?.filter((member) => member.userId !== user?._id)
-        .map((member) => member.userId);
+        ?.filter((member) => member.userId?._id !== user?._id)
+        .map((member) => member.userId._id);
 
       joinGroupSocket(selectedMembers, chat, [
         ...selectedMembers,

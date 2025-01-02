@@ -56,8 +56,8 @@ export const SocketProvider = ({ children, userId }) => {
 
     if (!socket) {
       const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_SERVER, {
-        transports: ["websocket"], 
-        withCredentials: true,  
+        transports: ["websocket"], // Đảm bảo chỉ dùng WebSocket
+        withCredentials: true,    // Gửi cookie/session (nếu cần)
       });
       setSocket(newSocket);
 
@@ -66,6 +66,11 @@ export const SocketProvider = ({ children, userId }) => {
       };
     } else return;
   }, [userId]);
+
+  useEffect(() => {
+    console.log("socket connected", onlineUsers);
+    
+  },[onlineUsers])
 
   useEffect(() => {
     if (socket === null) return;
@@ -79,6 +84,8 @@ export const SocketProvider = ({ children, userId }) => {
       socket.off("user_online_status");
     };
   }, [socket, userId]);
+
+
 
   const getChatMessage = async () => {
     try {
@@ -119,9 +126,9 @@ export const SocketProvider = ({ children, userId }) => {
 
   const sendMessageSocket = () => {
     if (!socket || !newMessage || !chat) return;
-
+    
     const recipients = chat.participants?.filter(
-      (participant) => participant.userId !== userId
+      (participant) => participant.userId?._id !== userId
     );
     socket.emit("sendMessage", {
       message: { ...newMessage },
@@ -188,10 +195,15 @@ export const SocketProvider = ({ children, userId }) => {
     }
   };
 
-  const joinGroupSocket = async (userId, chat, recipient) => {
+  const joinGroupSocket = async (userId, recipient) => {
     if (!socket || !chat) return;
-    socket.emit("joinGroup", { chat, recipient, userId });
+    socket.emit("joinGroup", { recipient, userId });
   };
+
+  const leaveGroupSocket = async ( chat, recipient, notify) => {
+    if (!socket ||!chat) return;
+    socket.emit("leaveGroup", { chat, recipient, notify });
+  }
 
   const typingSocket = (user,chatId, recipient) => {
     if (!socket ||!recipient) return;
@@ -270,7 +282,7 @@ export const SocketProvider = ({ children, userId }) => {
   const reactMessageSocket = () => {
     if (!socket || !chat) return;
     const recipients = chat.participants?.filter(
-      (participant) => participant.userId !== userId
+      (participant) => participant.userId?._id !== userId
     );
     socket.emit("reactMessage", {
       message: { ...reactedMessage },
@@ -283,7 +295,7 @@ export const SocketProvider = ({ children, userId }) => {
       await markAsRead({ messageId: message?._id, userId });
 
       const recipients = chat?.participants?.filter(
-        (participant) => participant.userId !== userId
+        (participant) => participant.userId._id !== userId
       );
       socket.emit("readMessage", { message, recipients });
     },
@@ -461,7 +473,7 @@ export const SocketProvider = ({ children, userId }) => {
           prev.map((msg) => (msg._id === messageId ? response : msg))
         );
         const recipients = chat?.participants?.filter(
-          (participant) => participant.userId !== userId
+          (participant) => participant.userId?._id !== userId
         );
         socket.emit("removeMessage", { message: response, recipients });
       } catch (error) {
@@ -486,6 +498,7 @@ export const SocketProvider = ({ children, userId }) => {
 
   useEffect(() => {
     if (socket === null) console.log("socket is null");
+    
     socket?.on("receiveMessage", (message) => {
       if (chat?._id !== message?.chat_id) {
         setReceiveMessage((prev) => prev + 1);
@@ -516,6 +529,10 @@ export const SocketProvider = ({ children, userId }) => {
 
     socket?.on("groupJoined", ({ chat, userId }) => {
       receiveSocketJoinGroup({ chat, userId });
+    });
+
+    socket?.on("groupLeft", ({ notify }) => {
+      setNotifications((prev) => [notify,...prev])
     });
 
     socket?.on("receiveRead", (message) => {
@@ -686,7 +703,8 @@ export const SocketProvider = ({ children, userId }) => {
         hasMore,
         blockUserSocket,
         blockedChat,
-        unBlockUserSocket
+        unBlockUserSocket,
+        leaveGroupSocket
       }}
     >
       {children}

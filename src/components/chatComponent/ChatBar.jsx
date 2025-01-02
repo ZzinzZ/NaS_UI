@@ -10,7 +10,6 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import React, { useEffect, useState, useCallback } from "react";
-import ActiveAvatar from "./ActiveAvatar";
 import ChatItem from "./ChatItem";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -112,7 +111,7 @@ const ChatBar = ({ setIsDeleteMessages }) => {
       sx={{
         background: "#fff",
         width: { xs: "100%", md: "23rem", sm: "100%" },
-        height: "100vh",
+        height: { xs: "95vh", sm:"95vh",md: "100vh"},
         boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
         display: "flex",
         flexDirection: "column",

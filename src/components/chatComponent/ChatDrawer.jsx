@@ -85,7 +85,8 @@ const ChatDrawer = ({
     kickChatSocket,
     chatLibrary,
     blockUserSocket,
-    unBlockUserSocket
+    unBlockUserSocket,
+    leaveGroupSocket
   } = useSocket();
   const router = useRouter();
   const theme = useTheme();
@@ -110,7 +111,7 @@ const ChatDrawer = ({
       }
       setOtherParticipants(
         response?.chat?.participants.find(
-          (participant) => participant.userId?.profileId?.userId !== user?._id
+          (participant) => participant.userId?._id !== user?._id
         )
       );
     } catch (error) {
@@ -164,6 +165,14 @@ const ChatDrawer = ({
         chatId: chat?._id,
         userId: user?._id,
       });
+      const message = `${user?.name} has left the ${chat?.name} chat`;
+      const notify = await createChatNotification({
+        userId: user._id,
+        message,
+        refChat: chat?._id,
+      });
+      const recipient = listMember?.filter(member => member.userId._id !== user._id);
+      leaveGroupSocket(recipient, notify)
       toast.info("Leave chat successfully");
 
       router.push("/user");
@@ -175,7 +184,7 @@ const ChatDrawer = ({
   const handleDeleteChat = async () => {
     try {
       const recipient = chat?.participants?.filter(
-        (participant) => participant?.userId?.profileId?.userId !== user._id
+        (participant) => participant?.userId?._id!== user._id
       );
       await deleteChat({
         chatId: chat?._id,
@@ -219,7 +228,7 @@ const ChatDrawer = ({
     try {
       await blockUser({
         blockerId: user?._id,
-        blockedId: otherParticipants?.userId?.profileId.userId,
+        blockedId: otherParticipants?.userId?._id,
       });
       setIsBlocked(true);
       const message = `${user?.name} has blocked you`;

@@ -61,15 +61,15 @@ const InputChat = ({ chat, refMessage, setRefMessage, isBlockedBy }) => {
 
   const handleTypingEvent = () => {
     const recipientIds = chat?.participants
-      .filter((participant) => participant?.userId !== user._id)
-      .map((participant) => participant?.userId);
+      .filter((participant) => participant?.userId._id !== user._id)
+      .map((participant) => participant?.userId._id);
     typingSocket(user,chat?._id, recipientIds);
   };
 
   const handleStopTypingEvent = () => {
     const recipientIds = chat?.participants
-      .filter((participant) => participant?.userId !== user?._id)
-      .map((participant) => participant.userId);
+      .filter((participant) => participant?.userId._id !== user?._id)
+      .map((participant) => participant.userId._id);
     stopTypingSocket(user,chat?._id, recipientIds );
   };
 
