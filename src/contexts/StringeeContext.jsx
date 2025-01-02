@@ -17,7 +17,7 @@ export const StringeeProvider = ({ children }) => {
   const [calleeRemote, setCalleeRemote] = useState(null);
   const [is_accepted, setIs_accepted] = useState(false);
   const [is_rejected, setIs_rejected] = useState(false);
-  const { stringeeToken } = useSelector((state) => state.auth);
+  const { stringeeToken = null } = useSelector((state) => state.auth ?? {});
 
   useEffect(() => {
     if (!stringeeToken) {
@@ -74,7 +74,7 @@ export const StringeeProvider = ({ children }) => {
       const localVideo = document.getElementById("localVideo");
       setCalleeLocal(stream);
       if (localVideo) {
-        localVideo.srcObject = null; 
+        localVideo.srcObject = null;
         localVideo.srcObject = stream;
       } else {
         console.error("Không tìm thấy localVideo element.");
@@ -93,15 +93,15 @@ export const StringeeProvider = ({ children }) => {
     });
     call;
     callInstance.on("mediastate", (state) => {
-      console.log( state);
+      console.log(state);
     });
 
     callInstance.on("info", (info) => {
-      console.log( info);
+      console.log(info);
     });
 
     callInstance.on("otherdevice", (data) => {
-      console.log( data);
+      console.log(data);
     });
   };
 
@@ -195,11 +195,10 @@ export const StringeeProvider = ({ children }) => {
   };
 
   const mute = () => {
-    
     if (!call) {
       return;
     }
-  
+
     var muted = !call.muted;
     call.mute(muted);
   };
@@ -209,16 +208,16 @@ export const StringeeProvider = ({ children }) => {
       return;
     }
     call.upgradeToVideoCall();
-  }
+  };
 
   const enableVideo = () => {
     var success;
     if (call.localVideoEnabled) {
-        success = call.enableLocalVideo(false);
+      success = call.enableLocalVideo(false);
     } else {
-        success = call.enableLocalVideo(true);
+      success = call.enableLocalVideo(true);
     }
-  }
+  };
 
   return (
     <StringeeContext.Provider

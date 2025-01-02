@@ -56,7 +56,7 @@ export const SocketProvider = ({ children, userId }) => {
   useEffect(() => {
     if (!userId) return;
 
-    if (!socket) {
+    if (!socket && user !== null) {
       const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_SERVER, {
         transports: ["websocket"], // Đảm bảo chỉ dùng WebSocket
         withCredentials: true, // Gửi cookie/session (nếu cần)
@@ -67,7 +67,7 @@ export const SocketProvider = ({ children, userId }) => {
         newSocket.disconnect();
       };
     } else return;
-  }, [userId]);
+  }, [userId, user]);
 
   useEffect(() => {
     console.log("socket connected", onlineUsers);
