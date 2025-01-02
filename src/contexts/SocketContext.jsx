@@ -37,6 +37,7 @@ export const SocketProvider = ({ children, userId }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [chatBarChange, setChatBarChange] = useState(null);
   const [chatDeleted, setChatDeleted] = useState(null);
+  const [chatLeaved, setChatLeaved] = useState(null);
   const [kickChat, setKickChat] = useState(null);
   const [typing, setTyping] = useState([]);
   const [micOff, setMicOff] = useState(null);
@@ -84,6 +85,10 @@ export const SocketProvider = ({ children, userId }) => {
       socket.off("user_online_status");
     };
   }, [socket, userId]);
+
+  const leaveChatEvent = (chatId) => {
+    setChatLeaved(chatId);
+  }
 
   const getChatMessage = async () => {
     try {
@@ -699,6 +704,8 @@ export const SocketProvider = ({ children, userId }) => {
         blockedChat,
         unBlockUserSocket,
         leaveGroupSocket,
+        chatLeaved,
+        leaveChatEvent
       }}
     >
       {children}

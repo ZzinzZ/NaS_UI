@@ -88,6 +88,7 @@ const ChatDrawer = ({
     blockUserSocket,
     unBlockUserSocket,
     leaveGroupSocket,
+    leaveChatEvent,
   } = useSocket();
   const router = useRouter();
   const theme = useTheme();
@@ -146,10 +147,13 @@ const ChatDrawer = ({
         userId: userId,
       });
       const recipient = groupMember?.filter(
-        (member) => member.userId?.profileId.userId !== user?._id
+        (member) => member.userId?._id !== user?._id
       );
       kickChatSocket(chat, userId, recipient);
-      setLisMember(response);
+      const updateMembers =  groupMember?.filter(
+        (member) => member.userId?._id !== userId
+      );
+      setLisMember(updateMembers);
     } catch (error) {
       toast.error(error.message || error || "Failed to remove member.");
     }
@@ -175,6 +179,7 @@ const ChatDrawer = ({
       const recipient = listMember?.filter(
         (member) => member.userId._id !== user._id
       );
+      leaveChatEvent(chat?._id);
       leaveGroupSocket(recipient, notify);
       toast.info("Leave chat successfully");
 
@@ -384,7 +389,7 @@ const ChatDrawer = ({
                 const otherUser = chat?.participants.find(
                   (participant) => participant?.userId._id !== user?._id
                 );
-                handleViewProfile(otherUser?.userId);
+                handleViewProfile(otherUser?.userId?._id);
               }}
             >
               View profile
@@ -465,7 +470,7 @@ const ChatDrawer = ({
                       justifyContent="space-between"
                       sx={{ width: "100%" }}
                     >
-                      <Stack direction="row" spacing={1} alignItems="center">
+                      <Stack direction="row" spacing={1} alignItems="center" onClick={() => handleViewProfile(member?.userId?._id)}>
                         <Avatar
                           src={
                             member?.userId?.profileId?.avatar?.content?.media[0]
