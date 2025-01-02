@@ -6,8 +6,8 @@ import Cookies from 'js-cookie';
 
 const ProtectedRoute = ({ children }) => {
   const router = useRouter();
-  const token = useSelector((state) => state.auth.token);
-  const user = useSelector((state) => state.auth.user);
+  const { token = null } = useSelector((state) => state.auth ?? {});
+  const { user = null } = useSelector((state) => state.auth ?? {});
 
   useEffect(() => {
     if (!token || !user) {
