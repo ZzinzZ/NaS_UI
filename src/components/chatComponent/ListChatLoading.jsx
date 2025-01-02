@@ -10,7 +10,7 @@ const ListChatLoading = () => {
       {arr.map((item, index) => (
         <Stack
           spacing={1}
-          sx={{ width: "18rem" }}
+          sx={{ width: "100%" }}
           direction="row"
           justifyContent="space-between"
           alignItems="center"
