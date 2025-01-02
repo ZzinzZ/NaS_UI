@@ -77,7 +77,8 @@ const ChatDrawer = ({
 
   const [otherParticipants, setOtherParticipants] = useState();
   const [groupMember, setGroupMember] = useState([]);
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const dispatch = useDispatch();
   const {
     deleteChatSocket,
@@ -85,7 +86,8 @@ const ChatDrawer = ({
     kickChatSocket,
     chatLibrary,
     blockUserSocket,
-    unBlockUserSocket
+    unBlockUserSocket,
+    leaveGroupSocket,
   } = useSocket();
   const router = useRouter();
   const theme = useTheme();
@@ -110,7 +112,7 @@ const ChatDrawer = ({
       }
       setOtherParticipants(
         response?.chat?.participants.find(
-          (participant) => participant.userId?.profileId?.userId !== user?._id
+          (participant) => participant.userId?._id !== user?._id
         )
       );
     } catch (error) {
@@ -164,6 +166,16 @@ const ChatDrawer = ({
         chatId: chat?._id,
         userId: user?._id,
       });
+      const message = `${user?.name} has left the ${chat?.name} chat`;
+      const notify = await createChatNotification({
+        userId: user._id,
+        message,
+        refChat: chat?._id,
+      });
+      const recipient = listMember?.filter(
+        (member) => member.userId._id !== user._id
+      );
+      leaveGroupSocket(recipient, notify);
       toast.info("Leave chat successfully");
 
       router.push("/user");
@@ -175,7 +187,7 @@ const ChatDrawer = ({
   const handleDeleteChat = async () => {
     try {
       const recipient = chat?.participants?.filter(
-        (participant) => participant?.userId?.profileId?.userId !== user._id
+        (participant) => participant?.userId?._id !== user._id
       );
       await deleteChat({
         chatId: chat?._id,
@@ -219,12 +231,16 @@ const ChatDrawer = ({
     try {
       await blockUser({
         blockerId: user?._id,
-        blockedId: otherParticipants?.userId?.profileId.userId,
+        blockedId: otherParticipants?.userId?._id,
       });
       setIsBlocked(true);
       const message = `${user?.name} has blocked you`;
-      const notify = await createChatNotification({userId: otherParticipants?.userId?._id, message, refChat:chat?._id})
-      blockUserSocket(chat?._id, otherParticipants?.userId?._id, notify );
+      const notify = await createChatNotification({
+        userId: otherParticipants?.userId?._id,
+        message,
+        refChat: chat?._id,
+      });
+      blockUserSocket(chat?._id, otherParticipants?.userId?._id, notify);
     } catch (error) {
       console.log(error);
     }
@@ -236,7 +252,8 @@ const ChatDrawer = ({
         unblockerId: user?._id,
         blockedId: otherParticipants?.userId?.profileId?.userId,
       });
-      unBlockUserSocket(chat?._id, otherParticipants?.userId?._id, notify );
+
+      unBlockUserSocket(chat?._id, otherParticipants?.userId?._id);
       setIsBlocked(false);
     } catch (error) {
       console.log(error);
@@ -290,7 +307,8 @@ const ChatDrawer = ({
             sx={{ width: 65, height: 65 }}
             src={
               chat?.type === "private"
-                ? otherParticipants?.userId?.profileId?.avatar?.content?.media[0].media_url
+                ? otherParticipants?.userId?.profileId?.avatar?.content
+                    ?.media[0].media_url
                 : chat?.avatar
             }
           />
@@ -335,9 +353,11 @@ const ChatDrawer = ({
                 ? chat?.chat_name
                 : otherParticipants?.userId?.profileId.userName}
             </Typography>
-            {chat?.type === "group" && <IconButton onClick={() => setUpdatingName(true)}>
-              <BorderColorIcon sx={{ fontSize: "1rem" }} />
-            </IconButton>}
+            {chat?.type === "group" && (
+              <IconButton onClick={() => setUpdatingName(true)}>
+                <BorderColorIcon sx={{ fontSize: "1rem" }} />
+              </IconButton>
+            )}
           </Stack>
         ) : (
           <Stack spacing={1}>
@@ -447,10 +467,15 @@ const ChatDrawer = ({
                     >
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Avatar
-                          src={member?.userId?.profileId?.avatar?.content?.media[0].media_url}
+                          src={
+                            member?.userId?.profileId?.avatar?.content?.media[0]
+                              .media_url
+                          }
                           sx={{ width: 20, height: 20 }}
                         />
-                        <Typography>{member?.userId?.profileId?.userName}</Typography>
+                        <Typography>
+                          {member?.userId?.profileId?.userName}
+                        </Typography>
                       </Stack>
 
                       {index !== 0 ? (
@@ -540,7 +565,7 @@ const ChatDrawer = ({
                         borderRadius: "8px", // Bo góc
                       }}
                       onClick={() => {
-                        dispatch(showImage(item))
+                        dispatch(showImage(item));
                       }}
                     />
                   </ImageListItem>

@@ -19,7 +19,8 @@ import { createGroupChat } from "@/utils/services/chatService/chatService";
 import { useSocket } from "@/contexts/SocketContext";
 
 const CreateGroupBoard = ({ open, handleClose, reloadChat }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const { createChatSocket } = useSocket();
   const [listFriend, setListFriend] = useState([]);
   const [selectedMember, setSelectedMember] = useState([]);
@@ -67,7 +68,7 @@ const CreateGroupBoard = ({ open, handleClose, reloadChat }) => {
   };
 
   useEffect(() => {
-    if(open) {
+    if (open) {
       getListFriend();
     }
   }, [open]);
@@ -215,7 +216,7 @@ const CreateGroupBoard = ({ open, handleClose, reloadChat }) => {
               variant="contained"
               fullWidth
               onClick={createGroup}
-              disabled={ selectedMember.length < 2}
+              disabled={selectedMember.length < 2}
             >
               Create
             </Button>

@@ -7,7 +7,8 @@ import PersonOffIcon from "@mui/icons-material/PersonOff";
 import FriendRequestItem from "./FriendRequestItem";
 
 const FriendRequestList = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const [listRequest, setListRequest] = useState([]);
 
   const getListRequest = async () => {
@@ -24,8 +25,17 @@ const FriendRequestList = () => {
   }, []);
 
   return (
-    <Stack sx={{ padding: "1.5rem", backgroundColor: "#f9f9f9", borderRadius: "0.8rem" }}>
-      <Typography variant="h6" sx={{ marginBottom: "1rem", color: "#333", fontWeight: "bold" }}>
+    <Stack
+      sx={{
+        padding: "1.5rem",
+        backgroundColor: "#f9f9f9",
+        borderRadius: "0.8rem",
+      }}
+    >
+      <Typography
+        variant="h6"
+        sx={{ marginBottom: "1rem", color: "#333", fontWeight: "bold" }}
+      >
         Friend Requests
       </Typography>
       <Stack
@@ -50,7 +60,12 @@ const FriendRequestList = () => {
             </Box>
           ))
         ) : (
-          <Stack spacing={1} alignItems="center" justifyContent="center" sx={{ color: "#aaa" }}>
+          <Stack
+            spacing={1}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ color: "#aaa" }}
+          >
             <PersonOffIcon sx={{ fontSize: "3rem", color: "#ddd" }} />
             <Typography variant="body1" sx={{ fontStyle: "italic" }}>
               No friend requests

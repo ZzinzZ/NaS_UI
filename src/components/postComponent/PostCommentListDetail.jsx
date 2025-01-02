@@ -34,7 +34,7 @@ const PostCommentListDetail = ({ open, handleClose, post, getPost }) => {
       disableScrollLock={true}
       PaperProps={{
         sx: {
-          width: "60vw",
+          width: "80vw",
           maxWidth: "none",
           height: "80vh",
         },

@@ -54,7 +54,8 @@ const PostItem = ({ profile, postItem, onDelete }) => {
   const [post, setPost] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const dispatch = useDispatch();
 
   const getPost = async () => {

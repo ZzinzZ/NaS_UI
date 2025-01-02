@@ -48,7 +48,8 @@ export const SocketProvider = ({ children, userId }) => {
   const [blockedChat, setBlockedChat] = useState(null);
 
   const chat = useSelector((state) => state.chat.chatData);
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
@@ -56,8 +57,8 @@ export const SocketProvider = ({ children, userId }) => {
 
     if (!socket) {
       const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_SERVER, {
-        transports: ["websocket"], 
-        withCredentials: true,  
+        transports: ["websocket"], // Đảm bảo chỉ dùng WebSocket
+        withCredentials: true, // Gửi cookie/session (nếu cần)
       });
       setSocket(newSocket);
 
@@ -66,6 +67,10 @@ export const SocketProvider = ({ children, userId }) => {
       };
     } else return;
   }, [userId]);
+
+  useEffect(() => {
+    console.log("socket connected", onlineUsers);
+  }, [onlineUsers]);
 
   useEffect(() => {
     if (socket === null) return;
@@ -87,7 +92,7 @@ export const SocketProvider = ({ children, userId }) => {
         userId: userId,
       });
       setMessages(response?.messages);
-      setHasMore(response?.hasMore)
+      setHasMore(response?.hasMore);
     } catch (error) {
       console.log(error);
     }
@@ -102,17 +107,17 @@ export const SocketProvider = ({ children, userId }) => {
           limit: 15,
           skip: messages.length,
         });
-        setMessages(prevMessages => [...response.messages,...prevMessages]);
-        setHasMore(response?.hasMore)
+        setMessages((prevMessages) => [...response.messages, ...prevMessages]);
+        setHasMore(response?.hasMore);
       } catch (error) {
         console.log(error);
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (user && chat) {
-      setMessages([])
+      setMessages([]);
       getChatMessage();
     }
   }, [chat, userId]);
@@ -121,7 +126,7 @@ export const SocketProvider = ({ children, userId }) => {
     if (!socket || !newMessage || !chat) return;
 
     const recipients = chat.participants?.filter(
-      (participant) => participant.userId !== userId
+      (participant) => participant.userId?._id !== userId
     );
     socket.emit("sendMessage", {
       message: { ...newMessage },
@@ -188,63 +193,67 @@ export const SocketProvider = ({ children, userId }) => {
     }
   };
 
-  const joinGroupSocket = async (userId, chat, recipient) => {
+  const joinGroupSocket = async (userId, recipient) => {
     if (!socket || !chat) return;
-    socket.emit("joinGroup", { chat, recipient, userId });
+    socket.emit("joinGroup", { recipient, userId });
   };
 
-  const typingSocket = (user,chatId, recipient) => {
-    if (!socket ||!recipient) return;
-    socket.emit("typing", { user,chatId, recipient });
-  }
+  const leaveGroupSocket = async (chat, recipient, notify) => {
+    if (!socket || !chat) return;
+    socket.emit("leaveGroup", { chat, recipient, notify });
+  };
 
-  const stopTypingSocket = (user,chatId, recipient) => {
-    if (!socket ||!recipient) return;
+  const typingSocket = (user, chatId, recipient) => {
+    if (!socket || !recipient) return;
+    socket.emit("typing", { user, chatId, recipient });
+  };
+
+  const stopTypingSocket = (user, chatId, recipient) => {
+    if (!socket || !recipient) return;
     socket.emit("stopTyping", { user, chatId, recipient });
-  }
+  };
 
   const blockUserSocket = (chatId, recipient, notify) => {
-    if (!socket ||!recipient) return;
+    if (!socket || !recipient) return;
     socket.emit("blockUser", { chatId, recipient, notify });
-  }
+  };
 
-  const unBlockUserSocket = (chatId, recipient, notify) => {
-    if (!socket ||!recipient) return;
-    socket.emit("unblockUser", { chatId, recipient, notify });
-  }
+  const unBlockUserSocket = (chatId, recipient) => {
+    if (!socket || !recipient) return;
+    socket.emit("unblockUser", { chatId, recipient });
+  };
 
   const micOffSocket = (user, recipient) => {
-    if (!socket ||!recipient) return;
+    if (!socket || !recipient) return;
     socket.emit("micOff", { user, recipient });
-  }
+  };
   const micOnSocket = (user, recipient) => {
-    if (!socket ||!recipient) return;
+    if (!socket || !recipient) return;
     socket.emit("micOn", { user, recipient });
-  }
+  };
   const cameraOffSocket = (user, recipient) => {
-    if (!socket ||!recipient) return;
+    if (!socket || !recipient) return;
     socket.emit("cameraOff", { user, recipient });
-  }
+  };
   const cameraOnSocket = (user, recipient) => {
-    if (!socket||!recipient) return;
+    if (!socket || !recipient) return;
     socket.emit("cameraOn", { user, recipient });
-  }
+  };
 
   const sendFriendRequestSocket = async (userId, notify) => {
-    if (!socket ||!userId) return;
-    socket.emit("sendFriendRequest", {userId, notify});
-  }
+    if (!socket || !userId) return;
+    socket.emit("sendFriendRequest", { userId, notify });
+  };
 
   const acceptFriendRequestSocket = async (userId, notify) => {
-    if (!socket ||!userId) return;
-    socket.emit("acceptFriendRequest", {userId, notify});
-  }
+    if (!socket || !userId) return;
+    socket.emit("acceptFriendRequest", { userId, notify });
+  };
 
   const rejectFriendRequestSocket = async (userId, notify) => {
-    if (!socket ||!userId) return;
-    socket.emit("rejectFriendRequest", {userId, notify});
-  }
-
+    if (!socket || !userId) return;
+    socket.emit("rejectFriendRequest", { userId, notify });
+  };
 
   const receiveSocketJoinGroup = async ({ chat, userId }) => {
     if (userId?.some((u) => u === user?._id)) {
@@ -270,7 +279,7 @@ export const SocketProvider = ({ children, userId }) => {
   const reactMessageSocket = () => {
     if (!socket || !chat) return;
     const recipients = chat.participants?.filter(
-      (participant) => participant.userId !== userId
+      (participant) => participant.userId?._id !== userId
     );
     socket.emit("reactMessage", {
       message: { ...reactedMessage },
@@ -283,7 +292,7 @@ export const SocketProvider = ({ children, userId }) => {
       await markAsRead({ messageId: message?._id, userId });
 
       const recipients = chat?.participants?.filter(
-        (participant) => participant.userId !== userId
+        (participant) => participant.userId._id !== userId
       );
       socket.emit("readMessage", { message, recipients });
     },
@@ -350,32 +359,27 @@ export const SocketProvider = ({ children, userId }) => {
     }
   );
 
-  const handleSendHello = useCallback(
-    async (
-      senderId,
+  const handleSendHello = useCallback(async (senderId, chatId) => {
+    const tempMessage = {
+      sender_id: senderId,
       chatId,
-    ) => {
-      const tempMessage = {
-        sender_id: senderId,
-        chatId,
-        content: {
-          text: "Hello 🙌",
-        },
-      };
-      setMessages((prev) => [...prev, tempMessage]);
-
-      const response = await sendMessage({
-        senderId: senderId,
-        chatId: chatId,
+      content: {
         text: "Hello 🙌",
-      });
+      },
+    };
+    setMessages((prev) => [...prev, tempMessage]);
 
-      setMessages((prev) =>
-        prev.map((msg) => (msg === tempMessage ? response : msg))
-      );
-      setNewMessage(response);
-    }
-  );
+    const response = await sendMessage({
+      senderId: senderId,
+      chatId: chatId,
+      text: "Hello 🙌",
+    });
+
+    setMessages((prev) =>
+      prev.map((msg) => (msg === tempMessage ? response : msg))
+    );
+    setNewMessage(response);
+  });
 
   const handleSendFile = useCallback(async (senderId, chatId, files) => {
     const tempMessage = {
@@ -461,7 +465,7 @@ export const SocketProvider = ({ children, userId }) => {
           prev.map((msg) => (msg._id === messageId ? response : msg))
         );
         const recipients = chat?.participants?.filter(
-          (participant) => participant.userId !== userId
+          (participant) => participant.userId?._id !== userId
         );
         socket.emit("removeMessage", { message: response, recipients });
       } catch (error) {
@@ -472,20 +476,22 @@ export const SocketProvider = ({ children, userId }) => {
   );
 
   useEffect(() => {
-    const listUnread = notifications?.filter(notification => !notification?.seen);
-    setCountUnreadNotifications(listUnread?.length)
-  },[notifications]);
+    const listUnread = notifications?.filter(
+      (notification) => !notification?.seen
+    );
+    setCountUnreadNotifications(listUnread?.length);
+  }, [notifications]);
 
   useEffect(() => {
-    const images = messages?.flatMap((message) =>
-      message?.content?.image || []
+    const images = messages?.flatMap(
+      (message) => message?.content?.image || []
     );
     setChatLibrary(images);
-  },[messages]);
-  
+  }, [messages]);
 
   useEffect(() => {
     if (socket === null) console.log("socket is null");
+
     socket?.on("receiveMessage", (message) => {
       if (chat?._id !== message?.chat_id) {
         setReceiveMessage((prev) => prev + 1);
@@ -518,6 +524,10 @@ export const SocketProvider = ({ children, userId }) => {
       receiveSocketJoinGroup({ chat, userId });
     });
 
+    socket?.on("groupLeft", ({ notify }) => {
+      setNotifications((prev) => [notify, ...prev]);
+    });
+
     socket?.on("receiveRead", (message) => {
       if (chat?._id !== message?.chat_id) return;
 
@@ -533,23 +543,24 @@ export const SocketProvider = ({ children, userId }) => {
     });
 
     socket?.on("receiveFriendRequest", (notify) => {
-      setNotifications((prev) => [notify,...prev])
+      setNotifications((prev) => [notify, ...prev]);
     });
 
     socket?.on("receiveFriendAccept", (notify) => {
-      setNotifications((prev) => [notify,...prev])
+      setNotifications((prev) => [notify, ...prev]);
     });
 
     socket?.on("receiveFriendReject", (notify) => {
-      setNotifications((prev) => [notify,...prev])
+      setNotifications((prev) => [notify, ...prev]);
     });
 
     socket?.on("receiveTyping", (res) => {
       setTyping((prev) => {
         const existingIndex = prev.findIndex(
-          (item) => item.user?._id === res.user?._id && item.chatId === res.chatId
+          (item) =>
+            item.user?._id === res.user?._id && item.chatId === res.chatId
         );
-        
+
         if (existingIndex !== -1) {
           const updatedTyping = [...prev];
           updatedTyping.splice(existingIndex, 1);
@@ -562,28 +573,30 @@ export const SocketProvider = ({ children, userId }) => {
 
     socket?.on("receiveStopTyping", (res) => {
       const { user, chatId } = res;
-    
+
       setTyping((prevTyping) =>
-        prevTyping.filter((t) => !(t.user?._id === user._id && t.chatId === chatId))
+        prevTyping.filter(
+          (t) => !(t.user?._id === user._id && t.chatId === chatId)
+        )
       );
     });
 
     socket?.on("receiveBlocked", (res) => {
-      const {chatId, notify} = res;
-      setNotifications((prev) => [notify,...prev])
+      const { chatId, notify } = res;
+      setNotifications((prev) => [notify, ...prev]);
       setBlockedChat(chatId);
-    } )
+    });
 
     socket?.on("receiveUnblocked", (chatId) => {
       setBlockedChat(null);
-    })
+    });
 
     socket?.on("receiveMicOff", (user) => {
       setMicOff(user);
-    })
+    });
     socket?.on("receiveMicOn", (user) => {
       setMicOff(null);
-    })
+    });
 
     socket?.on("receiveCameraOff", (user) => {
       setCameraOff(user);
@@ -591,7 +604,6 @@ export const SocketProvider = ({ children, userId }) => {
     socket?.on("receiveCameraOn", (user) => {
       setCameraOff(null);
     });
-
 
     return () => {
       socket?.off("receiveMessage");
@@ -612,7 +624,6 @@ export const SocketProvider = ({ children, userId }) => {
       socket?.off("receiveCameraOn");
       socket?.off("receiveBlocked");
       socket?.off("receiveUnblocked");
-
     };
   }, [socket, chat]);
 
@@ -686,7 +697,8 @@ export const SocketProvider = ({ children, userId }) => {
         hasMore,
         blockUserSocket,
         blockedChat,
-        unBlockUserSocket
+        unBlockUserSocket,
+        leaveGroupSocket,
       }}
     >
       {children}

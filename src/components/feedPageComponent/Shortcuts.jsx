@@ -1,5 +1,8 @@
 "use client";
-import { findChatByParticipants, getGroupChats } from "@/utils/services/chatService/chatService";
+import {
+  findChatByParticipants,
+  getGroupChats,
+} from "@/utils/services/chatService/chatService";
 import {
   getListFriendShortcuts,
   getSuggestedProfiles,
@@ -15,7 +18,8 @@ const Shortcuts = () => {
   const [friendList, setFriendList] = useState([]);
   const [noFriendList, setNoFriendList] = useState([]);
   const [suggestList, setSuggestList] = useState([]);
-  const { user } = useSelector((state) => state.auth);
+  const { user = null } = useSelector((state) => state.auth ?? {});
+
   const router = useRouter();
   const handleGetGroupList = async () => {
     const list = await getGroupChats({ userId: user._id });
@@ -37,7 +41,7 @@ const Shortcuts = () => {
 
   const handleNavigateToGroupChat = (chatId) => {
     router.push(`/user?chat-id=${chatId}`);
-  }
+  };
 
   const handleGoToChat = async (userId) => {
     if (!user?._id || !userId) {
@@ -59,8 +63,8 @@ const Shortcuts = () => {
   };
 
   const handleNavigateToProfile = (userId) => {
-    router.push(`/user/profile?id=${userId}`)
-  }
+    router.push(`/user/profile?id=${userId}`);
+  };
 
   useEffect(() => {
     handleGetGroupList();
@@ -78,14 +82,14 @@ const Shortcuts = () => {
         borderRadius: "0.5rem",
         width: "100%",
         boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-        display:{sm: "none", md:"block", xs:"none"},
+        display: { sm: "none", md: "block", xs: "none" },
         height: "100vh",
-          overflowY: "scroll",
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
+        overflowY: "scroll",
+        "&::-webkit-scrollbar": {
+          display: "none",
+        },
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
       }}
     >
       <Stack sx={{ backgroundColor: "#fff", width: "100%", height: "100%" }}>
@@ -114,84 +118,78 @@ const Shortcuts = () => {
           </Stack>
         ) : null}
         <Stack>
-          {
-            groupList?.length > 0? (
-              <Stack>
-                <Typography variant="h6">Groups</Typography>
-                {groupList?.map((group) => (
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    sx={{
-                      padding: "1rem",
-                      borderRadius: "1rem",
-                      cursor: "pointer",
-                      transition: "background-color 0.2s ease-in-out",
-                      "&:hover": { backgroundColor: "#f2f2f2" },
-                    }}
-                    key={group?._id}
-                    onClick={() => handleNavigateToGroupChat(group?._id)}
-                  >
-                    <Avatar src={group?.avatar} />
-                    <Typography>{group?.chat_name}</Typography>
-                  </Stack>
-                ))}
-              </Stack>
-            ) : null
-          }
-          {
-            noFriendList?.length > 0? (
-              <Stack>
-                <Typography variant="h6">Suggested Connections</Typography>
-                {noFriendList?.map((friend) => (
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    sx={{
-                      padding: "1rem",
-                      borderRadius: "1rem",
-                      cursor: "pointer",
-                      transition: "background-color 0.2s ease-in-out",
-                      "&:hover": { backgroundColor: "#f2f2f2" },
-                    }}
-                    key={friend?.userId}
-                    onClick={() => handleNavigateToProfile(friend?.userId)}
-                  >
-                    <Avatar src={friend?.avatar?.content?.media[0]?.media_url} />
-                    <Typography>{friend?.userName}</Typography>
-                  </Stack>
-                ))}
-              </Stack>
-            ) : null
-          }
-          {
-            suggestList?.length > 0? (
-              <Stack>
-                <Typography variant="h6">Mutual Friends</Typography>
-                {suggestList?.map((friend) => (
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    sx={{
-                      padding: "1rem",
-                      borderRadius: "1rem",
-                      cursor: "pointer",
-                      transition: "background-color 0.2s ease-in-out",
-                      "&:hover": { backgroundColor: "#f2f2f2" },
-                    }}
-                    key={friend?.userId}
-                    onClick={() => handleNavigateToProfile(friend?.userId)}
-                  >
-                    <Avatar src={friend?.avatar?.content?.media[0]?.media_url} />
-                    <Typography>{friend?.userName}</Typography>
-                  </Stack>
-                ))}
-              </Stack>
-            ) : null
-          }
+          {groupList?.length > 0 ? (
+            <Stack>
+              <Typography variant="h6">Groups</Typography>
+              {groupList?.map((group) => (
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  sx={{
+                    padding: "1rem",
+                    borderRadius: "1rem",
+                    cursor: "pointer",
+                    transition: "background-color 0.2s ease-in-out",
+                    "&:hover": { backgroundColor: "#f2f2f2" },
+                  }}
+                  key={group?._id}
+                  onClick={() => handleNavigateToGroupChat(group?._id)}
+                >
+                  <Avatar src={group?.avatar} />
+                  <Typography>{group?.chat_name}</Typography>
+                </Stack>
+              ))}
+            </Stack>
+          ) : null}
+          {noFriendList?.length > 0 ? (
+            <Stack>
+              <Typography variant="h6">Suggested Connections</Typography>
+              {noFriendList?.map((friend) => (
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  sx={{
+                    padding: "1rem",
+                    borderRadius: "1rem",
+                    cursor: "pointer",
+                    transition: "background-color 0.2s ease-in-out",
+                    "&:hover": { backgroundColor: "#f2f2f2" },
+                  }}
+                  key={friend?.userId}
+                  onClick={() => handleNavigateToProfile(friend?.userId)}
+                >
+                  <Avatar src={friend?.avatar?.content?.media[0]?.media_url} />
+                  <Typography>{friend?.userName}</Typography>
+                </Stack>
+              ))}
+            </Stack>
+          ) : null}
+          {suggestList?.length > 0 ? (
+            <Stack>
+              <Typography variant="h6">Mutual Friends</Typography>
+              {suggestList?.map((friend) => (
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  sx={{
+                    padding: "1rem",
+                    borderRadius: "1rem",
+                    cursor: "pointer",
+                    transition: "background-color 0.2s ease-in-out",
+                    "&:hover": { backgroundColor: "#f2f2f2" },
+                  }}
+                  key={friend?.userId}
+                  onClick={() => handleNavigateToProfile(friend?.userId)}
+                >
+                  <Avatar src={friend?.avatar?.content?.media[0]?.media_url} />
+                  <Typography>{friend?.userName}</Typography>
+                </Stack>
+              ))}
+            </Stack>
+          ) : null}
         </Stack>
       </Stack>
     </Box>
