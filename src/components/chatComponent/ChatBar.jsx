@@ -21,6 +21,7 @@ import CreateGroupBoard from "./CreateGroupBoard";
 import ListChatLoading from "./ListChatLoading";
 import useDebounce from "@/customHooks/useDebounce";
 import { useSocket } from "@/contexts/SocketContext";
+import CommentsDisabledIcon from "@mui/icons-material/CommentsDisabled";
 import { memo } from "react";
 
 const ChatBar = ({ setIsDeleteMessages }) => {
@@ -240,7 +241,12 @@ const ChatBar = ({ setIsDeleteMessages }) => {
               </Box>
             ))
           ) : (
-            <Typography>No conversation available</Typography>
+            <Stack sx={{width:"100%"}} spacing={1} alignItems="center" justifyContent="center">
+              <CommentsDisabledIcon sx={{ fontSize: "3rem", color: "#ddd" }} />
+              <Typography variant="body1" sx={{ fontStyle: "italic" }}>
+                No conversations available
+              </Typography>
+            </Stack>
           )}
         </Stack>
       </Box>
