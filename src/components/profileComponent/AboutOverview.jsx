@@ -473,9 +473,7 @@ const EducationSection = React.memo(
                           {edu.school}
                         </Typography>
                       </Stack>
-                      <Typography className="note-small-text">
-                        Start at {edu.from}
-                      </Typography>
+                    
                     </Stack>
                   </Stack>
                   {!isOtherProfile ? (
