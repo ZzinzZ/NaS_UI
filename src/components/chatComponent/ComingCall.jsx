@@ -86,12 +86,12 @@ const ComingCall = () => {
       }
     };
     getCallerProfile();
-    if (incomingCall?.isVideoCall) {
+    if (incomingCall?.isVideoCall || currentCall?.isVideoCall) {
       setCallType("video");
     } else {
       setCallType("audio");
     }
-  }, [incomingCall]);
+  }, [incomingCall, currentCall]);
 
   const handleRejectCall = async () => {
     if (ringtoneRef.current) {

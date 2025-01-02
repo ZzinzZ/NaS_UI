@@ -23,6 +23,11 @@ const RelationshipForm = ({ initialData, onSave, onCancel }) => {
           onChange={(e) => setType(e.target.value)}
           label="Type of Relationship"
           required
+          MenuProps= {
+            {
+              disableScrollLock: true,
+            }
+          }
         >
           <MenuItem value="single">Single</MenuItem>
           <MenuItem value="married">Married</MenuItem>

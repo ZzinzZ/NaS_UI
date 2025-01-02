@@ -111,8 +111,13 @@ const Conversation = ({ isDeleteMessages }) => {
       if (
         !chat?.participants.some(
           (participant) => participant?.userId?._id === user?._id
+        ) &&
+        !chat?.participants.some(
+          (participant) => participant?.userId === user?._id
         )
       ) {
+        
+        console.log(chat);
         router.push("/user");
       }
     }
@@ -296,7 +301,6 @@ const Conversation = ({ isDeleteMessages }) => {
     <Box
       sx={{
         width: "100%",
-        marginTop: { md: 0, xs: "3rem", sm: "3rem" },
       }}
     >
       <Stack
@@ -451,11 +455,7 @@ const Conversation = ({ isDeleteMessages }) => {
                 marginBottom: "1rem",
               }}
             >
-              <Button
-                onClick={handleLoadMore}
-                disabled={!hasMore}
-                
-              >
+              <Button onClick={handleLoadMore} disabled={!hasMore}>
                 Load More
               </Button>
             </Box>

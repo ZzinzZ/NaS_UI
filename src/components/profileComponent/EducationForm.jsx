@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -14,7 +14,10 @@ import {
 } from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
 import LockIcon from "@mui/icons-material/Lock";
-import { addProfileEducation, editProfileEducation } from "@/utils/services/profileService/profileDetails";
+import {
+  addProfileEducation,
+  editProfileEducation,
+} from "@/utils/services/profileService/profileDetails";
 import { useSearchParams } from "next/navigation";
 
 const EducationForm = ({ initialData, onSave, onCancel }) => {
@@ -112,7 +115,9 @@ const EducationForm = ({ initialData, onSave, onCancel }) => {
         required
       />
       <FormControlLabel
-        control={<Checkbox checked={isCurrent} onChange={handleCheckboxChange} />}
+        control={
+          <Checkbox checked={isCurrent} onChange={handleCheckboxChange} />
+        }
         label="Currently Studying"
       />
       <Stack direction="row" spacing={2}>
@@ -153,6 +158,9 @@ const EducationForm = ({ initialData, onSave, onCancel }) => {
                   status: e.target.value,
                 }))
               }
+              MenuProps={{
+                disableScrollLock: true,
+              }}
             >
               <MenuItem value={true}>
                 <Stack direction="row" alignItems="center" spacing={1}>
