@@ -30,7 +30,6 @@ const SearchResultItem = ({ profile }) => {
   const { user = null } = useSelector((state) => state.auth ?? {});
 
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.profile);
   const [isFriend, setIsFriend] = useState(false);
   const [isSentRequest, setIsSentRequested] = useState(false);
   const [isReceivedRequest, setIsReceivedRequest] = useState(false);

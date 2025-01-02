@@ -36,7 +36,7 @@ const CommentBar = ({ post, comment, getPost }) => {
   const { top, bottom } = useComponentPosition(ref);
   const { user = null } = useSelector((state) => state.auth ?? {});
 
-  const { profileData } = useSelector((state) => state.profile);
+  const { profileData = null } = useSelector((state) => state.profile ?? {});
 
   const shouldDisplayAbove = bottom > window.innerHeight / 2;
 
