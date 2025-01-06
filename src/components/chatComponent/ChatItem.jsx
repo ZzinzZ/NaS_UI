@@ -13,7 +13,6 @@ import ActiveAvatar from "./ActiveAvatar";
 import { useSearchParams } from "next/navigation";
 import { useSocket } from "@/contexts/SocketContext";
 import { useSelector } from "react-redux";
-import { getChatDetails } from "@/utils/services/chatService/chatService";
 import ChatItemLoading from "./ChatItemLoading";
 import GroupsIcon from "@mui/icons-material/Groups";
 import {
@@ -27,6 +26,7 @@ const ChatItem = ({
   setIsReadMessage,
   setIsDeleteMessages,
   onDeleteChatMessages,
+  
 }) => {
   const [isCurrent, setIsCurrent] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -40,7 +40,7 @@ const ChatItem = ({
   const chatId = searchParams.get("chat-id");
   const { user = null } = useSelector((state) => state.auth ?? {});
 
-  const { onlineUsers, messages, newMessage } = useSocket();
+  const { onlineUsers, messages, newMessage ,setChat} = useSocket();
 
   useEffect(() => {
     if (chat.type === "group") {
@@ -79,6 +79,11 @@ const ChatItem = ({
       console.log(error);
     }
   }, [chat._id, user._id]);
+
+  const handleSelectChat = () => {
+    setChat(chat);
+    setIsCurrent(true);
+  }
 
   useEffect(() => {
     const fetchUnreadCount = async () => {
@@ -178,6 +183,7 @@ const ChatItem = ({
           backgroundColor: "#EDEDED !important",
         },
       }}
+      onClick={handleSelectChat}
     >
       {loadingChat ? (
         <ChatItemLoading />

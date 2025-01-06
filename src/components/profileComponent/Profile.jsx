@@ -35,9 +35,6 @@ const Profile = () => {
   const [isOtherProfile, setIsOtherProfile] = useState(false);
   const { user, token } = useSelector((state) => state.auth);
   const [posts, setPosts] = useState([]);
-  const { profileData} = useSelector(
-    (state) => state.profile
-  );
 
   // Xử lý chuyển tab
   useEffect(() => {
@@ -217,6 +214,7 @@ const Profile = () => {
             profile={profile}
             user={user}
             isOtherProfile={isOtherProfile}
+            setProfile={setProfile}
           />
         )}
         {profile && isFriendTab && <ProfileFriend listFriend={listFriend} />}

@@ -8,7 +8,7 @@ import {
   putRequest,
 } from "../requestService";
 
-export const getUserProfile = async ({userId}) => {
+export const getUserProfile = async ({ userId }) => {
   try {
     const response = await getRequest(
       `${baseUrl}/profiles/find_by_userId/${userId}`
@@ -17,9 +17,21 @@ export const getUserProfile = async ({userId}) => {
   } catch (error) {
     // toast.error(error.response.data.message);
     console.error(error);
-    
   }
-} 
+};
+
+export const updateUserName = async ({ userId, userName }) => {
+  try {
+    const response = await putRequest(
+      `${baseUrl}/profiles/update_name/${userId}`,
+      { userName }
+    );
+    return response.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+    console.error(error);
+  }
+};
 
 export const addProfileExperience = async ({
   userId,

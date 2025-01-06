@@ -7,7 +7,7 @@ import { logout } from '@/redux/slices/AuthSlice';
 // Tạo một instance axios mới
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
-  timeout: 10000,
+  timeout: 15000,
 });
 
 apiClient.interceptors.request.use(

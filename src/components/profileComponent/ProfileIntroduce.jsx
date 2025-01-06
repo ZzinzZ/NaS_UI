@@ -1,13 +1,18 @@
 "use client";
-import { Avatar, Box, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, IconButton, Stack, TextField, Typography } from "@mui/material";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 import EditProfileForm from "./EditProfileForm";
 import IntroductionDetailsInfor from "./IntroductionDetailsInfor";
 import React, { useState } from "react";
 import moment from "moment"; // Import moment
+import { updateUserName } from "@/utils/services/profileService/profileDetails";
 
-const ProfileIntroduce = ({ profile, isOtherProfile }) => {
+const ProfileIntroduce = ({ profile, isOtherProfile, setProfile }) => {
   const [openForm, setOpenForm] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(profile.userName);
 
   const formattedBirthday = profile.birthday
     ? moment(profile.birthday).format("DD/MM/YYYY")
@@ -20,6 +25,19 @@ const ProfileIntroduce = ({ profile, isOtherProfile }) => {
     setOpenForm(false);
   };
 
+  const handleEditName = () => {
+    setIsEditingName(true);
+  };
+  const handleSaveName = async () => {
+    await updateUserName({userId:profile?.userId, userName: editedName})
+    setProfile({ ...profile, userName: editedName });
+    setIsEditingName(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditedName(profile.userName);
+    setIsEditingName(false);
+  };
   return (
     <Box
       sx={{
@@ -44,7 +62,38 @@ const ProfileIntroduce = ({ profile, isOtherProfile }) => {
             src={profile?.avatar?.content.media[0].media_url}
             sx={{ width: 150, height: 150, border: "3px solid white" }}
           />
-          <Typography sx={{ fontWeight: "600" }}>{profile.userName}</Typography>
+          {isEditingName ? (
+            <Stack   spacing={1}>
+              <TextField
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                size="small"
+              />
+              <Stack>
+              <Button
+                onClick={handleSaveName}
+              >
+                Save
+                <CheckIcon sx={{ color: "green" }} />
+              </Button>
+              <Button
+                onClick={handleCancelEdit}
+              >
+                Cancel
+                <ClearIcon sx={{ color: "red" }} />
+              </Button>
+              </Stack>
+            </Stack>
+          ) : (
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography sx={{ fontWeight: "600" }}>{profile.userName}</Typography>
+              {!isOtherProfile && (
+                <IconButton onClick={handleEditName} size="small">
+                  <BorderColorIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Stack>
+          )}
           <Typography>Birthday: {formattedBirthday}</Typography>
         </Stack>
         <hr />

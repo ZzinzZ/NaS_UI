@@ -34,7 +34,7 @@ const ChatBar = ({ setIsDeleteMessages }) => {
   const [isReadMessage, setIsReadMessage] = useState(false);
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText, 300);
-  const { chatBarChange, newMessage, receiveMessage, chatDeleted, chatLeaved } =
+  const { chatBarChange, newMessage, receiveMessage, chatDeleted, chatLeaved, updateChat } =
     useSocket();
 
   const getUserChat = async () => {
@@ -46,6 +46,7 @@ const ChatBar = ({ setIsDeleteMessages }) => {
       console.log(error);
     }
   };
+
 
   const handleDeleteChatMessages = useCallback((chatId) => {
     setChats((prevChats) => prevChats.filter((chat) => chat._id !== chatId));
@@ -69,7 +70,6 @@ const ChatBar = ({ setIsDeleteMessages }) => {
 
   useEffect(() => {
     if(chatLeaved !== null) {
-      console.log("chat left", chatLeaved);
       
       setChats(chats?.filter(chat => chat?._id !== chatLeaved))
     }
@@ -120,6 +120,13 @@ const ChatBar = ({ setIsDeleteMessages }) => {
       );
     }
   }, [chatDeleted]);
+
+  useEffect(() => {
+    if(updateChat !== null) {
+      const filteredChats = chats?.filter((chat) => chat._id !== updateChat?._id);
+      setChats([updateChat,...filteredChats]);
+    }
+  },[updateChat])
 
   return (
     <Box

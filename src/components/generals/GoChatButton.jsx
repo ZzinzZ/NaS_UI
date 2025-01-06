@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import ChatIcon from "@mui/icons-material/Chat";
 import React from "react";
 import { useSelector } from "react-redux";
+import { useSocket } from "@/contexts/SocketContext";
 
 const GoChatButton = ({ userId }) => {
   const { user = null } = useSelector((state) => state.auth ?? {});
-
+  const {setChat} = useSocket();
   const router = useRouter();
 
   const handleGoToChat = async () => {
@@ -23,6 +24,7 @@ const GoChatButton = ({ userId }) => {
         participantId: userId,
       });
       if (chat) {
+        setChat(chat);
         router.push(`/user?chat-id=${chat?._id}`);
       }
     } catch (error) {

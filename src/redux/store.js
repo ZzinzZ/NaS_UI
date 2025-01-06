@@ -37,7 +37,7 @@ const store = configureStore({
           'persist/REHYDRATE',
           'persist/REGISTER',
         ],
-        ignoredPaths: ['register.timestamp'], // Nếu có các path cần bỏ qua
+        ignoredPaths: ['register.timestamp'], 
       },
     }),
 })
