@@ -1,4 +1,5 @@
 "use client";
+import { useSocket } from "@/contexts/SocketContext";
 import {
   findChatByParticipants,
   getGroupChats,
@@ -19,6 +20,7 @@ const Shortcuts = () => {
   const [noFriendList, setNoFriendList] = useState([]);
   const [suggestList, setSuggestList] = useState([]);
   const { user = null } = useSelector((state) => state.auth ?? {});
+  const {setChat} = useSocket();
 
   const router = useRouter();
   const handleGetGroupList = async () => {
@@ -55,6 +57,7 @@ const Shortcuts = () => {
         participantId: userId,
       });
       if (chat) {
+        setChat(chat)
         router.push(`/user?chat-id=${chat?._id}`);
       }
     } catch (error) {

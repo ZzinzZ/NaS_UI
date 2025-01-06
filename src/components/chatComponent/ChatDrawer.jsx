@@ -33,6 +33,7 @@ import {
   leaveChat,
   removeGroupMember,
   updateChatAvatar,
+  updateChatBackground,
   updateChatName,
 } from "@/utils/services/chatService/chatService";
 import VisuallyHiddenInput from "../generals/VisuallyHiddenInput";
@@ -74,6 +75,7 @@ const ChatDrawer = ({
   const [showMember, setShowMember] = useState(false);
   const [showLibrary, setShowLibrary] = useState(false);
   const [newChatName, setNewChatName] = useState("");
+  const [selectedBackground, setSelectedBackground] = useState(chat?.background || null);
 
   const [otherParticipants, setOtherParticipants] = useState();
   const [groupMember, setGroupMember] = useState([]);
@@ -89,6 +91,8 @@ const ChatDrawer = ({
     unBlockUserSocket,
     leaveGroupSocket,
     leaveChatEvent,
+    updateChat,
+    setUpdateChat
   } = useSocket();
   const router = useRouter();
   const theme = useTheme();
@@ -104,20 +108,32 @@ const ChatDrawer = ({
     router.push(`/user/profile?id=${userId}`);
   };
 
-  const chatDetails = async () => {
-    try {
-      const response = await getChatDetails({ chatId: chat?._id });
-      setLisMember(response?.chat?.participants || []);
-      if (response.chat.type === "group") {
-        setGroupMember(response.chat.participants);
+  const chatDetails = () => {
+      setLisMember(chat?.participants || []);
+      if (chat.type === "group") {
+        setGroupMember(chat.participants);
       }
       setOtherParticipants(
-        response?.chat?.participants.find(
+        chat?.participants.find(
           (participant) => participant.userId?._id !== user?._id
         )
       );
+      setSelectedBackground(chat?.background)
+  };
+
+  const handleBackgroundUpdate = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const updatedChat = await updateChatBackground({ chatId: chat?._id, background: file });
+      setSelectedBackground(updatedChat?.background);
+      onUpdate(updatedChat);
+      setUpdateChat(updatedChat);
     } catch (error) {
       console.log(error);
+      
+      toast.error("Failed to update chat background", error);
     }
   };
 
@@ -131,7 +147,8 @@ const ChatDrawer = ({
         chatId: chat?._id,
         chatName: newChatName,
       });
-      console.log("Chat name updated", response);
+
+      setUpdateChat(response)
       
       onUpdate(response);
       setUpdatingName(false);
@@ -223,6 +240,7 @@ const ChatDrawer = ({
           avatar: file,
         });
         onUpdate(response);
+        setUpdateChat(response);
       } else {
         toast.error("Please select a valid image");
       }
@@ -269,6 +287,7 @@ const ChatDrawer = ({
   useEffect(() => {
     if (chat) {
       chatDetails();
+
     }
   }, [chat]);
   return (
@@ -381,6 +400,26 @@ const ChatDrawer = ({
             </Stack>
           </Stack>
         )}
+        <Stack sx={{ width: "100%" }}>
+        <Typography sx={{ fontWeight: "500", color: "#686b68", fontSize: "0.8rem", mb: 1 }}>
+          Chat Background
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+          {selectedBackground && (
+            <Image
+              src={selectedBackground}
+              alt="Chat background"
+              width={200}
+              height={100}
+              style={{ objectFit: "cover", borderRadius: "8px" }}
+            />
+          )}
+          <Button fullWidth variant="contained" component="label">
+            Change Background
+            <input type="file" hidden accept="image/*" onChange={handleBackgroundUpdate} />
+          </Button>
+        </Box>
+      </Stack>
         {chat?.type === "private" && (
           <Stack spacing={1} sx={{ width: "100%" }}>
             <Button
@@ -395,6 +434,7 @@ const ChatDrawer = ({
             >
               View profile
             </Button>
+            
             {isBlocked ? (
               <Button
                 fullWidth

@@ -7,9 +7,11 @@ import React from "react";
 import { USER_AVATAR_ORIGINAL } from "@/config/profileConfig";
 import { useSelector } from "react-redux";
 import { findChatByParticipants } from "@/utils/services/chatService/chatService";
+import { useSocket } from "@/contexts/SocketContext";
 
 const FriendOverView = ({ profile }) => {
   const {user} = useSelector((state) => state.auth)
+  const {setChat} = useSocket();
   const router = useRouter();
   const handleViewProfile = () => {
     router.push(`/user/profile?id=${profile?.userId}`);
@@ -27,6 +29,7 @@ const FriendOverView = ({ profile }) => {
         participantId: profile?.userId,
       });
       if (chat) {
+        setChat(chat);
         router.push(`/user?chat-id=${chat?._id}`);
       }
     } catch (error) {

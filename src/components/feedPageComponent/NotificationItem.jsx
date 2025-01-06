@@ -11,7 +11,7 @@ import { useSocket } from "@/contexts/SocketContext";
 
 const NotificationItem = ({ notify }) => {
   const router = useRouter();
-  const {setNotifications} = useSocket();
+  const {setNotifications,notifications} = useSocket();
   const [isSeen, setIsSeen]= useState(notify?.seen);
 
   const handleClick = async () => {
@@ -23,8 +23,12 @@ const NotificationItem = ({ notify }) => {
       router.push(`/user/profile?id=${notify?.refUser?._id}`)
     }
     if(!notify?.seen) {
-      await markNotificationAsRead({notificationId: notify?._id});
-      
+      const res = await markNotificationAsRead({notificationId: notify?._id});
+      const updatedNotifications = notifications.map((notification) => 
+        notification._id === notify?._id ? res : notification
+      );
+
+      setNotifications(updatedNotifications);
     }
   }
 
