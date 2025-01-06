@@ -34,12 +34,9 @@ export const createGroupChat = async ({ userId, participants, chatName }) => {
 };
 
 export const getChatDetails = async ({ chatId }) => {
-  try {
     const chat = await getRequest(`${baseUrl}/chats/details/${chatId}`);
     return chat.data;
-  } catch (error) {
-    toast.error(error.response.data.message);
-  }
+
 };
 
 export const updateChatName = async ({ chatId, chatName }) => {
@@ -67,6 +64,20 @@ export const updateChatAvatar = async ({ chatId, avatar }) => {
     toast.error(error.response.data.message);
   }
 };
+
+export const updateChatBackground = async ({chatId, background}) => {
+  try {
+    const formData = new FormData();
+    formData.append("background", background);
+    const chat = await patchRequest(
+      `${baseUrl}/chats/chat-background/${chatId}`,
+      formData
+    );
+    return chat.data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+  }
+}
 
 export const addGroupMember = async ({ chatId, participants }) => {
   try {

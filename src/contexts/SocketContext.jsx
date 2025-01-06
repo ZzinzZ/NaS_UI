@@ -31,6 +31,7 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider = ({ children, userId }) => {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [messageLoading, setMessageLoading] = useState(false);
   const [newMessage, setNewMessage] = useState(null);
   const [receiveMessage, setReceiveMessage] = useState(0);
   const [reactedMessage, setReactedMessage] = useState(null);
@@ -47,11 +48,14 @@ export const SocketProvider = ({ children, userId }) => {
   const [chatLibrary, setChatLibrary] = useState([]);
   const [hasMore, setHasMore] = useState(false);
   const [blockedChat, setBlockedChat] = useState(null);
+  const [chat, setChat] = useState(null);
+  const [updateChat, setUpdateChat] = useState(null);
 
-  const chat = useSelector((state) => state.chat.chatData);
+  // const chat = useSelector((state) => state.chat.chatData);
   const { user = null } = useSelector((state) => state.auth ?? {});
 
   const [onlineUsers, setOnlineUsers] = useState([]);
+  
 
   useEffect(() => {
     if (!userId) return;
@@ -91,6 +95,7 @@ export const SocketProvider = ({ children, userId }) => {
   }
 
   const getChatMessage = async () => {
+    setMessageLoading(true);
     try {
       const response = await getMessageByChatId({
         chatId: chat?._id,
@@ -100,6 +105,9 @@ export const SocketProvider = ({ children, userId }) => {
       setHasMore(response?.hasMore);
     } catch (error) {
       console.log(error);
+    }
+    finally{
+      setMessageLoading(false);
     }
   };
 
@@ -654,6 +662,8 @@ export const SocketProvider = ({ children, userId }) => {
     <SocketContext.Provider
       value={{
         socket,
+        chat,
+        setChat,
         onlineUsers,
         newMessage,
         messages,
@@ -705,7 +715,10 @@ export const SocketProvider = ({ children, userId }) => {
         unBlockUserSocket,
         leaveGroupSocket,
         chatLeaved,
-        leaveChatEvent
+        leaveChatEvent,
+        updateChat,
+        setUpdateChat,
+        messageLoading
       }}
     >
       {children}

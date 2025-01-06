@@ -8,7 +8,6 @@ import {
   useMediaQuery,
   useTheme,
   Fab,
-  Badge,
   Button,
 } from "@mui/material";
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -25,11 +24,12 @@ import ChatDrawer from "./ChatDrawer";
 import { useSocket } from "@/contexts/SocketContext";
 import Message from "./Message";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getChatDetails } from "@/redux/thunks/chatThunk";
 import { toast } from "react-toastify";
 import { useStringee } from "@/contexts/StringeeContext";
 import { findMessageByKeyword } from "@/utils/services/messageService/message.service";
 import SearchInput from "./SearchInput";
+import { getChatDetails } from "@/utils/services/chatService/chatService";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const drawerWidth = 240;
 
@@ -37,7 +37,7 @@ const Conversation = ({ isDeleteMessages }) => {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("chat-id");
   const [isActive, setIsActive] = useState(false);
-  const [chat, setChat] = useState();
+  // const [chat, setChat] = useState();
   const [open, setOpen] = useState(false);
   const [listMember, setLisMember] = useState([]);
   const [otherParticipant, setOtherParticipant] = useState();
@@ -62,9 +62,11 @@ const Conversation = ({ isDeleteMessages }) => {
     loadMoreChatMessage,
     hasMore,
     blockedChat,
+    chat,
+    setChat,
+    messageLoading,
   } = useSocket();
   const { makeCall } = useStringee();
-  const dispatch = useDispatch();
   const router = useRouter();
   const lastMessageRef = useRef(null);
   const messageRefs = useRef({});
@@ -77,17 +79,6 @@ const Conversation = ({ isDeleteMessages }) => {
   const theme = useTheme();
   const isTabletOrPhone = useMediaQuery(theme.breakpoints.down("md"));
 
-  const chatDetails = async () => {
-    try {
-      const response = await dispatch(getChatDetails({ chatId })).unwrap();
-
-      setChat(response?.chat);
-      setLisMember(response?.chat?.participants || []);
-    } catch (error) {
-      toast.error("Không thể lấy chi tiết cuộc trò chuyện:", error);
-    }
-  };
-
   const scrollToMessage = (messageId) => {
     if (messageRefs.current[messageId]) {
       messageRefs.current[messageId].scrollIntoView({
@@ -96,6 +87,28 @@ const Conversation = ({ isDeleteMessages }) => {
       });
     }
   };
+
+  const getChat = async (chatId) => {
+    try {
+      const response = await getChatDetails({ chatId });
+      setChat(response?.chat);
+    } catch (error) {
+      toast.error("Chat not found!");
+      router.push("/user");
+    }
+  };
+
+  useEffect(() => {
+    if (!chat) {
+      getChat(chatId);
+    }
+  }, [chat]);
+
+  useEffect(() => {
+    return () => {
+      setChat(null);
+    };
+  }, []);
 
   useEffect(() => {
     if (chat?.type === "group") {
@@ -116,13 +129,12 @@ const Conversation = ({ isDeleteMessages }) => {
           (participant) => participant?.userId === user?._id
         )
       ) {
-        
-        console.log(chat);
         router.push("/user");
       }
     }
+
     if (chat?.type === "private") {
-      const otherParticipant = listMember?.find(
+      const otherParticipant = chat?.participants?.find(
         (participant) => participant?.userId?._id !== user._id
       );
 
@@ -133,16 +145,6 @@ const Conversation = ({ isDeleteMessages }) => {
       setIsActive(isChatActive);
     }
   }, [onlineUsers, chat]);
-
-  useEffect(() => {
-    if (chatId !== undefined) {
-      const timeoutId = setTimeout(() => {
-        chatDetails(chatId);
-      }, 100);
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [chatId, isDeleteMessages]);
 
   useEffect(() => {
     if (messages?.length > 0 && lastMessageRef.current) {
@@ -308,6 +310,11 @@ const Conversation = ({ isDeleteMessages }) => {
           width: open ? `calc(100% - ${drawerWidth}px)` : "100%",
           height: { md: "100vh", sm: "100vh", xs: "100vh" },
           transition: "width 0.3s ease-out",
+          backgroundImage:
+            chat?.background !== "" ? `url(${chat?.background})` : "none",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
       >
         <Box
@@ -315,8 +322,10 @@ const Conversation = ({ isDeleteMessages }) => {
             position: "sticky",
             top: 0,
             zIndex: 1,
-            background: "#fff",
-            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            background: "rgba(255, 255, 255, 0.4)",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
           }}
         >
           <Stack
@@ -429,7 +438,8 @@ const Conversation = ({ isDeleteMessages }) => {
             flexGrow: 1,
             overflowY: "auto",
             padding: { md: "1rem", sm: "0.5rem", xs: "0.2rem" },
-            backgroundColor: "#f1f2f6",
+            backgroundColor:
+              chat?.background !== "" ? `transparent` : "#f1f2f6",
             "&::-webkit-scrollbar": {
               width: "6px",
               height: "6px",
@@ -447,84 +457,94 @@ const Conversation = ({ isDeleteMessages }) => {
             },
           }}
         >
-          {hasMore && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                marginBottom: "1rem",
-              }}
-            >
-              <Button onClick={handleLoadMore} disabled={!hasMore}>
-                Load More
-              </Button>
-            </Box>
-          )}
-          {messages?.length === 0 ? (
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-              height="100%"
-              textAlign="center"
-              color="text.secondary"
-              sx={{ opacity: 0.7 }}
-            >
-              <Typography variant="h5" gutterBottom>
-                No messages yet!
-              </Typography>
-              <Typography variant="body1">
-                Send the first message to start the conversation 🎉
-              </Typography>
-              <button
-                className="btn-17"
-                onClick={() => handleSendHello(user?._id, chat?._id)}
-              >
-                <span className="text-container">
-                  <span className="text">Hello 🙌</span>
-                </span>
-              </button>
-            </Box>
+          {messageLoading ? (
+            <Stack justifyContent="center" alignItems="center" sx={{ width: "100%" }}>
+              <CircularProgress />
+            </Stack>
           ) : (
             <>
-              {isSearching ? (
-                <Box sx={{ margin: "2rem 0" }}>
-                  <Box className="loader"></Box>
+              {hasMore && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <Button onClick={handleLoadMore} disabled={!hasMore}>
+                    Load More
+                  </Button>
+                </Box>
+              )}
+              {messages?.length === 0 ? (
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  height="100%"
+                  textAlign="center"
+                  color="#000"
+                  sx={{ opacity: 0.7, backgroundColor: "transparent" }}
+                >
+                  <Typography variant="h5" gutterBottom>
+                    No messages yet!
+                  </Typography>
+                  <Typography variant="body1">
+                    Send the first message to start the conversation 🎉
+                  </Typography>
+                  <button
+                    className="btn-17"
+                    onClick={() => handleSendHello(user?._id, chat?._id)}
+                  >
+                    <span className="text-container">
+                      <span className="text">Hello 🙌</span>
+                    </span>
+                  </button>
                 </Box>
               ) : (
-                messages?.map((message) => (
-                  <Message
-                    key={message?._id}
-                    scrollToMessage={scrollToMessage}
-                    ref={(el) => {
-                      if (el) {
-                        messageRefs.current[message?._id] = el;
-                      }
-                    }}
-                    message={message}
-                    setRefMessage={setRefMessage}
-                    isBlockedBy={isBlockedBy}
-                    isSearchResult={searchResults?.some(
-                      (result) => result?._id === message?._id
-                    )}
-                    isCurrentSearchResult={
-                      searchResults[currentSearchIndex]?._id === message?._id
-                    }
-                  />
-                ))
-              )}
-              <Box ref={lastMessageRef} />
-              {isBlockedBy && (
-                <Stack justifyContent="center" sx={{ width: "100%" }}>
-                  <Typography sx={{ color: "red", textAlign: "center" }}>
-                    Messages cannot currently be sent to this user
-                  </Typography>
-                </Stack>
+                <>
+                  {isSearching ? (
+                    <Box sx={{ margin: "2rem 0" }}>
+                      <Box className="loader"></Box>
+                    </Box>
+                  ) : (
+                    messages?.map((message) => (
+                      <Message
+                        key={message?._id}
+                        scrollToMessage={scrollToMessage}
+                        ref={(el) => {
+                          if (el) {
+                            messageRefs.current[message?._id] = el;
+                          }
+                        }}
+                        message={message}
+                        setRefMessage={setRefMessage}
+                        isBlockedBy={isBlockedBy}
+                        isSearchResult={searchResults?.some(
+                          (result) => result?._id === message?._id
+                        )}
+                        isCurrentSearchResult={
+                          searchResults[currentSearchIndex]?._id ===
+                          message?._id
+                        }
+                      />
+                    ))
+                  )}
+                  <Box ref={lastMessageRef} />
+                  {isBlockedBy && (
+                    <Stack justifyContent="center" sx={{ width: "100%" }}>
+                      <Typography sx={{ color: "red", textAlign: "center" }}>
+                        Messages cannot currently be sent to this user
+                      </Typography>
+                    </Stack>
+                  )}
+                </>
               )}
             </>
           )}
         </Box>
+
         {showScrollButton && (
           <Stack sx={{ width: "100%", position: "relative" }}>
             <Fab
@@ -624,7 +644,9 @@ const Conversation = ({ isDeleteMessages }) => {
           sx={{
             position: "sticky",
             zIndex: 1,
-            background: "#fff",
+            background: "rgba(255, 255, 255, 0.4)",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+            backdropFilter: "blur(10px)",
           }}
         >
           <InputChat
@@ -639,7 +661,7 @@ const Conversation = ({ isDeleteMessages }) => {
           handleDrawerClose={handleDrawerClose}
           chat={chat}
           onUpdate={setChat}
-          listMember={listMember}
+          listMember={chat?.participants}
           setLisMember={setLisMember}
           isBlocked={isBlocked}
           setIsBlocked={setIsBlocked}
